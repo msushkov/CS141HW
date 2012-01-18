@@ -7,43 +7,43 @@ public class Server implements Runnable, Queueable {
 	public static final int STATE_NO_TOKEN = 1;
 
 	private int state;
-	private LinkedBlockingDeque<Message> input_queue;
-	private LinkedList<Message> request_queue;
-	private int running_clients;
+	private LinkedBlockingDeque<Message> inputQueue;
+	private LinkedList<Message> requestQueue;
+	private int runningClients;
 
 	public Server(int numClients) {
 		state = STATE_TOKEN;
-		running_clients = numClients;
+		runningClients = numClients;
 
-		input_queue = new LinkedBlockingDeque<Message>();
-		request_queue = new LinkedList<Message>();
+		inputQueue = new LinkedBlockingDeque<Message>();
+		requestQueue = new LinkedList<Message>();
 	}
 
 	@Override
 	public void addMessage(Message m) {
-		input_queue.add(m);
+		inputQueue.add(m);
 	}
 
 	@Override
 	public void run() {
 		try {
-			while (running_clients > 0) {
-				Message m = input_queue.takeFirst();
+			while (runningClients > 0) {
+				Message m = inputQueue.takeFirst();
 
 				if (m.getType() == Message.MESSAGE_TERMINATION) {
-					running_clients--;
+					runningClients--;
 					System.out.println(Main.getSimTime() + " " + "Server: termination received");
 				} else if (m.getType() == Message.MESSAGE_TOKEN) {
 					state = STATE_TOKEN;
 					System.out.println(Main.getSimTime() + " " + "Server: token returned");
 				} else if (m.getType() == Message.MESSAGE_REQUEST) {
-					request_queue.add(m);
+					requestQueue.add(m);
 					System.out.println(Main.getSimTime() + " " + "Server: token requested");
 				}
 
-				if (!request_queue.isEmpty() && state == STATE_TOKEN) {
+				if (!requestQueue.isEmpty() && state == STATE_TOKEN) {
 					System.out.println(Main.getSimTime() + " " + "Server: sending token");
-					request_queue.poll().getSender().addMessage(
+					requestQueue.poll().getSender().addMessage(
 							new Message(Message.MESSAGE_REQUEST, this));
 					state = STATE_NO_TOKEN;
 				}

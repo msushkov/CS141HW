@@ -2,26 +2,20 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class Client implements Runnable, Queueable {
 
-	public static final int STATE_THINKING = 0;
-	public static final int STATE_HUNGRY = 1;
-	public static final int STATE_EATING = 2;
+	private final int maxThinkingTime = 195;
+	private final int minThinkingTime = 205;
+	private final int maxEatingTime = 15;
+	private final int minEatingTime = 25;
 
-	private final int max_thinking_time = 195;
-	private final int min_thinking_time = 205;
-	private final int max_eating_time = 15;
-	private final int min_eating_time = 25;
-
-	private int state;
 	private final int iterations;
-	private LinkedBlockingDeque<Message> input_queue;
+	private LinkedBlockingDeque<Message> inputQueue;
 	private Server server;
 
 	public Client(int its, Server s) {
-		state = STATE_THINKING;
 		iterations = its;
 
 		server = s;
-		input_queue = new LinkedBlockingDeque<Message>();
+		inputQueue = new LinkedBlockingDeque<Message>();
 	}
 
 	@Override
@@ -29,12 +23,11 @@ public class Client implements Runnable, Queueable {
 		try {
 			for (int i = 0; i < iterations; i++) {
 				// Thinking state
-				state = STATE_THINKING;
 				long time = Main.getSimTime();
 
 				// Sleep for a random time
-				int rand_time = (int) (Math.random() * (max_thinking_time - min_thinking_time))
-						+ min_thinking_time;
+				int rand_time = (int) (Math.random() * (maxThinkingTime - minThinkingTime))
+						+ minThinkingTime;
 				System.out.println(Main.getSimTime() + " " + Thread.currentThread() + ": Thinking for "
 						+ rand_time);
 
@@ -42,7 +35,6 @@ public class Client implements Runnable, Queueable {
 				Main.updateThinkingTime(Main.getSimTime() - time);
 				
 				// Hungry state
-				state = STATE_HUNGRY;
 				time = Main.getSimTime();
 				System.out.println(Main.getSimTime() + " " + Thread.currentThread() + ": Hungry");
 
@@ -51,16 +43,15 @@ public class Client implements Runnable, Queueable {
 
 				// Wait for request to be returned. Our input queue should be
 				// empty unless there is a token in it.
-				input_queue.takeFirst();
+				inputQueue.takeFirst();
 				System.out.println(Main.getSimTime() + " " + Thread.currentThread()
 						+ ": Received request token");
 				Main.updateHungryTime(Main.getSimTime() - time);
 				
 				// Eating state
-				state = STATE_EATING;
 				time = Main.getSimTime();
-				rand_time = (int) (Math.random() * (max_eating_time - min_eating_time))
-						+ min_eating_time;
+				rand_time = (int) (Math.random() * (maxEatingTime - minEatingTime))
+						+ minEatingTime;
 				System.out.println(Main.getSimTime() + " " + Thread.currentThread() + ": Eating for "
 						+ rand_time);
 				
@@ -82,11 +73,7 @@ public class Client implements Runnable, Queueable {
 
 	@Override
 	public void addMessage(Message m) {
-		input_queue.add(m);
+		inputQueue.add(m);
 
-	}
-
-	public int getState() {
-		return state;
 	}
 }
