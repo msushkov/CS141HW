@@ -1,41 +1,45 @@
 public class Main {
-	private static long nano_start_time;
-	private static double average_eat_time;
-	private static double num_eat_measurements;
-	private static double average_think_time;
-	private static double num_think_measurements;
-	private static double average_hungry_time;
-	private static double num_hungry_measurements;
+
+	private static long nanoStartTime;
+	private static double averageEatTime;
+	private static double numEatMeasurements;
+	private static double averageThinkTime;
+	private static double numThinkMeasurements;
+	private static double averageHungryTime;
+	private static double numHungryMeasurements;
 
 	public static long getSimTime() {
 		// Use nanotime for better granularity and convert to milliseconds
-		return (System.nanoTime() - nano_start_time) / 1000000L;
+		return (System.nanoTime() - nanoStartTime) / 1000000L;
 	}
 
 	public static void updateEatTime(long time) {
-		average_eat_time = (num_eat_measurements * average_eat_time + (double) time)
-				/ (num_eat_measurements + 1);
-		num_eat_measurements += 1.0;
+		averageEatTime = (numEatMeasurements * averageEatTime + (double) time)
+				/ (numEatMeasurements + 1);
+		numEatMeasurements += 1.0;
 	}
 
 	public static void updateHungryTime(long time) {
-		average_hungry_time = (num_hungry_measurements * average_hungry_time + (double) time)
-				/ (num_hungry_measurements + 1);
-		num_hungry_measurements += 1.0;
+		averageHungryTime = (numHungryMeasurements * averageHungryTime + (double) time)
+				/ (numHungryMeasurements + 1);
+		numHungryMeasurements += 1.0;
 	}
 
 	public static void updateThinkingTime(long time) {
-		average_think_time = (num_think_measurements * average_think_time + (double) time)
-				/ (num_think_measurements + 1);
-		num_think_measurements += 1.0;
+		averageThinkTime = (numThinkMeasurements * averageThinkTime + (double) time)
+				/ (numThinkMeasurements + 1);
+		numThinkMeasurements += 1.0;
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		nano_start_time = System.nanoTime();
-		num_hungry_measurements = num_think_measurements = num_eat_measurements = average_eat_time = average_think_time = average_hungry_time = 0.0;
+		nanoStartTime = System.nanoTime();
+		numHungryMeasurements = numThinkMeasurements = 0.0;
+		numEatMeasurements = averageEatTime = 0.0;
+		averageThinkTime = averageHungryTime = 0.0;
+
 		int numClients = 100;
 
 		Server s = new Server(numClients);
@@ -52,17 +56,17 @@ public class Main {
 		for (int i = 0; i < clients.length; i++) {
 			new Thread(clients[i], "Client " + i).start();
 		}
-		
+
 		try {
 			t.join();
 		} catch (InterruptedException e) {
 			// This should never happen
 			e.printStackTrace();
 		}
-		
-		System.out.println("Average eating time: " + average_eat_time);
-		System.out.println("Average thinking time: " + average_think_time);
-		System.out.println("Average hungry time: " + average_hungry_time);
+
+		System.out.println("Average eating time: " + averageEatTime);
+		System.out.println("Average thinking time: " + averageThinkTime);
+		System.out.println("Average hungry time: " + averageHungryTime);
 	}
 
 }
