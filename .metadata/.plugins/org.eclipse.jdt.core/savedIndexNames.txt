@@ -1,16 +1,2 @@
-INDEX VERSION 1.126+D:\My Documents\Dropbox\Caltech\Caltech Classes\CS\CS 141b\Git Repo\CS141HW\.metadata\.plugins\org.eclipse.jdt.core
-1896129790.index
-1801258344.index
-3379803251.index
-3203845365.index
-1029812341.index
-924985868.index
-1018460045.index
-11625921.index
-3906231413.index
-1347875669.index
-1537758335.index
-2288688875.index
-744979032.index
-2628215972.index
-2481355036.index
+INDEX VERSION 1.126+/Users/msushkov/Dropbox/Caltech/Caltech Classes/CS/CS 141b/Git Repo/CS141HW/.metadata/.plugins/org.eclipse.jdt.core
+3195597527.index
