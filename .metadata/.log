@@ -1,0 +1,12 @@
+!SESSION 2012-01-17 16:24:37.003 -----------------------------------------------
+eclipse.buildId=I20110613-1736
+java.version=1.6.0_27
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -data D:\My Documents\Dropbox\Caltech\Caltech Classes\CS\CS 141b\Git Repo\CS141HW -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.google.gdt.eclipse.suite 1 0 2012-01-17 16:24:41.246
+!MESSAGE Registering: com.google.appengine.eclipse.sdkbundle_1.5.3.r37v201108301710
+
+!ENTRY com.google.gdt.eclipse.suite 1 0 2012-01-17 16:24:41.389
+!MESSAGE Registering: com.google.gwt.eclipse.sdkbundle_2.4.0.r37v201108301710
