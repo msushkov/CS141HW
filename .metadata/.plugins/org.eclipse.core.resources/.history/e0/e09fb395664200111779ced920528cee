@@ -55,6 +55,7 @@ public class Server implements Runnable {
 						total = total + averageHungerTimes[i];
 
 					System.out.println("The average hungry time was " + total/numClients);
+					System.out.print(total/numClients);
 					break;
 				}
 				// wait for a request until we get one

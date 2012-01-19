@@ -1,8 +1,5 @@
 import java.util.concurrent.ArrayBlockingQueue;
 
-/*
- * Server thread creates n clients.
- */
 public class Server implements Runnable {
 	int numClients;
 	int finishedClients = 0;
@@ -29,40 +26,30 @@ public class Server implements Runnable {
 			threads[i] = new Thread(clients[i]);
 			threads[i].start();
 		}
-		// Adding initial token of value 0
+		// Adding intial token of value 0
 		token.add(0);
 	}
 
 	public void run() {
-		// Holds the ID of the next client to be given the token
-		int clientId;	 
-		
+		int clientId;	 // Holds the ID of the next client to be given the token
 		while (true) {
 			try {
-				// wait for the token until we acquire it
 				int value = token.take();
-				
-				// if we are done calculate avg hungry time and break
 				if (finishedClients == numClients) {
-					// Making sure we receive client data
 					Thread.sleep(500);
-					
-					System.out.println("THE END");
-					
-					// calculate avg hungry time
+					//System.out.println("THE END");
 					long total = 0;
-					for (int i = 0; i < numClients; i++)
+					for (int i = 0; i < numClients; i++) {
 						total = total + averageHungerTimes[i];
-
-					System.out.println("The average hungry time was " + total/numClients);
+					}
+					//System.out.println("The average hunger time was " + total/numClients);
+					System.out.print(total/numClients);
 					break;
 				}
-				// wait for a request until we get one
 				clientId = queue.take();
-				
-				// send the token to the appropriate client
 				clients[clientId].getToken(value);
 				
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
