@@ -1,62 +1,62 @@
 public class Main {
 
-	private static long nanoStartTime;
-	private static double averageEatTime;
-	private static double numEatMeasurements;
-	private static double averageThinkTime;
-	private static double numThinkMeasurements;
-	private static double averageHungryTime;
-	private static double numHungryMeasurements;
+	private static long startTime;
+	private static double avgEatT;
+	private static double numEats;
+	private static double avgThinkT;
+	private static double numThinks;
+	private static double avgHungryT;
+	private static double numHungrys;
 
 	public static long getSimTime() {
 		// Use nanotime for better granularity and convert to milliseconds
-		return (System.nanoTime() - nanoStartTime) / 1000000L;
+		return (System.nanoTime() - startTime) / 1000000L;
 	}
 
+	// My averages update as you go along
 	public static void updateEatTime(long time) {
-		averageEatTime = (numEatMeasurements * averageEatTime + (double) time)
-				/ (numEatMeasurements + 1);
-		numEatMeasurements += 1.0;
+		avgEatT = (numEats * avgEatT + (double) time)
+				/ (numEats + 1);
+		numEats += 1.0;
 	}
 
 	public static void updateHungryTime(long time) {
-		averageHungryTime = (numHungryMeasurements * averageHungryTime + (double) time)
-				/ (numHungryMeasurements + 1);
-		numHungryMeasurements += 1.0;
+		avgHungryT = (numHungrys * avgHungryT + (double) time)
+				/ (numHungrys + 1);
+		numHungrys += 1.0;
 	}
 
 	public static void updateThinkingTime(long time) {
-		averageThinkTime = (numThinkMeasurements * averageThinkTime + (double) time)
-				/ (numThinkMeasurements + 1);
-		numThinkMeasurements += 1.0;
+		avgThinkT = (numThinks * avgThinkT + (double) time)
+				/ (numThinks + 1);
+		numThinks += 1.0;
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		nanoStartTime = System.nanoTime();
-		numHungryMeasurements = numThinkMeasurements = 0.0;
-		numEatMeasurements = averageEatTime = 0.0;
-		averageThinkTime = averageHungryTime = 0.0;
+		startTime = System.nanoTime();
+		numHungrys = numThinks = 0.0;
+		numEats = avgEatT = 0.0;
+		avgThinkT = avgHungryT = 0.0;
 
 		int numClients = 100;
 
+		// Set up the server
 		Server s = new Server(numClients);
-
+		Thread t = new Thread(s, "Server");
+		t.start();
+		
+		// Start the clients
 		Client[] clients = new Client[numClients];
 
 		for (int i = 0; i < clients.length; i++) {
 			clients[i] = new Client(10, s);
-		}
-
-		Thread t = new Thread(s, "Server");
-		t.start();
-
-		for (int i = 0; i < clients.length; i++) {
 			new Thread(clients[i], "Client " + i).start();
 		}
 
+		// Wait for the server (and thus the clients) to stop running
 		try {
 			t.join();
 		} catch (InterruptedException e) {
@@ -64,9 +64,10 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		System.out.println("Average eating time: " + averageEatTime);
-		System.out.println("Average thinking time: " + averageThinkTime);
-		System.out.println("Average hungry time: " + averageHungryTime);
+		// Print results
+		System.out.println("Average eating time: " + avgEatT);
+		System.out.println("Average thinking time: " + avgThinkT);
+		System.out.println("Average hungry time: " + avgHungryT);
 	}
 
 }

@@ -2,78 +2,86 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class Client implements Runnable, Queueable {
 
-	private final int maxThinkingTime = 195;
-	private final int minThinkingTime = 205;
-	private final int maxEatingTime = 15;
-	private final int minEatingTime = 25;
+	private final int maxThinkT = 195;
+	private final int minThinkT = 205;
+	private final int maxEatT = 15;
+	private final int minEatT = 25;
 
-	private final int iterations;
-	private LinkedBlockingDeque<Message> inputQueue;
+	private final int iters;
+	private LinkedBlockingDeque<Message> inQueue;
 	private Server server;
 
 	public Client(int its, Server s) {
-		iterations = its;
+		iters = its;
 
 		server = s;
-		inputQueue = new LinkedBlockingDeque<Message>();
+		inQueue = new LinkedBlockingDeque<Message>();
 	}
 
 	@Override
 	public void run() {
 		try {
-			for (int i = 0; i < iterations; i++) {
+			for (int i = 0; i < iters; i++) {
 				// Thinking state
+				// Calculate simulation time
 				long time = Main.getSimTime();
 
 				// Sleep for a random time
-				int rand_time = (int) (Math.random() * (maxThinkingTime - minThinkingTime))
-						+ minThinkingTime;
-				System.out.println(Main.getSimTime() + " " + Thread.currentThread() + ": Thinking for "
+				int rand_time = (int) (Math.random() * (maxThinkT - minThinkT))
+						+ minThinkT;
+				System.out.println(Main.getSimTime() + " "
+						+ Thread.currentThread() + ": Thinking for "
 						+ rand_time);
-
 				Thread.sleep(rand_time);
-				Main.updateThinkingTime(Main.getSimTime() - time);
 				
+				Main.updateThinkingTime(Main.getSimTime() - time);
+
 				// Hungry state
 				time = Main.getSimTime();
-				System.out.println(Main.getSimTime() + " " + Thread.currentThread() + ": Hungry");
+				System.out.println(Main.getSimTime() + " "
+						+ Thread.currentThread() + ": Hungry");
 
 				// Send request to server
 				server.addMessage(new Message(Message.MESSAGE_REQUEST, this));
 
 				// Wait for request to be returned. Our input queue should be
 				// empty unless there is a token in it.
-				inputQueue.takeFirst();
-				System.out.println(Main.getSimTime() + " " + Thread.currentThread()
-						+ ": Received request token");
+				inQueue.takeFirst();
+				System.out.println(Main.getSimTime() + " "
+						+ Thread.currentThread() + ": Received request token");
 				Main.updateHungryTime(Main.getSimTime() - time);
-				
+
 				// Eating state
 				time = Main.getSimTime();
-				rand_time = (int) (Math.random() * (maxEatingTime - minEatingTime))
-						+ minEatingTime;
-				System.out.println(Main.getSimTime() + " " + Thread.currentThread() + ": Eating for "
-						+ rand_time);
 				
+				// Eat for a random time
+				rand_time = (int) (Math.random() * (maxEatT - minEatT))
+						+ minEatT;
+				System.out.println(Main.getSimTime() + " "
+						+ Thread.currentThread() + ": Eating for " + rand_time);
+
 				Thread.sleep(rand_time);
 
-				System.out.println(Main.getSimTime() + " " + Thread.currentThread()
-						+ ": Returning request token");
+				System.out.println(Main.getSimTime() + " "
+						+ Thread.currentThread() + ": Returning request token");
 				Main.updateEatTime(Main.getSimTime() - time);
+				// Return token
 				server.addMessage(new Message(Message.MESSAGE_TOKEN, this));
 			}
 		} catch (InterruptedException e) {
 			// This should never happen
 			e.printStackTrace();
 		} finally {
-			System.out.println(Main.getSimTime() + " " + Thread.currentThread() + ": Terminating");
+			System.out.println(Main.getSimTime() + " " + Thread.currentThread()
+					+ ": Terminating");
 			server.addMessage(new Message(Message.MESSAGE_TERMINATION, this));
 		}
 	}
 
+	// Add a message to the input queue
 	@Override
 	public void addMessage(Message m) {
-		inputQueue.add(m);
+		inQueue.add(m);
 
 	}
 }
