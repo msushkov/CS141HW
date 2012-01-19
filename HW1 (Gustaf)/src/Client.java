@@ -11,7 +11,7 @@ public class Client implements Runnable {
 	
 	int minE = 15;      // min time to be eating
 	int diffE = 10;     // max difference
-	int M = 10;   		// Number of times client wants to "eat"
+	int M = 20;   		// Number of times client wants to "eat"
 	long[] hungryTimes = new long[M];
 	
 	
@@ -50,7 +50,7 @@ public class Client implements Runnable {
 
 			}
 			catch (InterruptedException e) {
-				System.out.println("Interrupted!");
+				e.printStackTrace();			
 			}
 			
 		}

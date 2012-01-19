@@ -36,21 +36,22 @@ public class Server implements Runnable {
 			try {
 				int value = token.take();
 				if (finishedClients == numClients) {
-					Thread.sleep(2000);
-					System.out.println("THE END");
+					Thread.sleep(500);
+					//System.out.println("THE END");
 					long total = 0;
 					for (int i = 0; i < numClients; i++) {
 						total = total + averageHungerTimes[i];
 					}
-					System.out.println("The average hunger time was " + total/numClients);
+					//System.out.println("The average hunger time was " + total/numClients);
+					System.out.print(total/numClients);
 					break;
 				}
 				clientId = queue.take();
 				clients[clientId].getToken(value);
 				
 
-			} catch (Exception e) {
-					
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -70,7 +71,8 @@ public class Server implements Runnable {
 		try {
 			// Record the request by placing the ID of the client in the queue.
 			queue.put(cId);
-		} catch (Exception e) {
+		} catch (InterruptedException e) {
+			e.printStackTrace();			
 		}
 	}
 	
