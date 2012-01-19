@@ -13,9 +13,4 @@ public class HW1 {
 		Thread s = new Thread(new Server(numClients));
 		s.start();
 	}
-	
-	public static void calculateAverages() {
-		
-		
-	}
 }
