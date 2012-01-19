@@ -16,14 +16,20 @@ public class Server implements Runnable {
 	// Clients and threads stored in arrays
 	private Client[] clients;
 	private Thread[] threads;
-	private long[] averageHungerTimes;
+	
+	// Variables holding the total of all clients' average times
+	private long hungerTimes = 0;
+	private long eatingTimes = 0;
+	private long thinkingTimes = 0;
 
 	public Server(int given_num_clients) {
+		// Construction initialising values and arrays
 		numClients = given_num_clients;
 		queue = new ArrayBlockingQueue<Integer>(numClients);
 		clients = new Client[numClients];
 		threads = new Thread[numClients];
-		averageHungerTimes = new long[numClients];
+		
+		// Create and start the clients as threads and save both the thread and client objects in arrays
 		for (int i = 0; i < numClients; i++) {
 			clients[i] = new Client(this, i);
 			threads[i] = new Thread(clients[i]);
@@ -44,17 +50,6 @@ public class Server implements Runnable {
 				
 				// if we are done calculate avg hungry time and break
 				if (finishedClients == numClients) {
-					// Making sure we receive client data
-					Thread.sleep(500);
-					
-					System.out.println("THE END");
-					
-					// calculate avg hungry time
-					long total = 0;
-					for (int i = 0; i < numClients; i++)
-						total = total + averageHungerTimes[i];
-
-					System.out.println("The average hungry time was " + total/numClients);
 					break;
 				}
 				// wait for a request until we get one
@@ -67,19 +62,42 @@ public class Server implements Runnable {
 				e.printStackTrace();
 			}
 		}
+		
+		// Wait for all clients (specifically the last) to finish reporting their average times 
+		for (int i = 0; i < numClients; i++) {
+			try {
+				threads[i].join();	
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		// Calculating and printint the average times for thinking, hunger and eating
+		System.out.println("Average thinking time was " + thinkingTimes / numClients + " ns");
+		System.out.println("Average hunger time was " + hungerTimes / numClients + " ns");
+		System.out.println("Average eating time was " + eatingTimes / numClients + " ns");
+		
+		System.out.println("Server finished.");
 	}
 	
+	// Gets the token back from a client and a boolean indicating if the client is full
 	public void getToken(int x, boolean done) {
 		token.add(x);
+		
+		// If the client reports done record this
 		if (done) {
 			finishedClients++;
 		}
 	}
 	
-	public void getAverageHunger(int cId, long time) {
-		averageHungerTimes[cId] = time;
+	// Receives the average times from a client and adds their times to the total count
+	public void getAverageTimes(long thinking, long hungry, long eating) {
+		thinkingTimes += thinking;
+		hungerTimes += hungry;
+		eatingTimes += eating;
 	}
 	
+	// Gets the ID of a client wanting the token and puts this in the queue
 	public void request(int cId) {
 		try {
 			// Record the request by placing the ID of the client in the queue.

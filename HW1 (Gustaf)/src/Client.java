@@ -3,18 +3,24 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class Client implements Runnable {
 	
-	private int id;
-	Server controller;
+	private int id; // the ID of the client
+	Server controller;  // the server the client belongs to
 	Random rand = new Random();
+	
 	int minH = 195; 	// min time to be thinking
 	int diffH = 10; 	// max difference
 	
 	int minE = 15;      // min time to be eating
 	int diffE = 10;     // max difference
-	int M = 20;   		// Number of times client wants to "eat"
-	long[] hungryTimes = new long[M];
 	
+	int M = 20;   		// Number of times a client wants to "eat"
 	
+	// Time variables keeping track of how long a client has been thinking, hungry and eating respectively
+	long totalThinkingTime = 0;
+	long totalHungryTime = 0;
+	long totalEatingTime = 0;
+	
+	// The client's private blocking queue for the token
 	private ArrayBlockingQueue<Integer> token = new ArrayBlockingQueue<Integer>(1);
 
 	
@@ -25,28 +31,37 @@ public class Client implements Runnable {
 		for (int i = 0; i < M; i++) {
 			try {
 				// Thinking
+				long thinkingStart = System.nanoTime();  // record start of thinking
 				int thinkFor = minH + rand.nextInt(diffH);
-				Thread.sleep(thinkFor);
+				Thread.sleep(thinkFor);	// think for random time
+				long thinkingEnd = System.nanoTime();  // record end of thinking
 				
 				// Hungry
+				long hungerStart = System.nanoTime(); // record start of hunger
 				controller.request(id);
-				long hungerStart = System.nanoTime();
-				//System.out.print(System.nanoTime());
 				//System.out.println("requested and am " + id);
 				int value = token.take();
-				long hungerEnd = System.nanoTime();
+				long hungerEnd = System.nanoTime(); // record end of hunger
 				
 				// Eating
+				long eatingStart = System.nanoTime(); // record start of eating
 				int eatFor = minE + rand.nextInt(diffE);
 				//System.out.println("eating and am " + id);
 				Thread.sleep(eatFor);
+				long eatingEnd = System.nanoTime(); // record end of eating
 				
 				// Last run?
 				if (i == M - 1) {
 					done = true;
 				}
+				
+				// return the token to the server
 				controller.getToken(value, done);
-				hungryTimes[i] = hungerEnd - hungerStart;
+				
+				// record the thinking, hungry and eating times for the round
+				totalThinkingTime += thinkingEnd - thinkingStart;
+				totalHungryTime += hungerEnd - hungerStart;
+				totalEatingTime += eatingEnd - eatingStart;
 
 			}
 			catch (InterruptedException e) {
@@ -55,13 +70,10 @@ public class Client implements Runnable {
 			
 		}
 		//System.out.println("done and am " + id);
-		long totalHTime = 0;
-		for (int i=0; i < M; i++) {
-			totalHTime = totalHTime + hungryTimes[i];
-		}
-		long average = totalHTime / M;
-		controller.getAverageHunger(id, average);
-		//System.out.println("Average hunger time for " + id + "was " + average);
+		long averageThinking = totalThinkingTime / M;
+		long averageHunger = totalHungryTime / M;
+		long averageEating = totalEatingTime / M;
+		controller.getAverageTimes(averageThinking, averageHunger, averageEating);
 		
 	}
 	

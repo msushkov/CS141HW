@@ -5,7 +5,7 @@
 public class HW1 {
 	
 	// specifies how many clients server will create
-	private static final int numClients = 2;
+	private static final int numClients = 10;
 	
 	public static void main(String[] args) {
 		// create server thread
