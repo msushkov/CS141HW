@@ -4,6 +4,7 @@
 		<item value="false" key="WizardFileSystemResourceImportPage1.STORE_OVERWRITE_EXISTING_RESOURCES_ID"/>
 		<item value="false" key="WizardFileSystemResourceImportPage1.STORE_CREATE_CONTAINER_STRUCTURE_ID"/>
 		<list key="WizardFileSystemResourceImportPage1.STORE_SOURCE_NAMES_ID">
+			<item value="/Users/msushkov/Dropbox/Caltech/Caltech Classes/CS/CS 141b/Git Repo/CS141HW/hw2"/>
 			<item value="D:\My Documents\Dropbox\Caltech\Caltech Classes\CS\CS 141b\Git Repo\CS141HW"/>
 		</list>
 	</section>
