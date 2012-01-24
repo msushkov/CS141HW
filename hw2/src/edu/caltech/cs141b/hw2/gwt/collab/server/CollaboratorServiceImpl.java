@@ -93,9 +93,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
   @Override
   public UnlockedDocument saveDocument(LockedDocument doc)
     throws LockExpired {
+	Key key = doc.getKey();
     Entity document = new Entity (dsDoc);
     document.setProperty(dsTitle, doc.getTitle());
     document.setProperty(dsContent, doc.getContents());
+    System.out.println("key = " + doc.getKey());
     
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(document);
