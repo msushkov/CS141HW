@@ -37,6 +37,12 @@ public class Document {
 		content = doc.getContents();
 	}
 	
+	public Document(LockedDocument doc) {
+		title = doc.getTitle();
+		content = doc.getContents();
+	}
+	
+	
 	public void Update(UnlockedDocument doc) {
 		title = doc.getTitle();
 		content = doc.getContents();	

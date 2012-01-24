@@ -9,6 +9,8 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.LockExpired;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockUnavailable;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
+import edu.caltech.cs141b.hw2.gwt.collab.shared.Document;
+
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.appengine.api.datastore.DatastoreService;
@@ -25,6 +27,8 @@ import static com.google.appengine.api.datastore.FetchOptions.Builder.*;
 
 import java.util.Date;
 import java.util.ArrayList;
+
+import javax.jdo.PersistenceManager;
 /**
  * The server side implementation of the RPC service.
  */
@@ -36,6 +40,8 @@ import java.util.ArrayList;
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
     CollaboratorService {
   DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+  PersistenceManager pm = PMF.get().getPersistenceManager();
+
 
   private static final Logger log = Logger.getLogger(CollaboratorServiceImpl.class.toString());
   
@@ -93,11 +99,19 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
   @Override
   public UnlockedDocument saveDocument(LockedDocument doc)
     throws LockExpired {
-	Key key = doc.getKey();
+	String stringKey = doc.getKey();
+	Document toSave;
+	if (stringKey == null) {
+		toSave = new Document(doc);
+	} else {
+		Key key = KeyFactory.stringToKey(stringKey);
+		
+	}
+
+	
     Entity document = new Entity (dsDoc);
     document.setProperty(dsTitle, doc.getTitle());
     document.setProperty(dsContent, doc.getContents());
-    System.out.println("key = " + doc.getKey());
     
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(document);
