@@ -22,8 +22,6 @@ public class Client implements Runnable {
 	
 	// The client's private blocking queue for the token
 	private ArrayBlockingQueue<Integer> token = new ArrayBlockingQueue<Integer>(1);
-
-	
 	
 	public void run() {
 		boolean done = false; // set when the client has eaten M times
