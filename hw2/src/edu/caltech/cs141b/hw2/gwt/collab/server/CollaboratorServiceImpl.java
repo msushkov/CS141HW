@@ -1,4 +1,4 @@
-ckage edu.caltech.cs141b.hw2.gwt.collab.server;
+package edu.caltech.cs141b.hw2.gwt.collab.server;
 
 import java.util.List;
 import java.util.logging.Logger;
