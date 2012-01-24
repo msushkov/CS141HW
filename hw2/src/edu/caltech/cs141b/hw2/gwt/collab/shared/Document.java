@@ -42,8 +42,20 @@ public class Document {
 		content = doc.getContents();
 	}
 	
+	public String GetTitle() {
+		return title;
+	}
+	
+	public String GetKey() {
+		return KeyFactory.keyToString(docKey);
+	}
 	
 	public void Update(UnlockedDocument doc) {
+		title = doc.getTitle();
+		content = doc.getContents();	
+	}
+	
+	public void Update(LockedDocument doc) {
 		title = doc.getTitle();
 		content = doc.getContents();	
 	}

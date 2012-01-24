@@ -27,6 +27,7 @@ import static com.google.appengine.api.datastore.FetchOptions.Builder.*;
 
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 /**
@@ -51,23 +52,17 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
   private static final String dsContent = "content";
   private static final String dsLocked = "locked";
   private static final String dsLockedTil = "lockedTil";
-  ArrayList <DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
 
   
   
   @Override
   public List<DocumentMetadata> getDocumentList() {
-	  Query query = new Query(dsDoc);
-	  List<Entity> entityList = datastore.prepare(query).asList(withLimit(10));
-	  System.out.println(entityList);
-	  for (Entity entity:entityList) {
-		  String title = (String) entity.getProperty(dsTitle);
-		  DocumentMetadata doc = new DocumentMetadata("abc", title);
-		  docList.add(doc);
+	  ArrayList <DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
+	  Set<Document> documentSet = pm.getManagedObjects(Document.class);
+	  for (Document doc:documentSet) {
+		  DocumentMetadata metaDoc = new DocumentMetadata(doc.GetKey(),doc.GetTitle());
+		  docList.add(metaDoc);
 	  }
-	  
-	  System.out.println(datastore.getDatastoreAttributes());
-	  //DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     return docList;
   }
 
@@ -79,20 +74,15 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
   @Override
   public UnlockedDocument getDocument(String documentKey) {
-	Key docKey = KeyFactory.stringToKey(documentKey);
-    Entity doc;
+	Key key = KeyFactory.stringToKey(documentKey);
+	UnlockedDocument unlockedDoc;
 	try {
-		doc = datastore.get(docKey);
-	    String title = (String) doc.getProperty(dsTitle);
-	    String content = (String) doc.getProperty(dsContent);
-	    UnlockedDocument unlockedDoc = new UnlockedDocument(documentKey, title, content);
-	    return unlockedDoc;
-	} catch (EntityNotFoundException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+		Document doc = pm.getObjectById(Document.class, key);
+		unlockedDoc = doc.GetUnlocked();
+	} finally {
+		pm.close();
 	}
-
-    return null;
+    return unlockedDoc;
     
   }
 
@@ -105,18 +95,17 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		toSave = new Document(doc);
 	} else {
 		Key key = KeyFactory.stringToKey(stringKey);
+		toSave = pm.getObjectById(Document.class, key);
+		toSave.Update(doc);
+	}
+	try {
+		pm.makePersistent(toSave);
+	} finally {
+		pm.close();
 		
 	}
-
-	
-    Entity document = new Entity (dsDoc);
-    document.setProperty(dsTitle, doc.getTitle());
-    document.setProperty(dsContent, doc.getContents());
     
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    datastore.put(document);
-    
-    return doc.unlock();
+    return toSave.GetUnlocked();
   }
   
   @Override
