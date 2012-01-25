@@ -148,7 +148,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			throws LockUnavailable {
 		
 		String identity = getThreadLocalRequest().getRemoteAddr();
-		System.out.println("Identity = " + identity);
 		Document toSave;
 		pm = PMF.get().getPersistenceManager();
 		Transaction t = pm.currentTransaction();
