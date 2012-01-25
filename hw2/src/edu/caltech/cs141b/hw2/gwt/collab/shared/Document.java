@@ -30,7 +30,7 @@ public class Document {
 	private String lockedBy;
 	
 	@Persistent
-	private Date lockedTil;
+	private Date lockedUntil;
 	
 	public Document(UnlockedDocument doc) {
 		title = doc.getTitle();
@@ -62,12 +62,12 @@ public class Document {
 	
 	public void lock(Date lockedTil, String lockedBy) {
 		this.locked = true;
-		this.lockedTil = lockedTil;
+		this.lockedUntil = lockedTil;
 		this.lockedBy = lockedBy;
 	}
 	
 	public void unlock() {
-		this.lockedTil = null;
+		this.lockedUntil = null;
 		this.lockedBy = null;
 		this.locked = false;
 	}
@@ -78,9 +78,13 @@ public class Document {
 		return doc;
 	}
 	
+	public Date getLockedUntil() {
+		return this.lockedUntil;
+	}
+	
 	public LockedDocument getLocked() {
 		String keyString = KeyFactory.keyToString(docKey);
-		LockedDocument doc = new LockedDocument(lockedBy, lockedTil, keyString, title, content);
+		LockedDocument doc = new LockedDocument(lockedBy, lockedUntil, keyString, title, content);
 		return doc;
 	}
 	

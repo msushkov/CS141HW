@@ -10,6 +10,8 @@ import javax.jdo.Transaction;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService;
@@ -29,25 +31,24 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		CollaboratorService {
 	private PersistenceManager pm = PMF.get().getPersistenceManager();
 
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<DocumentMetadata> getDocumentList() {
 
 		pm = PMF.get().getPersistenceManager();
 		Query query = pm.newQuery(Document.class);
-		List<Document> documentList;
+		List<Document> documentList = new ArrayList<Document>();
 		ArrayList<DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
 		Transaction t = pm.currentTransaction();
 		try {
 			t.begin();
 			documentList = (List<Document>) query.execute();
-
 			for (Document doc : documentList) {
 				DocumentMetadata metaDoc = new DocumentMetadata(doc.GetKey(),
 						doc.getTitle());
 				docList.add(metaDoc);
 			}
+
 			t.commit();
 		} finally {
 			if (t.isActive()) {
@@ -142,13 +143,22 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			Key key = KeyFactory.stringToKey(documentKey);
 			toSave = pm.getObjectById(Document.class, key);
+
+			if (toSave.isLocked()
+					&& toSave.getLockedUntil().before(
+							new Date(System.currentTimeMillis()))) {
+				toSave.unlock();
+			}
+
 			if (toSave.isLocked()) {
 				throw new LockUnavailable(key + " is locked");
 			} else {
-				toSave.lock(new Date(System.currentTimeMillis() + 300000L), "GustafBryanMichael");
+				UserService userService = UserServiceFactory.getUserService();
+	
+				toSave.lock(new Date(System.currentTimeMillis() + 30000L), "BMG");
 				pm.makePersistent(toSave);
 			}
-			
+
 			t.commit();
 		} finally {
 			if (t.isActive()) {
@@ -156,7 +166,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			}
 			pm.close();
 		}
-		
+
 		return toSave.getLocked();
 	}
 
