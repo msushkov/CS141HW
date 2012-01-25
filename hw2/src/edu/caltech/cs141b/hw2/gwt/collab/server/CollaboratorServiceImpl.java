@@ -68,14 +68,25 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			pm.close();
 		}
 
-		return docList;
-	}
-
-	@Override
-	public LockedDocument lockDocument(String documentKey)
-			throws LockUnavailable {
-		return null;
-	}
+  
+  @Override
+  public List<DocumentMetadata> getDocumentList() {
+	  Query query = pm.newQuery(Document.class);
+	  List<Document> documentList;
+	  ArrayList<DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
+	  try {
+		  documentList = (List<Document >) query.execute();
+		  System.out.println("Document list = " + documentList);
+		  for (Document doc:documentList) {
+			  DocumentMetadata metaDoc = new DocumentMetadata(doc.GetKey(),doc.GetTitle());
+			  docList.add(metaDoc);
+		  }
+	  } finally {
+	        query.closeAll();
+	  }
+	System.out.println("Document list = " + docList);
+    return docList;
+  }
 
 	@Override
 	public UnlockedDocument getDocument(String documentKey) {
