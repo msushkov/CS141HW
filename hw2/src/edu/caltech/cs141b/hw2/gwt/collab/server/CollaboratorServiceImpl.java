@@ -1,6 +1,7 @@
 package edu.caltech.cs141b.hw2.gwt.collab.server;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +22,8 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.LockExpired;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockUnavailable;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
+
+import com.google.gwt.user.client.Cookies;
 
 /**
  * The server side implementation of the RPC service.
@@ -85,30 +88,38 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public UnlockedDocument saveDocument(LockedDocument doc) throws LockExpired {
 		String stringKey = doc.getKey();
+		String lockedBy = doc.getLockedBy();
 		Document toSave;
-		pm = PMF.get().getPersistenceManager();
-		Transaction t = pm.currentTransaction();
-		try {
-			t.begin();
-			if (stringKey == null) {
-				toSave = new Document(doc);
-			} else {
-				Key key = KeyFactory.stringToKey(stringKey);
-				toSave = pm.getObjectById(Document.class, key);
-				toSave.update(doc);
-				toSave.unlock();
+		String identity = getThreadLocalRequest().getRemoteAddr();
+		
+		if (lockedBy != null || lockedBy == identity) {
+			pm = PMF.get().getPersistenceManager();
+			Transaction t = pm.currentTransaction();
+			try {
+				t.begin();
+				if (stringKey == null) {
+					toSave = new Document(doc);
+				} else {
+					Key key = KeyFactory.stringToKey(stringKey);
+					toSave = pm.getObjectById(Document.class, key);
+					toSave.update(doc);
+					toSave.unlock();
+				}
+
+				pm.makePersistent(toSave);
+				t.commit();
+			} finally {
+				if (t.isActive()) {
+					t.rollback();
+				}
+				pm.close();
 			}
 
-			pm.makePersistent(toSave);
-			t.commit();
-		} finally {
-			if (t.isActive()) {
-				t.rollback();
-			}
-			pm.close();
+			return toSave.getUnlocked();			
+		} else {
+			LockExpired lockException = new LockExpired();
+			throw lockException;
 		}
-
-		return toSave.getUnlocked();
 	}
 
 	@Override
@@ -135,6 +146,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public LockedDocument lockDocument(String documentKey)
 			throws LockUnavailable {
+		
+		String identity = getThreadLocalRequest().getRemoteAddr();
+		System.out.println("Identity = " + identity);
 		Document toSave;
 		pm = PMF.get().getPersistenceManager();
 		Transaction t = pm.currentTransaction();
@@ -153,9 +167,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			if (toSave.isLocked()) {
 				throw new LockUnavailable(key + " is locked");
 			} else {
-				UserService userService = UserServiceFactory.getUserService();
+				//UserService userService = UserServiceFactory.getUserService();
 	
-				toSave.lock(new Date(System.currentTimeMillis() + 30000L), "BMG");
+				toSave.lock(new Date(System.currentTimeMillis() + 30000L), identity);
 				pm.makePersistent(toSave);
 			}
 
