@@ -67,8 +67,9 @@ public class Document {
 	}
 	
 	public void Unlock() {
-		lockedTil = null;
-		lockedBy = null;
+		this.lockedTil = null;
+		this.lockedBy = null;
+		this.locked = false;
 	}
 	
 	public UnlockedDocument GetUnlocked() {
@@ -81,6 +82,10 @@ public class Document {
 		String keyString = KeyFactory.keyToString(docKey);
 		LockedDocument doc = new LockedDocument(lockedBy, lockedTil, keyString, title, content);
 		return doc;
+	}
+	
+	public boolean IsLocked() {
+		return this.locked;
 	}
 	
 	

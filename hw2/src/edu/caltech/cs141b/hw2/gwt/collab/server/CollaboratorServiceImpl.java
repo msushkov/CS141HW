@@ -1,5 +1,6 @@
 package edu.caltech.cs141b.hw2.gwt.collab.server;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -122,13 +123,52 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public void releaseLock(LockedDocument doc) throws LockExpired {
+		String stringKey = doc.getKey();
+		Document toSave;
+		pm = PMF.get().getPersistenceManager();
+		Transaction t = pm.currentTransaction();
+		try {
+			t.begin();
+			Key key = KeyFactory.stringToKey(stringKey);
+			toSave = pm.getObjectById(Document.class, key);
+			toSave.Unlock();
+			System.out.println(toSave.IsLocked());
+			pm.makePersistent(toSave);
+			t.commit();
+		} finally {
+			if (t.isActive()) {
+				t.rollback();
+			}
+			pm.close();
+		}
 	}
 
 	@Override
 	public LockedDocument lockDocument(String documentKey)
 			throws LockUnavailable {
-		
-		return null;
+		Document toSave;
+		pm = PMF.get().getPersistenceManager();
+		Transaction t = pm.currentTransaction();
+		try {
+			t.begin();
+
+			Key key = KeyFactory.stringToKey(documentKey);
+			toSave = pm.getObjectById(Document.class, key);
+			if (toSave.IsLocked()) {
+				throw new LockUnavailable(key + " is locked");
+			} else {
+				toSave.Lock(new Date(System.currentTimeMillis() + 300000L), "GustafBryanMichael");
+				pm.makePersistent(toSave);
+			}
+			
+			t.commit();
+		} finally {
+			if (t.isActive()) {
+				t.rollback();
+			}
+			pm.close();
+		}
+		return toSave.GetLocked();
 	}
 
 }
