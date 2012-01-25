@@ -42,7 +42,7 @@ public class Document {
 		content = doc.getContents();
 	}
 	
-	public String GetTitle() {
+	public String getTitle() {
 		return title;
 	}
 	
@@ -50,41 +50,41 @@ public class Document {
 		return KeyFactory.keyToString(docKey);
 	}
 	
-	public void Update(UnlockedDocument doc) {
+	public void update(UnlockedDocument doc) {
 		title = doc.getTitle();
 		content = doc.getContents();	
 	}
 	
-	public void Update(LockedDocument doc) {
+	public void update(LockedDocument doc) {
 		title = doc.getTitle();
 		content = doc.getContents();	
 	}
 	
-	public void Lock(Date lockedTil, String lockedBy) {
+	public void lock(Date lockedTil, String lockedBy) {
 		this.locked = true;
 		this.lockedTil = lockedTil;
 		this.lockedBy = lockedBy;
 	}
 	
-	public void Unlock() {
+	public void unlock() {
 		this.lockedTil = null;
 		this.lockedBy = null;
 		this.locked = false;
 	}
 	
-	public UnlockedDocument GetUnlocked() {
+	public UnlockedDocument getUnlocked() {
 		String keyString = KeyFactory.keyToString(docKey);
 		UnlockedDocument doc = new UnlockedDocument(keyString, title, content);
 		return doc;
 	}
 	
-	public LockedDocument GetLocked() {
+	public LockedDocument getLocked() {
 		String keyString = KeyFactory.keyToString(docKey);
 		LockedDocument doc = new LockedDocument(lockedBy, lockedTil, keyString, title, content);
 		return doc;
 	}
 	
-	public boolean IsLocked() {
+	public boolean isLocked() {
 		return this.locked;
 	}
 	

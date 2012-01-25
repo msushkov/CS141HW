@@ -1,16 +1,13 @@
 package edu.caltech.cs141b.hw2.gwt.collab.server;
 
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.Transaction;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -30,19 +27,10 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 @SuppressWarnings("serial")
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		CollaboratorService {
-	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private PersistenceManager pm = PMF.get().getPersistenceManager();
 
-	private static final Logger log = Logger
-			.getLogger(CollaboratorServiceImpl.class.toString());
 
-	// Datastore static strings
-	private static final String dsDoc = "Document";
-	private static final String dsTitle = "title";
-	private static final String dsContent = "content";
-	private static final String dsLocked = "locked";
-	private static final String dsLockedTil = "lockedTil";
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<DocumentMetadata> getDocumentList() {
 
@@ -57,7 +45,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			for (Document doc : documentList) {
 				DocumentMetadata metaDoc = new DocumentMetadata(doc.GetKey(),
-						doc.GetTitle());
+						doc.getTitle());
 				docList.add(metaDoc);
 			}
 			t.commit();
@@ -81,7 +69,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		try {
 			t.begin();
 			Document doc = pm.getObjectById(Document.class, key);
-			unlockedDoc = doc.GetUnlocked();
+			unlockedDoc = doc.getUnlocked();
 			t.commit();
 		} finally {
 			if (t.isActive()) {
@@ -106,7 +94,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			} else {
 				Key key = KeyFactory.stringToKey(stringKey);
 				toSave = pm.getObjectById(Document.class, key);
-				toSave.Update(doc);
+				toSave.update(doc);
+				toSave.unlock();
 			}
 
 			pm.makePersistent(toSave);
@@ -118,7 +107,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			pm.close();
 		}
 
-		return toSave.GetUnlocked();
+		return toSave.getUnlocked();
 	}
 
 	@Override
@@ -131,8 +120,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			t.begin();
 			Key key = KeyFactory.stringToKey(stringKey);
 			toSave = pm.getObjectById(Document.class, key);
-			toSave.Unlock();
-			System.out.println(toSave.IsLocked());
+			toSave.unlock();
 			pm.makePersistent(toSave);
 			t.commit();
 		} finally {
@@ -154,10 +142,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			Key key = KeyFactory.stringToKey(documentKey);
 			toSave = pm.getObjectById(Document.class, key);
-			if (toSave.IsLocked()) {
+			if (toSave.isLocked()) {
 				throw new LockUnavailable(key + " is locked");
 			} else {
-				toSave.Lock(new Date(System.currentTimeMillis() + 300000L), "GustafBryanMichael");
+				toSave.lock(new Date(System.currentTimeMillis() + 300000L), "GustafBryanMichael");
 				pm.makePersistent(toSave);
 			}
 			
@@ -168,7 +156,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			}
 			pm.close();
 		}
-		return toSave.GetLocked();
+		
+		return toSave.getLocked();
 	}
 
 }
