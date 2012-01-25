@@ -59,7 +59,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
   public List<DocumentMetadata> getDocumentList() {
 	  Query query = pm.newQuery(Document.class);
 	  List<Document> documentList;
-	  ArrayList <DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
+	  ArrayList<DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
 	  try {
 		  documentList = (List<Document >) query.execute();
 		  System.out.println("Document list = " + documentList);
@@ -70,7 +70,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	  } finally {
 	        query.closeAll();
 	  }
-
+	System.out.println("Document list = " + docList);
     return docList;
   }
 
