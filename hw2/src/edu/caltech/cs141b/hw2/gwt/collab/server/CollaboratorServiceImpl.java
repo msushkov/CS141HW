@@ -98,9 +98,12 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				Key key = KeyFactory.stringToKey(stringKey);
 				toSave = pm.getObjectById(Document.class, key);
 				String lockedBy = toSave.getLockedBy();
+				Date lockedUntil = toSave.getLockedUntil();
 
 				String identity = getThreadLocalRequest().getRemoteAddr();
-				if (lockedBy.equals(identity)) {
+				if (lockedBy.equals(identity)
+						&& lockedUntil.after(new Date(System
+								.currentTimeMillis()))) {
 					toSave.update(doc);
 					toSave.unlock();
 					pm.makePersistent(toSave);
@@ -164,7 +167,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			if (toSave.isLocked()) {
 				throw new LockUnavailable(key + " is locked");
 			} else {
-				toSave.lock(new Date(System.currentTimeMillis() + 60000L),
+				toSave.lock(new Date(System.currentTimeMillis() + 20000L),
 						identity);
 				pm.makePersistent(toSave);
 			}
