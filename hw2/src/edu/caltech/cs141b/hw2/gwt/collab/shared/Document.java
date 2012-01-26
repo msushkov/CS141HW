@@ -14,6 +14,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 // Datastore JDO interface class for documents.
 @PersistenceCapable
 public class Document {
+	// The following are values we are writing to our Datastore
 	@Persistent
 	private String title;
 	
@@ -33,47 +34,89 @@ public class Document {
 	@Persistent
 	private Date lockedUntil;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param doc The UnlockedDocument we should create the java data object out of
+	 */
 	public Document(UnlockedDocument doc) {
 		title = doc.getTitle();
 		content = doc.getContents();
+		locked = false;
 	}
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param doc The LockedDocument we should create the java data object out of
+	 */
 	public Document(LockedDocument doc) {
 		title = doc.getTitle();
 		content = doc.getContents();
+		
+		locked = true;
+		lockedBy = doc.getLockedBy();
+		lockedUntil = doc.getLockedUntil();
 	}
 	
 	
 	// Getters
 	
+	/**
+	 * @return The title of the document
+	 */
 	public String getTitle() {
 		return title;
 	}
 	
+	/**
+	 * @return The person who locked the document
+	 */
 	public String getLockedBy() {
 		return lockedBy;
 	}
 	
+	/**
+	 * @return The string form of the document's key
+	 */
 	public String getKey() {
 		return KeyFactory.keyToString(docKey);
 	}
 	
+	/**
+	 * @return The date until when this is locked
+	 */
 	public Date getLockedUntil() {
-		return this.lockedUntil;
+		return lockedUntil;
 	}
 	
+	
+	/**
+	 * @return Whether the document is locked
+	 */
 	public boolean isLocked() {
-		return this.locked;
+		return locked;
 	}
 	
 	
 	// Update Functions
 	
+	/**
+	 * Updates the Document with new data
+	 * 
+	 * @param doc The UnlockedDocument whose data we should update it with
+	 */
 	public void update(UnlockedDocument doc) {
 		title = doc.getTitle();
 		content = doc.getContents();	
 	}
 	
+	
+	/**
+	 * Update the Document with new data
+	 * 
+	 * @param doc The LockedDocument whose data we should update it with 
+	 */
 	public void update(LockedDocument doc) {
 		title = doc.getTitle();
 		content = doc.getContents();	
@@ -81,12 +124,21 @@ public class Document {
 	
 	// Setters
 	
+	/**
+	 * Locks the document
+	 * 
+	 * @param lockedTil The document should stay locked until this time
+	 * @param lockedBy The document is locked by this person
+	 */
 	public void lock(Date lockedTil, String lockedBy) {
 		this.locked = true;
 		this.lockedUntil = lockedTil;
 		this.lockedBy = lockedBy;
 	}
 	
+	/**
+	 * Unlocks the document
+	 */
 	public void unlock() {
 		this.lockedUntil = null;
 		this.lockedBy = null;
@@ -96,12 +148,18 @@ public class Document {
 	
 	// Document type converters 
 	
+	/**
+	 * @return Returns the unlocked form of this document
+	 */
 	public UnlockedDocument getUnlockedDoc() {
 		String keyString = KeyFactory.keyToString(docKey);
 		UnlockedDocument doc = new UnlockedDocument(keyString, title, content);
 		return doc;
 	}
 
+	/**
+	 * @return Returns the locked form of this document
+	 */
 	public LockedDocument getLockedDoc() {
 		String keyString = KeyFactory.keyToString(docKey);
 		LockedDocument doc = new LockedDocument(lockedBy, lockedUntil, keyString, title, content);
