@@ -46,6 +46,10 @@ public class Document {
 		return title;
 	}
 	
+	public String getLockedBy() {
+		return lockedBy;
+	}
+	
 	public String GetKey() {
 		return KeyFactory.keyToString(docKey);
 	}

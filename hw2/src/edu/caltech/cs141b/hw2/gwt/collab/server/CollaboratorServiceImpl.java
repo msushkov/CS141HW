@@ -88,25 +88,34 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public UnlockedDocument saveDocument(LockedDocument doc) throws LockExpired {
 		String stringKey = doc.getKey();
-		String lockedBy = doc.getLockedBy();
-		Document toSave;
 		String identity = getThreadLocalRequest().getRemoteAddr();
+		boolean failed = false;
+		Document toSave;
+		//String identity = getThreadLocalRequest().getRemoteAddr();
 		
-		if (lockedBy != null || lockedBy == identity) {
 			pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 			try {
 				t.begin();
 				if (stringKey == null) {
 					toSave = new Document(doc);
+					pm.makePersistent(toSave);
 				} else {
 					Key key = KeyFactory.stringToKey(stringKey);
 					toSave = pm.getObjectById(Document.class, key);
-					toSave.update(doc);
-					toSave.unlock();
+					String lockedBy = toSave.getLockedBy();
+					/*System.out.print("locked by = " + lockedBy);
+					System.out.print("identity = " + identity);
+					System.out.print(lockedBy.equals(identity));*/
+					if (lockedBy.equals(identity)) {
+						toSave.update(doc);
+						toSave.unlock();
+						pm.makePersistent(toSave);
+					} else {
+						failed = true;
+					}
+					
 				}
-
-				pm.makePersistent(toSave);
 				t.commit();
 			} finally {
 				if (t.isActive()) {
@@ -114,12 +123,12 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				}
 				pm.close();
 			}
-
-			return toSave.getUnlocked();			
-		} else {
+			if (!failed) {
+				return toSave.getUnlocked();			
+			} else {
 			LockExpired lockException = new LockExpired();
 			throw lockException;
-		}
+			}
 	}
 
 	@Override
