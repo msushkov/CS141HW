@@ -11,7 +11,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 
-// Datastore JDO interface class for documents.
+// Datastore "JDO interface" class for documents.
 @PersistenceCapable
 public class Document {
 	// The following are values we are writing to our Datastore
