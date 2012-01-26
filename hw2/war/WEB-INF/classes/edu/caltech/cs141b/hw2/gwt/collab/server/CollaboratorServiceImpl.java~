@@ -1,13 +1,15 @@
 package edu.caltech.cs141b.hw2.gwt.collab.server;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.Transaction;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -27,24 +29,36 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 @SuppressWarnings("serial")
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		CollaboratorService {
+	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	private PersistenceManager pm = PMF.get().getPersistenceManager();
 
-	@SuppressWarnings("unchecked")
+	private static final Logger log = Logger
+			.getLogger(CollaboratorServiceImpl.class.toString());
+
+	// Datastore static strings
+	private static final String dsDoc = "Document";
+	private static final String dsTitle = "title";
+	private static final String dsContent = "content";
+	private static final String dsLocked = "locked";
+	private static final String dsLockedTil = "lockedTil";
+
 	@Override
 	public List<DocumentMetadata> getDocumentList() {
 
-		PersistenceManager pm = PMF.get().getPersistenceManager();
+		pm = PMF.get().getPersistenceManager();
 		Query query = pm.newQuery(Document.class);
+		List<Document> documentList;
 		ArrayList<DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
 		Transaction t = pm.currentTransaction();
 		try {
 			t.begin();
+			documentList = (List<Document>) query.execute();
 
-			for (Document doc : (List<Document>) query.execute()) {
+			for (Document doc : documentList) {
 				DocumentMetadata metaDoc = new DocumentMetadata(doc.GetKey(),
-						doc.getTitle());
+						doc.GetTitle());
 				docList.add(metaDoc);
 			}
-
 			t.commit();
 		} finally {
 			if (t.isActive()) {
@@ -54,22 +68,48 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			pm.close();
 		}
 
+<<<<<<< HEAD
 		return docList;
 	}
 
 	@Override
+	public LockedDocument lockDocument(String documentKey)
+			throws LockUnavailable {
+		return null;
+	}
+=======
+  
+  
+  @Override
+  public List<DocumentMetadata> getDocumentList() {
+	  Query query = pm.newQuery(Document.class);
+	  List<Document> documentList;
+	  ArrayList<DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
+	  try {
+		  documentList = (List<Document >) query.execute();
+		  System.out.println("Document list = " + documentList);
+		  for (Document doc:documentList) {
+			  DocumentMetadata metaDoc = new DocumentMetadata(doc.GetKey(),doc.GetTitle());
+			  docList.add(metaDoc);
+		  }
+	  } finally {
+	        query.closeAll();
+	  }
+	System.out.println("Document list = " + docList);
+    return docList;
+  }
+>>>>>>> 5ff9e02a01a70511804a81cfbe2be74922eb4d59
+
+	@Override
 	public UnlockedDocument getDocument(String documentKey) {
+		Key key = KeyFactory.stringToKey(documentKey);
 		UnlockedDocument unlockedDoc;
-		PersistenceManager pm = PMF.get().getPersistenceManager();
+		pm = PMF.get().getPersistenceManager();
 		Transaction t = pm.currentTransaction();
-		
 		try {
 			t.begin();
-			
-			Key key = KeyFactory.stringToKey(documentKey);
 			Document doc = pm.getObjectById(Document.class, key);
-			unlockedDoc = doc.getUnlocked();
-			
+			unlockedDoc = doc.GetUnlocked();
 			t.commit();
 		} finally {
 			if (t.isActive()) {
@@ -77,7 +117,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			}
 			pm.close();
 		}
-		
 		return unlockedDoc;
 
 	}
@@ -86,7 +125,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	public UnlockedDocument saveDocument(LockedDocument doc) throws LockExpired {
 		String stringKey = doc.getKey();
 		Document toSave;
-		PersistenceManager pm = PMF.get().getPersistenceManager();
+		pm = PMF.get().getPersistenceManager();
 		Transaction t = pm.currentTransaction();
 		try {
 			t.begin();
@@ -95,8 +134,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			} else {
 				Key key = KeyFactory.stringToKey(stringKey);
 				toSave = pm.getObjectById(Document.class, key);
-				toSave.update(doc);
-				toSave.unlock();
+				toSave.Update(doc);
 			}
 
 			pm.makePersistent(toSave);
@@ -108,65 +146,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			pm.close();
 		}
 
-		return toSave.getUnlocked();
+		return toSave.GetUnlocked();
 	}
 
 	@Override
 	public void releaseLock(LockedDocument doc) throws LockExpired {
-		String stringKey = doc.getKey();
-		Document toSave;
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Transaction t = pm.currentTransaction();
-		try {
-			t.begin();
-			Key key = KeyFactory.stringToKey(stringKey);
-			toSave = pm.getObjectById(Document.class, key);
-			toSave.unlock();
-			pm.makePersistent(toSave);
-			t.commit();
-		} finally {
-			if (t.isActive()) {
-				t.rollback();
-			}
-			pm.close();
-		}
-	}
-
-	@Override
-	public LockedDocument lockDocument(String documentKey)
-			throws LockUnavailable {
-		Document toSave;
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Transaction t = pm.currentTransaction();
-		try {
-			t.begin();
-
-			Key key = KeyFactory.stringToKey(documentKey);
-			toSave = pm.getObjectById(Document.class, key);
-
-			if (toSave.isLocked()
-					&& toSave.getLockedUntil().before(
-							new Date(System.currentTimeMillis()))) {
-				toSave.unlock();
-			}
-
-			if (toSave.isLocked()) {
-				throw new LockUnavailable(key + " is locked");
-			} else {
-				toSave.lock(new Date(System.currentTimeMillis() + 60000L),
-						"BMG");
-				pm.makePersistent(toSave);
-			}
-
-			t.commit();
-		} finally {
-			if (t.isActive()) {
-				t.rollback();
-			}
-			pm.close();
-		}
-
-		return toSave.getLocked();
 	}
 
 }
