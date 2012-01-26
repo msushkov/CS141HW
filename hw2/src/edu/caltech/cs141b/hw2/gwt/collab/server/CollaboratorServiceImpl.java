@@ -40,7 +40,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			t.begin();
 
 			for (Document doc : (List<Document>) query.execute()) {
-				DocumentMetadata metaDoc = new DocumentMetadata(doc.GetKey(),
+				DocumentMetadata metaDoc = new DocumentMetadata(doc.getKey(),
 						doc.getTitle());
 				docList.add(metaDoc);
 			}
@@ -68,7 +68,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			Key key = KeyFactory.stringToKey(documentKey);
 			Document doc = pm.getObjectById(Document.class, key);
-			unlockedDoc = doc.getUnlocked();
+			unlockedDoc = doc.getUnlockedDoc();
 
 			t.commit();
 		} finally {
@@ -116,7 +116,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			pm.close();
 		}
 
-		return toSave.getUnlocked();
+		return toSave.getUnlockedDoc();
 
 	}
 
@@ -176,7 +176,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			}
 			pm.close();
 		}
-		return toSave.getLocked();
+		return toSave.getLockedDoc();
 	}
 
 }

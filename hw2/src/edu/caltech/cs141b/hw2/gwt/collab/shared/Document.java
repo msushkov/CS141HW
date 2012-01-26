@@ -11,6 +11,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 
+// Datastore JDO interface class for documents.
 @PersistenceCapable
 public class Document {
 	@Persistent
@@ -20,8 +21,8 @@ public class Document {
 	private String content;
 	
 	@PrimaryKey
-	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Key docKey;
+	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)  
+	private Key docKey; // Automatically assigned GAE key
 	
 	@Persistent
 	private boolean locked;
@@ -42,6 +43,9 @@ public class Document {
 		content = doc.getContents();
 	}
 	
+	
+	// Getters
+	
 	public String getTitle() {
 		return title;
 	}
@@ -50,9 +54,20 @@ public class Document {
 		return lockedBy;
 	}
 	
-	public String GetKey() {
+	public String getKey() {
 		return KeyFactory.keyToString(docKey);
 	}
+	
+	public Date getLockedUntil() {
+		return this.lockedUntil;
+	}
+	
+	public boolean isLocked() {
+		return this.locked;
+	}
+	
+	
+	// Update Functions
 	
 	public void update(UnlockedDocument doc) {
 		title = doc.getTitle();
@@ -63,6 +78,8 @@ public class Document {
 		title = doc.getTitle();
 		content = doc.getContents();	
 	}
+	
+	// Setters
 	
 	public void lock(Date lockedTil, String lockedBy) {
 		this.locked = true;
@@ -76,25 +93,21 @@ public class Document {
 		this.locked = false;
 	}
 	
-	public UnlockedDocument getUnlocked() {
+	
+	// Document type converters 
+	
+	public UnlockedDocument getUnlockedDoc() {
 		String keyString = KeyFactory.keyToString(docKey);
 		UnlockedDocument doc = new UnlockedDocument(keyString, title, content);
 		return doc;
 	}
-	
-	public Date getLockedUntil() {
-		return this.lockedUntil;
-	}
-	
-	public LockedDocument getLocked() {
+
+	public LockedDocument getLockedDoc() {
 		String keyString = KeyFactory.keyToString(docKey);
 		LockedDocument doc = new LockedDocument(lockedBy, lockedUntil, keyString, title, content);
 		return doc;
 	}
 	
-	public boolean isLocked() {
-		return this.locked;
-	}
-	
+
 	
 }
