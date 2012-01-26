@@ -42,6 +42,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 		// Make the Document query
 		Query query = pm.newQuery(Document.class);
+
 		ArrayList<DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
 
 		Transaction t = pm.currentTransaction();

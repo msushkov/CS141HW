@@ -1,0 +1,6 @@
+App URL: http://cs141bmgb.appspot.com/
+Github URL: https://github.com/msushkov/CS141HW
+
+Our homework is specifically in the hw2 folder (It's an eclipse project) and you can ssh in and such using information on that page.
+
+We noticed that your client had more detailed document names on the left side when you were fetching documents: It would say "Fetching document <name>".  We didn't know how to do this without modifying the client, so it currently will just say "Fetching document agtzfmNzMTQxYm1nYnIPCxIIRG9jdW1lbnQY0Q8M" or something similar.

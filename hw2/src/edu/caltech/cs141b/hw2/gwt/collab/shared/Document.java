@@ -152,7 +152,7 @@ public class Document {
 	 * @return Returns the unlocked form of this document
 	 */
 	public UnlockedDocument getUnlockedDoc() {
-		String keyString = KeyFactory.keyToString(docKey);
+		String keyString = getKey();
 		UnlockedDocument doc = new UnlockedDocument(keyString, title, content);
 		return doc;
 	}
@@ -161,7 +161,7 @@ public class Document {
 	 * @return Returns the locked form of this document
 	 */
 	public LockedDocument getLockedDoc() {
-		String keyString = KeyFactory.keyToString(docKey);
+		String keyString = getKey();
 		LockedDocument doc = new LockedDocument(lockedBy, lockedUntil, keyString, title, content);
 		return doc;
 	}
