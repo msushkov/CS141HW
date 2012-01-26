@@ -161,7 +161,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					toSave.update(doc);
 					toSave.unlock();
 				} else {
-					// Otherwise, through an exception
+					// Otherwise, throw an exception
 					throw new LockExpired();
 				}
 			}
@@ -258,7 +258,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					toSave.unlock();
 				} else {
 					// Otherwise notify the client that it lock is unavailable
-					throw new LockUnavailable(key + " is locked");
+					throw new LockUnavailable("\'" + toSave.getTitle()
+							+ "\' is locked until "
+							+ toSave.getLockedUntil().toString());
 				}
 			}
 
@@ -266,8 +268,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// Get the IP Address of th euser
 			String identity = getThreadLocalRequest().getRemoteAddr();
 
-			// Lock the document for 20 seconds
-			toSave.lock(new Date(System.currentTimeMillis() + 20000L),
+			// Lock the document for 30 seconds
+			toSave
+					.lock(new Date(System.currentTimeMillis() + 30000L),
 							identity);
 			// Write this to the Datastore
 			pm.makePersistent(toSave);
