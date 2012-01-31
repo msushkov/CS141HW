@@ -9,11 +9,17 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.HTML;
+<<<<<<< HEAD
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.TabPanel;
+=======
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.RichTextArea;
+>>>>>>> a3381fdbeb4d8716f27f45106becb999eecc9c01
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -42,8 +48,11 @@ public class Collaborator extends Composite implements ClickHandler, ChangeHandl
 	protected Button refreshDoc = new Button("Refresh Document");
 	protected Button lockButton = new Button("Get Document Lock");
 	protected Button saveButton = new Button("Save Document");
+<<<<<<< HEAD
 	protected TabPanel documentsL = new TabPanel();
 	protected TabPanel documentsR = new TabPanel();
+=======
+>>>>>>> a3381fdbeb4d8716f27f45106becb999eecc9c01
 	
 	// Callback objects.
 	protected DocLister lister = new DocLister(this);
@@ -63,15 +72,23 @@ public class Collaborator extends Composite implements ClickHandler, ChangeHandl
 	 */
 	public Collaborator(CollaboratorServiceAsync collabService) {
 		this.collabService = collabService;
+<<<<<<< HEAD
 		
 		HorizontalPanel outerHp = new HorizontalPanel();
 		outerHp.setWidth("100%");
 		
+=======
+		HorizontalPanel outerHp = new HorizontalPanel();
+		outerHp.setWidth("100%");
+>>>>>>> a3381fdbeb4d8716f27f45106becb999eecc9c01
 		VerticalPanel outerVp = new VerticalPanel();
 		outerVp.setSpacing(20);
 		
 		VerticalPanel vp = new VerticalPanel();
+<<<<<<< HEAD
 		vp.setHeight("100%");
+=======
+>>>>>>> a3381fdbeb4d8716f27f45106becb999eecc9c01
 		vp.setSpacing(10);
 		vp.add(new HTML("<h2>Available Documents</h2>"));
 		documentList.setWidth("100%");
@@ -86,6 +103,7 @@ public class Collaborator extends Composite implements ClickHandler, ChangeHandl
 		dp.add(vp);
 		outerVp.add(dp);
 		
+<<<<<<< HEAD
 		dp = new DecoratorPanel();
 		dp.setWidth("100%");
 		statusArea.setSpacing(10);
@@ -94,10 +112,32 @@ public class Collaborator extends Composite implements ClickHandler, ChangeHandl
 		outerVp.add(dp);
 		outerHp.add(outerVp);
 		
+=======
+		vp = new VerticalPanel();
+		vp.setSpacing(10);
+		vp.add(new HTML("<h2>Selected Document</h2>"));
+		title.setWidth("100%");
+		vp.add(title);
+		contents.setWidth("100%");
+		vp.add(contents);
+		hp = new HorizontalPanel();
+		hp.setSpacing(10);
+		hp.add(refreshDoc);
+		hp.add(lockButton);
+		hp.add(saveButton);
+		vp.add(hp);
+		dp = new DecoratorPanel();
+		dp.setWidth("100%");
+		dp.add(vp);
+		outerVp.add(dp);
+		
+		outerHp.add(outerVp);
+>>>>>>> a3381fdbeb4d8716f27f45106becb999eecc9c01
 		outerVp = new VerticalPanel();
 		outerVp.setSpacing(20);
 		dp = new DecoratorPanel();
 		dp.setWidth("100%");
+<<<<<<< HEAD
 		VerticalPanel innerVp = new VerticalPanel();
 		innerVp.add(new HTML("<h2>Documents</h2>"));
 		HorizontalPanel innerHp = new HorizontalPanel();
@@ -112,6 +152,11 @@ public class Collaborator extends Composite implements ClickHandler, ChangeHandl
 		innerHp.add(documentsR);
 		innerVp.add(innerHp);
 		dp.add(innerVp);
+=======
+		statusArea.setSpacing(10);
+		statusArea.add(new HTML("<h2>Console</h2>"));
+		dp.add(statusArea);
+>>>>>>> a3381fdbeb4d8716f27f45106becb999eecc9c01
 		outerVp.add(dp);
 		outerHp.add(outerVp);
 		
@@ -217,7 +262,10 @@ public class Collaborator extends Composite implements ClickHandler, ChangeHandl
 			History.newItem("list");
 			lister.getDocumentList();
 		} else if (event.getSource().equals(createNew)) {
+<<<<<<< HEAD
 			documentsL.add(new VerticalPanel(), "yo");
+=======
+>>>>>>> a3381fdbeb4d8716f27f45106becb999eecc9c01
 			createNewDocument();
 		} else if (event.getSource().equals(refreshDoc)) {
 			if (readOnlyDoc != null) {

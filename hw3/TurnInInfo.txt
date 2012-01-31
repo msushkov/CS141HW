@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 App URL: http://cs141bmgb.appspot.com/
 Github URL: https://github.com/msushkov/CS141HW
 
 Our homework is specifically in the hw2 folder (It's an eclipse project) and you can ssh in and such using information on the github page.
+=======
+App URL: http://cs141bmgb.appspot.com/
+Github URL: https://github.com/msushkov/CS141HW
+
+Our homework is specifically in the hw2 folder (It's an eclipse project) and you can ssh in and such using information on that page.
+>>>>>>> a3381fdbeb4d8716f27f45106becb999eecc9c01
