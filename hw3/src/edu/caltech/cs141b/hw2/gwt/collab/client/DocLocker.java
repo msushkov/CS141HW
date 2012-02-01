@@ -57,12 +57,25 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 	 * @param result
 	 */
 	protected void gotDoc(LockedDocument result) {
+		// we got the lock for this document
+		
 		collaborator.readOnlyDoc = null;
 		collaborator.lockedDoc = result;
-		collaborator.title.setValue(result.getTitle());
-		collaborator.title.setEnabled(true);
-		collaborator.contents.setHTML(result.getContents());
-		collaborator.contents.setEnabled(true);
+		
+		// enable the title and the contents widgets
+		//collaborator.docContents.setEnabled(true);
+		//collaborator.docTitle.setEnabled(true);
+		collaborator.setContentsEnabled(true);
+		collaborator.setTitleEnabled(true);
+		
+		//collaborator.docTitle.setValue(result.getTitle());
+		//collaborator.docContents.setHTML(result.getContents());
+		collaborator.docTitle = result.getTitle();
+		collaborator.docContents = result.getContents();
+		
+		// set the document properties on the tabpanel
+		collaborator.setTabPanelContents(result.getContents(), result.getTitle());
+		
 		collaborator.refreshDoc.setEnabled(false);
 		collaborator.lockButton.setEnabled(false);
 		collaborator.saveButton.setEnabled(true);

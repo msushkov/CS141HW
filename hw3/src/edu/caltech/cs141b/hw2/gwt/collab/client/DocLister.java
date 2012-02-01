@@ -1,5 +1,6 @@
 package edu.caltech.cs141b.hw2.gwt.collab.client;
 
+import java.awt.TextArea;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -38,16 +39,19 @@ public class DocLister implements AsyncCallback<List<DocumentMetadata>> {
 		if (result == null || result.size() == 0) {
 			collaborator.statusUpdate("No documents available.");
 		}
+		// otherwise if we have a doc list to display
 		else {
 			collaborator.statusUpdate("Document list updated.");
 			GWT.log("Got " + result.size() + " documents.");
 			collaborator.documentList.clear();
 			
-			for (DocumentMetadata meta : result) {
-				collaborator.documentList.addItem(
-						meta.getTitle(), meta.getKey());
+			// iterate through the docs we have now and add to the available docs list
+			for (DocumentMetadata currDoc : result) {
+				collaborator.documentList.addItem(currDoc.getTitle(), 
+						currDoc.getKey());
 			}
 		}
+		// we can now press the 'refresh doc' button
 		collaborator.refreshDoc.setEnabled(true);
 	}
 	
