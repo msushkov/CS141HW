@@ -2,3 +2,8 @@
 /bin
 /gwt-unitCache
 /tomcat
+/war/collab
+/war/WEB-INF/appengine-generated
+/war/WEB-INF/classes
+/war/WEB-INF/deploy
+/war/WEB-INF/lib
