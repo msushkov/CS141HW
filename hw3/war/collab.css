@@ -19,3 +19,24 @@ body{
 .app-innerpanel {
 	margin: 0 auto 0 auto;
 }
+
+
+.outerPanel {
+/* 	border-style: none;  */
+}
+
+.docsAndConsole {
+/*  	border-style: none;  */
+}
+
+.docListPanel {
+/* 	border-style: none; */
+}
+
+.mainButtonPanel {
+/* 	border-style: none;  */
+}
+
+.outerTabbedDocsPanel {
+ 	border-style: solid;  
+}

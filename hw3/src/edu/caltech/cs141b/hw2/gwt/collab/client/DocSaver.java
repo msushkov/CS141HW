@@ -20,8 +20,11 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 		collaborator.waitingKey = lockedDoc.getKey();
 		collaborator.collabService.saveDocument(lockedDoc, this);
 		collaborator.saveButton.setEnabled(false);
-		collaborator.title.setEnabled(false);
-		collaborator.contents.setEnabled(false);
+		
+		//collaborator.docTitle.setEnabled(false);
+		//collaborator.docContents.setEnabled(false);
+		collaborator.setTitleEnabled(false);
+		collaborator.setContentsEnabled(false);
 	}
 
 	@Override
