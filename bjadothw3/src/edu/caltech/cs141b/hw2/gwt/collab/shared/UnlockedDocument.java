@@ -9,7 +9,7 @@ public class UnlockedDocument extends AbstractDocument implements IsSerializable
 	
 	// Required by GWT serialization.
 	public UnlockedDocument() {
-		super(null, null, null);
+		
 	}
 	
 	public UnlockedDocument(String key, String title, String contents) {

@@ -15,7 +15,7 @@ public class LockedDocument extends AbstractDocument implements IsSerializable {
 	
 	// Required by GWT serialization.
 	public LockedDocument() {
-		super(null, null, null);
+		
 	}
 	
 	public LockedDocument(String lockedBy, Date lockedUntil, String key,

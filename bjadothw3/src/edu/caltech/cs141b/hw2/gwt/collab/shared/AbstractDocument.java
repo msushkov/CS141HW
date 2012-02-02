@@ -1,9 +1,15 @@
 package edu.caltech.cs141b.hw2.gwt.collab.shared;
 
-public abstract class AbstractDocument {
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+public abstract class AbstractDocument implements IsSerializable {
 	protected String key = null;
 	protected String title = null;
 	protected String contents = null;
+	
+	public AbstractDocument () {
+		
+	}
 	
 	public AbstractDocument(String key, String title, String contents) {
 		this.key = key;

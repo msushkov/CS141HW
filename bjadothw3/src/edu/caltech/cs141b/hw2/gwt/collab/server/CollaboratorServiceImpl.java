@@ -253,6 +253,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// If the doc is locked...
 			if (toSave.isLocked()) {
 				// But it should be unlocked...
+				System.out.println(toSave.getLockedUntil());
 				if (toSave.getLockedUntil().before(
 						new Date(System.currentTimeMillis()))) {
 					// Unlock it
