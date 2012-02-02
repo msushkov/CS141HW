@@ -30,7 +30,8 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 		collaborator.statusUpdate("Attempting to lock document.");
 		collaborator.waitingKey = key;
 		collaborator.collabService.lockDocument(key, this);
-
+		this.side = side;
+		this.index = index;
 		//collaborator.lockButton.setEnabled(false);
 
 		// disable the 'lock doc' button for the correct side

@@ -7,6 +7,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
@@ -86,6 +87,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		vp.setHeight("100%");
 		vp.setSpacing(10);
 		vp.add(new HTML("<h2>Available Documents</h2>"));
+		DOM.setElementAttribute(vp.getElement(), "class", "availdocs");
+
 		documentList.setWidth("100%");
 		vp.add(documentList);
 		HorizontalPanel hp = new HorizontalPanel();
@@ -112,6 +115,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		dp.setWidth("100%");
 		VerticalPanel innerVp = new VerticalPanel();
 		innerVp.add(new HTML("<h2>Documents</h2>"));
+		DOM.setElementAttribute(innerVp.getElement(), "class", "docdisplay");
 
 		HorizontalPanel innerHp = new HorizontalPanel();
 		innerHp.setSpacing(10);
@@ -149,9 +153,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	        public void onSelection(SelectionEvent<Integer> event) {
 				int ind = documentsL.getTabBar().getSelectedTab();
 				leftHPanel.clear();
-				boolean b1 = (documentsLeft.get(ind) instanceof UnlockedDocument);
-				boolean b2 = (documentsLeft.get(ind) instanceof LockedDocument);
-				System.out.println(b1 + " " + b2);
 				if (documentsLeft.get(ind) instanceof LockedDocument) {
 					leftHPanel.add(saveButtonL);
 
