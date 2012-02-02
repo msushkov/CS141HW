@@ -1,0 +1,2 @@
+serviceClass: edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService
+path: 8A37A62E49B2AAF9F2592586512396EC.gwt.rpc
