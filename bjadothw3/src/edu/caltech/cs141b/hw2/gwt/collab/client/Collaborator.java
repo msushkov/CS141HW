@@ -149,10 +149,14 @@ public class Collaborator extends Composite implements ClickHandler {
 	        public void onSelection(SelectionEvent<Integer> event) {
 				int ind = documentsL.getTabBar().getSelectedTab();
 				leftHPanel.clear();
-				if (documentsLeft.get(ind) instanceof UnlockedDocument) {
-					leftHPanel.add(lockButtonL);
-				} else {
+				boolean b1 = (documentsLeft.get(ind) instanceof UnlockedDocument);
+				boolean b2 = (documentsLeft.get(ind) instanceof LockedDocument);
+				System.out.println(b1 + " " + b2);
+				if (documentsLeft.get(ind) instanceof LockedDocument) {
 					leftHPanel.add(saveButtonL);
+
+				} else {
+					leftHPanel.add(lockButtonL);
 				}
 	        }});
 		
