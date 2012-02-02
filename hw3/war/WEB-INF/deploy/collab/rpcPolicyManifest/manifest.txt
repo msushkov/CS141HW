@@ -1,2 +1,0 @@
-# Module collab
-# RPC service class, partial path of RPC policy file
