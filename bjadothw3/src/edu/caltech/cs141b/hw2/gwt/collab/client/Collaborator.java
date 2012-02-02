@@ -30,10 +30,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	// Track document information.
 	protected ArrayList<AbstractDocument> documentsLeft = new ArrayList<AbstractDocument>();
 	protected ArrayList<AbstractDocument> documentsRight = new ArrayList<AbstractDocument>();
-	// protected ArrayList<UnlockedDocument> readOnlyDoc = new
-	// ArrayList<UnlockedDocument>();
-	// protected ArrayList<LockedDocument> lockedDoc = new
-	// ArrayList<LockedDocument>();
 
 	// Managing available documents.
 	protected ListBox documentList = new ListBox();
@@ -306,34 +302,4 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// Set buttons back to normal
 	}
-
-	/*
-	 * (non-Javadoc) Intercepts events from the list box.
-	 * 
-	 * @see
-	 * com.google.gwt.event.dom.client.ChangeHandler#onChange(com.google.gwt
-	 * .event.dom.client.ChangeEvent)
-	 */
-	/*
-	 * @Override public void onChange(ChangeEvent event) { if
-	 * (event.getSource().equals(documentList)) { String key =
-	 * documentList.getValue(documentList.getSelectedIndex());
-	 * reader.getDocument(key); } }
-	 */
-
-	/**
-	 * Used to release existing locks when the active document changes.
-	 * 
-	 * @param key
-	 *            the key of the new active document or null for a new document
-	 */
-	/*
-	 * private void discardExisting(String key) { if (lockedDoc != null) { if
-	 * (lockedDoc.getKey() == null) { statusUpdate("Discarding new document.");
-	 * } else if (!lockedDoc.getKey().equals(key)) {
-	 * releaser.releaseLock(lockedDoc); } else { // Newly active item is the
-	 * currently locked item. return; } lockedDoc = null; setDefaultButtons(); }
-	 * else if (readOnlyDoc != null) { if (readOnlyDoc.getKey().equals(key))
-	 * return; readOnlyDoc = null; } }
-	 */
 }
