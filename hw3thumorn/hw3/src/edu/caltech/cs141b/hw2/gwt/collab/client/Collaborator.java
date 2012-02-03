@@ -82,11 +82,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	public Collaborator(CollaboratorServiceAsync collabService) {
 		this.collabService = collabService;
 
-		
-		
-		// NOTE: LOCKING DOES NOT WORK
-		
-		
 		// the main outer panel - holds everything
 		HorizontalPanel mainOuterPanel = new HorizontalPanel();
 		mainOuterPanel.setStyleName("mainOuterPanel");
@@ -190,25 +185,36 @@ public class Collaborator extends Composite implements ClickHandler {
 				if (documentsLeftList.get(ind) instanceof LockedDocument) {
 					leftHPanel.add(saveButtonL);
 					leftHPanel.add(removeTabL);
+					
+					titleL.get(ind).setEnabled(true);
+					contentsL.get(ind).setEnabled(true);
 
 				} else {
 					leftHPanel.add(lockButtonL);
 					leftHPanel.add(removeTabL);
+					// Disabling the fields since you don't have the lock
+					titleL.get(ind).setEnabled(false);
+					contentsL.get(ind).setEnabled(false);
 				}
 	        }});
 		
 		documentsR.addSelectionHandler(new SelectionHandler<Integer>(){
 	        public void onSelection(SelectionEvent<Integer> event) {
 				int ind = documentsR.getTabBar().getSelectedTab();
-				rightHPanel.clear();
 				if (documentsLeftList.get(ind) instanceof UnlockedDocument) {
+					rightHPanel.clear();
 					rightHPanel.add(lockButtonR);
 					rightHPanel.add(removeTabR);
+					
+					titleR.get(ind).setEnabled(true);
+					contentsR.get(ind).setEnabled(true);
 
 				} else {
+					rightHPanel.clear();
 					rightHPanel.add(saveButtonR);
 					rightHPanel.add(removeTabR);
-
+					titleR.get(ind).setEnabled(false);
+					contentsR.get(ind).setEnabled(false);
 				}
 	        }});
 		
@@ -414,6 +420,7 @@ public class Collaborator extends Composite implements ClickHandler {
 					ld.setTitle(titleR.get(ind).getValue());
 					ld.setContents(contentsR.get(ind).getHTML());
 					DocSaver.saveDoc(this, ld, "right", ind);
+					saveButtonR.setEnabled(true);
 					saveButtonR.removeFromParent();
 					rightHPanel.add(lockButtonR);
 					rightHPanel.add(removeTabR);
@@ -519,32 +526,24 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected void setDoc(UnlockedDocument result, int index, String side) {
 		// from saver: refresh and lock are enabled
 		// save and fields are disabled
+		statusUpdate("hello " + side);
 		if (side.equals("left")) {
 			documentsLeftList.set(index, result);
 			titleL.get(index).setValue(result.getTitle());
 			contentsL.get(index).setHTML(result.getContents());
-		} else if (side.equals("right")) {
-			documentsRightList.set(index, result);
-			titleR.get(index).setValue(result.getTitle());
-			contentsR.get(index).setHTML(result.getContents());
+
+			//titleL.get(index).setEnabled(false);
+			//contentsL.get(index).setEnabled(false);
 		}
-		if (side.equals("left")) {
-			documentsLeftList.set(index, result);
-			titleL.get(index).setValue(result.getTitle());
-			contentsL.get(index).setHTML(result.getContents());
-
-
-			titleL.get(index).setEnabled(false);
-			contentsL.get(index).setEnabled(false);
-		} 
-		else if (side.equals("right")) {
+		// if (side.equals("right")
+			else {
+			statusUpdate("in " + side);
 			documentsRightList.set(index, result);
 			titleR.get(index).setValue(result.getTitle());
 			contentsR.get(index).setHTML(result.getContents());
-
-
-			titleR.get(index).setEnabled(false);
-			contentsR.get(index).setEnabled(false);
+			
+			//titleR.get(index).setEnabled(false);
+			//contentsR.get(index).setEnabled(false);
 		}
 	}
 
