@@ -189,9 +189,11 @@ public class Collaborator extends Composite implements ClickHandler {
 				leftHPanel.clear();
 				if (documentsLeftList.get(ind) instanceof LockedDocument) {
 					leftHPanel.add(saveButtonL);
+					leftHPanel.add(removeTabL);
 
 				} else {
 					leftHPanel.add(lockButtonL);
+					leftHPanel.add(removeTabL);
 				}
 	        }});
 		
@@ -201,8 +203,12 @@ public class Collaborator extends Composite implements ClickHandler {
 				rightHPanel.clear();
 				if (documentsLeftList.get(ind) instanceof UnlockedDocument) {
 					rightHPanel.add(lockButtonR);
+					rightHPanel.add(removeTabR);
+
 				} else {
 					rightHPanel.add(saveButtonR);
+					rightHPanel.add(removeTabR);
+
 				}
 	        }});
 		
@@ -351,9 +357,10 @@ public class Collaborator extends Composite implements ClickHandler {
 			AbstractDocument doc = documentsLeftList.get(ind);
 			if (doc instanceof UnlockedDocument) 
 				DocLocker.lockDoc(this, doc.getKey(), "left", ind);
-				lockButtonL.removeFromParent();
+				leftHPanel.clear();
 				leftHPanel.add(saveButtonL);
-		} 
+				leftHPanel.add(removeTabL);
+	} 
 
 		// pressed right 'get lock' button
 		else if (event.getSource().equals(lockButtonR)) {
@@ -364,8 +371,9 @@ public class Collaborator extends Composite implements ClickHandler {
 			AbstractDocument doc = documentsRightList.get(ind);
 			if (doc instanceof UnlockedDocument) 
 				DocLocker.lockDoc(this, doc.getKey(), "right", ind);
-				lockButtonR.removeFromParent();
+				rightHPanel.clear();
 				rightHPanel.add(saveButtonR);
+				rightHPanel.add(removeTabR);
 		} 
 
 		// pressed left 'save doc' button
@@ -386,6 +394,8 @@ public class Collaborator extends Composite implements ClickHandler {
 					saveButtonL.setEnabled(true);
 					saveButtonL.removeFromParent();
 					leftHPanel.add(lockButtonL);
+					leftHPanel.add(removeTabL);
+
 				}
 			}
 		} 
@@ -406,6 +416,7 @@ public class Collaborator extends Composite implements ClickHandler {
 					DocSaver.saveDoc(this, ld, "right", ind);
 					saveButtonR.removeFromParent();
 					rightHPanel.add(lockButtonR);
+					rightHPanel.add(removeTabR);
 				}
 			}
 		} 
