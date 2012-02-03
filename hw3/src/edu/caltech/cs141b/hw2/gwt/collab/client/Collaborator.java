@@ -27,8 +27,8 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  */
 public class Collaborator extends Composite implements ClickHandler {
 
-	private int leftTabCount = 1;
-	private int rightTabCount = 1;
+	//private int leftTabCount = 1;
+	//private int rightTabCount = 1;
 
 	protected CollaboratorServiceAsync collabService;
 
@@ -258,13 +258,14 @@ public class Collaborator extends Composite implements ClickHandler {
 			contentsL.add(areaBox);
 
 			// add the doc to the left tab panel
+			int leftTabCount = documentsL.getTabBar().getTabCount() + 1;
 			documentsL.add(vp, Integer.toString(leftTabCount));
 			leftTabCount++;
 		} else {
 			// add the title and contents to the lists for bookkeeping
 			titleR.add(titleBox);
 			contentsR.add(areaBox);
-
+			int rightTabCount = documentsR.getTabBar().getTabCount() + 1;
 			// add the doc to the right tab panel
 			documentsR.add(vp, Integer.toString(rightTabCount));
 			rightTabCount++;
@@ -462,6 +463,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// if user wants to remove current tab on left
 		else if (event.getSource().equals(removeTabL)) {
 			int ind = documentsL.getTabBar().getSelectedTab();
+			statusUpdate("Removing " + ind);
 			documentsL.remove(ind); // remove from the tabpanel
 			// statusUpdate("" + ind + ", " +
 			// documentsLeftList.get(ind).getContents());
