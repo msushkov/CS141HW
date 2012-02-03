@@ -1,21 +1,155 @@
+body {
+  color: black;
+  margin: 10px;
+  border: 0px;
+  padding: 0px;
+  background: #fff;
+  direction: ltr;
+  margin-left: 0;
+ margin-right: 0;
+   	padding: 0;
+   	width: 100%;
+	text-align: center;
+
+}
+
+
 h2 {
 	font-stretch: narrower;
 	font-weight: 500;
 	margin: 4px;
+	color: blue;
+	text-decoration: underline; 
+	font-size: 1.8em;
+	font-weight: bold; 
 }
-body{
-	text-align:center;
-}
+
 #application {
-	margin: 10px;
+	width: 1200px;
+	margin-left: auto;
+	margin-right: auto;
 }
+
 .app-title {
-	font-size: 2.5em; 
+	font-size: 4em; 
 	font-family: sans-serif;
 	display: inline;	
 	margin: 10px;
-	text-align:center;
+	text-align: center;
+	color: navy;
+	font-weight: bold;
+	text-align: center;
 }
 .app-innerpanel {
 	margin: 0 auto 0 auto;
+}
+
+.mainOuterPanel {
+	height: 100%;
+}
+
+.docsAndConsoleVertPanel {
+	width: 200px;
+	/*border-style: solid;*/
+}
+
+.docListPanel {
+
+}
+
+.openDocsOuterPanel {
+	/*border-style: none;*/
+	background: none;
+	width: 800px;
+}
+
+.openDocsInnerPanel {
+	width: 780px
+	/*border-style: none;*/
+}
+
+/*The Tab Panels*/
+
+.gwt-TabPanel {
+
+}
+
+.gwt-TabPanelBottom {
+	height: 400px;
+	width: 350px;
+
+
+}
+
+.gwt-TabBar {
+	border-color: white;
+	width: 350px;
+	height: 30px;
+}
+
+
+.gwt-TabBar .gwt-TabBarItem {
+  margin-left: 4px;
+  padding: 4px 8px 4px 8px;
+  cursor: pointer;
+  cursor: hand;
+  color: white;
+  font-weight: normal;
+  text-align: center;
+  background: gray;
+  -moz-border-radius: 3px 3px 0px 0px;
+  border-radius: 3px 3px 0px 0px;
+}
+.gwt-TabBar .gwt-TabBarItem-selected {
+  cursor: default;
+  background: blue;
+  color: white;
+  font-weight: bold;
+} 
+
+
+/* The document boxes */
+
+.gwt-TextBox {
+	width: 220px;
+	margin-left: 50px;
+	margin-right: auto;
+}
+.gwt-RichTextArea {
+	height: 320px;
+	width: 310px;
+	margin-left: 10px;
+	margin-right: auto;
+}
+
+
+
+/* Console */
+
+.consoleDP {
+	height: 100px;
+}
+
+
+
+
+
+/*The document list*/
+.gwt-ListBox {
+	overflow: hidden;
+	color: green;
+	background-color: black;
+}
+
+
+.consoleDP {
+	width: 100%
+	border-style: solid;
+	background-color: black;
+	color: white; 
+	font-weight: light;
+}
+
+.openDocsDP {
+	/*border-style: solid;*/
 }

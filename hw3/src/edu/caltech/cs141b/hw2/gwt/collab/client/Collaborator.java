@@ -38,8 +38,8 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	// Managing available documents.
 	protected ListBox documentList = new ListBox();
-	private Button refreshList = new Button("Refresh Document List");
-	private Button createNew = new Button("Create New Document");
+	private Button refreshList = new Button("Refresh List");
+	private Button createNew = new Button("New Document");
 
 	// For displaying document information and editing document content.
 	protected ArrayList<TextBox> titleL = new ArrayList<TextBox>();
