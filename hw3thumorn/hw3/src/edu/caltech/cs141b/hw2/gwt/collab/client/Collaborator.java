@@ -207,7 +207,7 @@ public class Collaborator extends Composite implements ClickHandler {
 					rightHPanel.clear();
 					rightHPanel.add(saveButtonR);
 					rightHPanel.add(removeTabR);
-					
+
 					titleR.get(ind).setEnabled(true);
 					contentsR.get(ind).setEnabled(true);					
 				} else {
@@ -359,11 +359,14 @@ public class Collaborator extends Composite implements ClickHandler {
 
 			// get the selected doc
 			AbstractDocument doc = documentsLeftList.get(ind);
-			if (doc instanceof UnlockedDocument)
+			// Lock only if it can be locked.
+
+			if (doc instanceof UnlockedDocument) {
 				DocLocker.lockDoc(this, doc.getKey(), "left", ind);
-			leftHPanel.clear();
-			leftHPanel.add(saveButtonL);
-			leftHPanel.add(removeTabL);
+				leftHPanel.clear();
+				leftHPanel.add(saveButtonL);
+				leftHPanel.add(removeTabL);
+			}
 		}
 
 		// pressed right 'get lock' button
@@ -373,11 +376,14 @@ public class Collaborator extends Composite implements ClickHandler {
 
 			// get the selected doc
 			AbstractDocument doc = documentsRightList.get(ind);
-			if (doc instanceof UnlockedDocument)
+			
+			// Lock only if it can be locked.
+			if (doc instanceof UnlockedDocument) {
 				DocLocker.lockDoc(this, doc.getKey(), "right", ind);
-			rightHPanel.clear();
-			rightHPanel.add(saveButtonR);
-			rightHPanel.add(removeTabR);
+				rightHPanel.clear();
+				rightHPanel.add(saveButtonR);
+				rightHPanel.add(removeTabR);
+			}
 		}
 
 		// pressed left 'save doc' button
@@ -460,7 +466,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			// statusUpdate("" + ind + ", " +
 			// documentsLeftList.get(ind).getContents());
 			documentsLeftList.remove(ind); // remove from the list of things on
-											// the left
+			// the left
 		}
 
 		// TODO - does not work
@@ -469,7 +475,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			int ind = documentsR.getTabBar().getSelectedTab();
 			documentsR.remove(ind); // remove from the tabpanel
 			documentsRightList.remove(ind); // remove from the list of things on
-											// the right
+			// the right
 		}
 
 		else if (event.getSource().equals(documentList)) {
