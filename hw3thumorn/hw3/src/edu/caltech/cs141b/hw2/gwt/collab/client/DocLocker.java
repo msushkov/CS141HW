@@ -34,11 +34,6 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 		this.index = index;
 		//collaborator.lockButton.setEnabled(false);
 
-		// disable the 'lock doc' button for the correct side
-		if (side.equals("left"))
-			collaborator.lockButtonL.setEnabled(false);
-		else if (side.equals("right"))
-			collaborator.lockButtonR.setEnabled(false);
 	}
 
 	@Override
@@ -96,18 +91,6 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 
 		//collaborator.refreshDoc.setEnabled(false);
 
-		// enable buttons
-		// refresh doc is disabled for both
-		if (side.equals("left"))
-		{
-			collaborator.saveButtonL.setEnabled(true);
-			collaborator.lockButtonL.setEnabled(false);
-		}
-		else if (side.equals("right"))
-		{
-			collaborator.saveButtonR.setEnabled(true);
-			collaborator.lockButtonR.setEnabled(false);
-		}
 
 	}
 

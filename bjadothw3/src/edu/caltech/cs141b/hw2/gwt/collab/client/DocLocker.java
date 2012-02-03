@@ -69,7 +69,7 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 	 */
 	protected void gotDoc(LockedDocument result, String side, int index) {
 		if (side.equals("left")) {
-			collaborator.documentsLeft.set(index, result);
+			collaborator.documentsLeftList.set(index, result);
 			TextBox box = collaborator.titleL.get(index);
 			box.setValue(result.getTitle());
 			box.setEnabled(true);

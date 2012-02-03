@@ -31,8 +31,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected CollaboratorServiceAsync collabService;
 
 	// Track document information.
-	protected ArrayList<AbstractDocument> documentsLeft = new ArrayList<AbstractDocument>();
-	protected ArrayList<AbstractDocument> documentsRight = new ArrayList<AbstractDocument>();
+	protected ArrayList<AbstractDocument> documentsLeftList = new ArrayList<AbstractDocument>();
+	protected ArrayList<AbstractDocument> documentsRightList = new ArrayList<AbstractDocument>();
 
 	// Managing available documents.
 	protected ListBox documentList = new ListBox();
@@ -153,7 +153,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	        public void onSelection(SelectionEvent<Integer> event) {
 				int ind = documentsL.getTabBar().getSelectedTab();
 				leftHPanel.clear();
-				if (documentsLeft.get(ind) instanceof LockedDocument) {
+				if (documentsLeftList.get(ind) instanceof LockedDocument) {
 					leftHPanel.add(saveButtonL);
 
 				} else {
@@ -165,7 +165,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	        public void onSelection(SelectionEvent<Integer> event) {
 				int ind = documentsR.getTabBar().getSelectedTab();
 				rightHPanel.clear();
-				if (documentsLeft.get(ind) instanceof UnlockedDocument) {
+				if (documentsLeftList.get(ind) instanceof UnlockedDocument) {
 					rightHPanel.add(lockButtonR);
 				} else {
 					rightHPanel.add(saveButtonR);
@@ -216,14 +216,14 @@ public class Collaborator extends Composite implements ClickHandler {
 		String key = documentList.getValue(docIndx);
 
 		if (side.equals("left")) {
-		documentsLeft.add(null);
+		documentsLeftList.add(null);
 		addLeftTab(title, "");
-		reader = DocReader.readDoc(this, key, "left", documentsLeft.size() - 1);
+		reader = DocReader.readDoc(this, key, "left", documentsLeftList.size() - 1);
 		
 		} else {
-			documentsRight.add(null);
+			documentsRightList.add(null);
 			addRightTab(title, "");
-			reader = DocReader.readDoc(this, key, "right", documentsLeft.size() - 1);	
+			reader = DocReader.readDoc(this, key, "right", documentsLeftList.size() - 1);	
 		}
 		
 		openLatestTab(side);
@@ -255,10 +255,10 @@ public class Collaborator extends Composite implements ClickHandler {
 		LockedDocument ld = new LockedDocument(null, null, null,
 				"Enter the document title.", "Enter the document contents.");
 		if (side.equals("left")) {
-			documentsLeft.add(ld);
+			documentsLeftList.add(ld);
 			addLeftTab(ld.getTitle(), ld.getContents());
 		} else {
-			documentsRight.add(ld);
+			documentsRightList.add(ld);
 			addRightTab(ld.getTitle(), ld.getContents());
 		}
 		openLatestTab(side);
@@ -295,7 +295,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		} else if (event.getSource().equals(lockButtonL)) {
 			int ind = documentsL.getTabBar()
 			.getSelectedTab();
-			AbstractDocument doc = documentsLeft.get(ind);
+			AbstractDocument doc = documentsLeftList.get(ind);
 			if (doc instanceof UnlockedDocument) {
 				DocLocker.lockDoc(this, doc.getKey(), "left", ind);
 				lockButtonL.removeFromParent();
@@ -304,7 +304,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		} else if (event.getSource().equals(lockButtonR)) {
 			int ind = documentsR.getTabBar()
 			.getSelectedTab();
-			AbstractDocument doc = documentsRight.get(ind);
+			AbstractDocument doc = documentsRightList.get(ind);
 			if (doc instanceof UnlockedDocument) {
 				DocLocker.lockDoc(this, doc.getKey(), "right", ind);
 				lockButtonR.removeFromParent();
@@ -312,7 +312,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			}
 		} else if (event.getSource().equals(saveButtonL)) {
 			int ind = documentsL.getTabBar().getSelectedTab();
-			AbstractDocument doc = documentsLeft.get(ind);
+			AbstractDocument doc = documentsLeftList.get(ind);
 			if (doc instanceof LockedDocument) {
 				if (doc.getTitle().equals(titleL.get(ind).getValue())
 						&& doc.getContents()
@@ -329,7 +329,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			}
 		} else if (event.getSource().equals(saveButtonR)) {
 			int ind = documentsR.getTabBar().getSelectedTab();
-			AbstractDocument doc = documentsRight.get(ind);
+			AbstractDocument doc = documentsRightList.get(ind);
 			if (doc instanceof LockedDocument) {
 				if (doc.getTitle().equals(titleR.get(ind).getValue())
 						&& doc.getContents()
@@ -363,11 +363,11 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	protected void setDoc(UnlockedDocument result, int index, String side) {
 		if (side.equals("left")) {
-			documentsLeft.set(index, result);
+			documentsLeftList.set(index, result);
 			titleL.get(index).setValue(result.getTitle());
 			contentsL.get(index).setHTML(result.getContents());
 		} else if (side.equals("right")) {
-			documentsRight.set(index, result);
+			documentsRightList.set(index, result);
 			titleR.get(index).setValue(result.getTitle());
 			contentsR.get(index).setHTML(result.getContents());
 		}
