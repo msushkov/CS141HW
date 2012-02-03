@@ -58,13 +58,12 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected Button removeTabL = new Button("Remove Tab");
 	protected Button removeTabR = new Button("Remove Tab");
 
-	
 	// Panels
 	VerticalPanel leftPanel = new VerticalPanel();
 	VerticalPanel rightPanel = new VerticalPanel();
 	HorizontalPanel leftHPanel = new HorizontalPanel();
 	HorizontalPanel rightHPanel = new HorizontalPanel();
-	
+
 	// Callback objects.
 	protected DocReader reader = new DocReader(this);
 	protected DocLister lister = new DocLister(this);
@@ -101,7 +100,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		docListPanel.add(new HTML("<h2>Available Documents</h2>"));
 		documentList.setWidth("100%");
 		docListPanel.add(documentList);
-		
+
 		// buttons inder the doc list
 		HorizontalPanel docListButtonPanel = new HorizontalPanel();
 		docListButtonPanel.setSpacing(10);
@@ -131,7 +130,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		DecoratorPanel openDocsDP = new DecoratorPanel();
 		openDocsDP.setStyleName("openDocsDP");
 		openDocsDP.setWidth("100%");
-		
+
 		VerticalPanel openDocsInnerPanel = new VerticalPanel();
 		openDocsInnerPanel.setStyleName("openDocsInnerPanel");
 		openDocsInnerPanel.add(new HTML("<h2>Open Documents</h2>"));
@@ -143,7 +142,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// holds the buttons for the left tab panel
 		leftHPanel.add(lockButtonL);
-		//leftHPanel.add(saveButtonL);
+		// leftHPanel.add(saveButtonL);
 		leftHPanel.add(removeTabL);
 		leftPanel.add(leftHPanel);
 
@@ -152,7 +151,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// holds the buttons for the right tab panel
 		rightHPanel.add(lockButtonR);
-		//rightHPanel.add(saveButtonR);
+		// rightHPanel.add(saveButtonR);
 		rightHPanel.add(removeTabR);
 		rightPanel.add(rightHPanel);
 
@@ -177,49 +176,50 @@ public class Collaborator extends Composite implements ClickHandler {
 		showButtonR.addClickHandler(this);
 		removeTabR.addClickHandler(this);
 		removeTabL.addClickHandler(this);
-		
-		documentsL.addSelectionHandler(new SelectionHandler<Integer>(){
-	        public void onSelection(SelectionEvent<Integer> event) {
+
+		documentsL.addSelectionHandler(new SelectionHandler<Integer>() {
+			public void onSelection(SelectionEvent<Integer> event) {
 				int ind = documentsL.getTabBar().getSelectedTab();
 				leftHPanel.clear();
 				if (documentsLeftList.get(ind) instanceof LockedDocument) {
+					leftHPanel.clear();
 					leftHPanel.add(saveButtonL);
 					leftHPanel.add(removeTabL);
-					
+
 					titleL.get(ind).setEnabled(true);
 					contentsL.get(ind).setEnabled(true);
 
 				} else {
+					leftHPanel.clear();
 					leftHPanel.add(lockButtonL);
 					leftHPanel.add(removeTabL);
 					// Disabling the fields since you don't have the lock
 					titleL.get(ind).setEnabled(false);
 					contentsL.get(ind).setEnabled(false);
 				}
-	        }});
-		
-		documentsR.addSelectionHandler(new SelectionHandler<Integer>(){
-	        public void onSelection(SelectionEvent<Integer> event) {
-				int ind = documentsR.getTabBar().getSelectedTab();
-				if (documentsRightList.get(ind) instanceof UnlockedDocument) {
-					rightHPanel.clear();
-					rightHPanel.add(lockButtonR);
-					rightHPanel.add(removeTabR);
-					
-					titleR.get(ind).setEnabled(true);
-					contentsR.get(ind).setEnabled(true);
+			}
+		});
 
-				} else {
+		documentsR.addSelectionHandler(new SelectionHandler<Integer>() {
+			public void onSelection(SelectionEvent<Integer> event) {
+				int ind = documentsR.getTabBar().getSelectedTab();
+				if (documentsRightList.get(ind) instanceof LockedDocument) {
 					rightHPanel.clear();
 					rightHPanel.add(saveButtonR);
 					rightHPanel.add(removeTabR);
+					
+					titleR.get(ind).setEnabled(true);
+					contentsR.get(ind).setEnabled(true);					
+				} else {
+					rightHPanel.clear();
+					rightHPanel.add(lockButtonR);
+					rightHPanel.add(removeTabR);
+
 					titleR.get(ind).setEnabled(false);
 					contentsR.get(ind).setEnabled(false);
 				}
-	        }});
-		
-		
-		
+			}
+		});
 
 		documentList.addClickHandler(this);
 		documentList.setVisibleItemCount(20);
@@ -230,6 +230,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	/**
 	 * Adds a tab to either the left or the right tab panel.
+	 * 
 	 * @param title
 	 * @param content
 	 * @param left
@@ -251,8 +252,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		vp.add(areaBox);
 
 		// add the doc title and contents to the appropriate tabpanel
-		if (left)
-		{
+		if (left) {
 			// add the title and contents to the lists for bookkeeping
 			titleL.add(titleBox);
 			contentsL.add(areaBox);
@@ -260,9 +260,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			// add the doc to the left tab panel
 			documentsL.add(vp, Integer.toString(leftTabCount));
 			leftTabCount++;
-		}
-		else
-		{
+		} else {
 			// add the title and contents to the lists for bookkeeping
 			titleR.add(titleBox);
 			contentsR.add(areaBox);
@@ -288,36 +286,36 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 		openLatestTab(side);
 	}
-	
-	
+
 	public void openLatestTab(String side) {
 		if (side.equals("left")) {
-			int last = documentsL.getTabBar().getTabCount() -1;
+			int last = documentsL.getTabBar().getTabCount() - 1;
 			documentsL.getTabBar().selectTab(last);
 		} else {
-			int last = documentsR.getTabBar().getTabCount() -1;
+			int last = documentsR.getTabBar().getTabCount() - 1;
 			documentsR.getTabBar().selectTab(last);
 		}
 	}
-	
+
 	public void openDocument(String side) {
 		int docIndx = documentList.getSelectedIndex();
 		String title = documentList.getItemText(docIndx);
 		String key = documentList.getValue(docIndx);
 
 		if (side.equals("left")) {
-		documentsLeftList.add(null);
-		addTab(title, "", true);
-		reader = DocReader.readDoc(this, key, "left", documentsLeftList.size() - 1);
-		
+			documentsLeftList.add(null);
+			addTab(title, "", true);
+			reader = DocReader.readDoc(this, key, "left", documentsLeftList
+					.size() - 1);
+
 		} else {
 			documentsRightList.add(null);
 			addTab(title, "", false);
-			reader = DocReader.readDoc(this, key, "right", documentsRightList.size() - 1);	
+			reader = DocReader.readDoc(this, key, "right", documentsRightList
+					.size() - 1);
 		}
-		
-		openLatestTab(side);
 
+		openLatestTab(side);
 
 	}
 
@@ -329,7 +327,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 *            the status to add to the console window
 	 */
 	protected void statusUpdate(String status) {
-		while (statusArea.getWidgetCount() > 10) 
+		while (statusArea.getWidgetCount() > 10)
 			statusArea.remove(1);
 
 		final HTML statusUpd = new HTML(status);
@@ -347,11 +345,11 @@ public class Collaborator extends Composite implements ClickHandler {
 	public void onClick(ClickEvent event) {
 
 		// pressed 'refresh document list' button
-		if (event.getSource().equals(refreshList)) 
+		if (event.getSource().equals(refreshList))
 			lister.getDocumentList();
 
 		// pressed 'new doc' button
-		else if (event.getSource().equals(createNew)) 
+		else if (event.getSource().equals(createNew))
 			createNewDocument("left");
 
 		// pressed left 'get lock' button
@@ -359,14 +357,14 @@ public class Collaborator extends Composite implements ClickHandler {
 			// get the index of the selected tab on the left tabpanel
 			int ind = documentsL.getTabBar().getSelectedTab();
 
-			// get the selected doc 
+			// get the selected doc
 			AbstractDocument doc = documentsLeftList.get(ind);
-			if (doc instanceof UnlockedDocument) 
+			if (doc instanceof UnlockedDocument)
 				DocLocker.lockDoc(this, doc.getKey(), "left", ind);
-				leftHPanel.clear();
-				leftHPanel.add(saveButtonL);
-				leftHPanel.add(removeTabL);
-	} 
+			leftHPanel.clear();
+			leftHPanel.add(saveButtonL);
+			leftHPanel.add(removeTabL);
+		}
 
 		// pressed right 'get lock' button
 		else if (event.getSource().equals(lockButtonR)) {
@@ -375,12 +373,12 @@ public class Collaborator extends Composite implements ClickHandler {
 
 			// get the selected doc
 			AbstractDocument doc = documentsRightList.get(ind);
-			if (doc instanceof UnlockedDocument) 
+			if (doc instanceof UnlockedDocument)
 				DocLocker.lockDoc(this, doc.getKey(), "right", ind);
-				rightHPanel.clear();
-				rightHPanel.add(saveButtonR);
-				rightHPanel.add(removeTabR);
-		} 
+			rightHPanel.clear();
+			rightHPanel.add(saveButtonR);
+			rightHPanel.add(removeTabR);
+		}
 
 		// pressed left 'save doc' button
 		else if (event.getSource().equals(saveButtonL)) {
@@ -389,10 +387,10 @@ public class Collaborator extends Composite implements ClickHandler {
 
 			if (doc instanceof LockedDocument) {
 				if (doc.getTitle().equals(titleL.get(ind).getValue())
-						&& doc.getContents().equals(contentsL.get(ind).getHTML())) {
+						&& doc.getContents().equals(
+								contentsL.get(ind).getHTML())) {
 					statusUpdate("No document changes; not saving.");
-				} 
-				else {
+				} else {
 					LockedDocument ld = (LockedDocument) doc;
 					ld.setTitle(titleL.get(ind).getValue());
 					ld.setContents(contentsL.get(ind).getHTML());
@@ -404,7 +402,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 				}
 			}
-		} 
+		}
 
 		// pressed right 'save doc' button
 		else if (event.getSource().equals(saveButtonR)) {
@@ -412,10 +410,10 @@ public class Collaborator extends Composite implements ClickHandler {
 			AbstractDocument doc = documentsRightList.get(ind);
 			if (doc instanceof LockedDocument) {
 				if (doc.getTitle().equals(titleR.get(ind).getValue())
-						&& doc.getContents().equals(contentsR.get(ind).getHTML())) {
+						&& doc.getContents().equals(
+								contentsR.get(ind).getHTML())) {
 					statusUpdate("No document changes; not saving.");
-				} 
-				else {
+				} else {
 					LockedDocument ld = (LockedDocument) doc;
 					ld.setTitle(titleR.get(ind).getValue());
 					ld.setContents(contentsR.get(ind).getHTML());
@@ -426,28 +424,26 @@ public class Collaborator extends Composite implements ClickHandler {
 					rightHPanel.add(removeTabR);
 				}
 			}
-		} 
+		}
 
 		// if show left is pressed, add doc to the left tab panel
 		else if (event.getSource().equals(showButtonL)) {
-			String key = documentList.getValue(documentList.getSelectedIndex());	
+			String key = documentList.getValue(documentList.getSelectedIndex());
 			// if we arent already showing this doc, add it to the panel
-			if (!contained(key, documentsLeftList, documentsRightList))
-			{
+			if (!contained(key, documentsLeftList, documentsRightList)) {
 				openDocument("left");
 			}
 
 			// this is already up on the tabpanels, so disable these buttons
 			showButtonL.setEnabled(false);
 			showButtonR.setEnabled(false);
-		} 
+		}
 
 		// if show right is pressed, add doc to the right tab panel
 		else if (event.getSource().equals(showButtonR)) {
-			String key = documentList.getValue(documentList.getSelectedIndex());	
+			String key = documentList.getValue(documentList.getSelectedIndex());
 			// if we arent already showing this doc, add it to the panel
-			if (!contained(key, documentsLeftList, documentsRightList))
-			{
+			if (!contained(key, documentsLeftList, documentsRightList)) {
 				openDocument("right");
 			}
 
@@ -461,8 +457,10 @@ public class Collaborator extends Composite implements ClickHandler {
 		else if (event.getSource().equals(removeTabL)) {
 			int ind = documentsL.getTabBar().getSelectedTab();
 			documentsL.remove(ind); // remove from the tabpanel
-			//statusUpdate("" + ind + ", " + documentsLeftList.get(ind).getContents());
-			documentsLeftList.remove(ind); // remove from the list of things on the left
+			// statusUpdate("" + ind + ", " +
+			// documentsLeftList.get(ind).getContents());
+			documentsLeftList.remove(ind); // remove from the list of things on
+											// the left
 		}
 
 		// TODO - does not work
@@ -470,19 +468,18 @@ public class Collaborator extends Composite implements ClickHandler {
 		else if (event.getSource().equals(removeTabR)) {
 			int ind = documentsR.getTabBar().getSelectedTab();
 			documentsR.remove(ind); // remove from the tabpanel
-			documentsRightList.remove(ind); // remove from the list of things on the right
+			documentsRightList.remove(ind); // remove from the list of things on
+											// the right
 		}
 
 		else if (event.getSource().equals(documentList)) {
-			String key = documentList.getValue(documentList.getSelectedIndex());	
-			// if we aren already showing this doc, disable show left and show right
-			if (contained(key, documentsLeftList, documentsRightList))
-			{
+			String key = documentList.getValue(documentList.getSelectedIndex());
+			// if we aren already showing this doc, disable show left and show
+			// right
+			if (contained(key, documentsLeftList, documentsRightList)) {
 				showButtonL.setEnabled(false);
 				showButtonR.setEnabled(false);
-			}
-			else
-			{
+			} else {
 				showButtonL.setEnabled(true);
 				showButtonR.setEnabled(true);
 			}
@@ -491,22 +488,21 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	/**
 	 * Returns true of key is in either of the lists, false otherwise.
+	 * 
 	 * @param key
 	 * @param list
 	 * @return
 	 */
-	private boolean contained(String key, ArrayList<AbstractDocument> list1, ArrayList<AbstractDocument> list2)
-	{
+	private boolean contained(String key, ArrayList<AbstractDocument> list1,
+			ArrayList<AbstractDocument> list2) {
 		boolean contains = false;
 
-		for (AbstractDocument doc : list1)
-		{
+		for (AbstractDocument doc : list1) {
 			if (doc.getKey().equals(key))
 				contains = true;
 		}
 
-		for (AbstractDocument doc : list2)
-		{
+		for (AbstractDocument doc : list2) {
 			if (doc.getKey().equals(key))
 				contains = true;
 		}
@@ -521,7 +517,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * 
 	 * Called by docsaver and docreader.
 	 * 
-	 * @param result the unlocked document that should be displayed
+	 * @param result
+	 *            the unlocked document that should be displayed
 	 */
 	protected void setDoc(UnlockedDocument result, int index, String side) {
 		// from saver: refresh and lock are enabled
@@ -532,18 +529,18 @@ public class Collaborator extends Composite implements ClickHandler {
 			titleL.get(index).setValue(result.getTitle());
 			contentsL.get(index).setHTML(result.getContents());
 
-			//titleL.get(index).setEnabled(false);
-			//contentsL.get(index).setEnabled(false);
+			// titleL.get(index).setEnabled(false);
+			// contentsL.get(index).setEnabled(false);
 		}
 		// if (side.equals("right")
-			else {
+		else {
 			statusUpdate("in " + side);
 			documentsRightList.set(index, result);
 			titleR.get(index).setValue(result.getTitle());
 			contentsR.get(index).setHTML(result.getContents());
-			
-			//titleR.get(index).setEnabled(false);
-			//contentsR.get(index).setEnabled(false);
+
+			// titleR.get(index).setEnabled(false);
+			// contentsR.get(index).setEnabled(false);
 		}
 	}
 }
