@@ -201,7 +201,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		documentsR.addSelectionHandler(new SelectionHandler<Integer>(){
 	        public void onSelection(SelectionEvent<Integer> event) {
 				int ind = documentsR.getTabBar().getSelectedTab();
-				if (documentsLeftList.get(ind) instanceof UnlockedDocument) {
+				if (documentsRightList.get(ind) instanceof UnlockedDocument) {
 					rightHPanel.clear();
 					rightHPanel.add(lockButtonR);
 					rightHPanel.add(removeTabR);
@@ -313,7 +313,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		} else {
 			documentsRightList.add(null);
 			addTab(title, "", false);
-			reader = DocReader.readDoc(this, key, "right", documentsLeftList.size() - 1);	
+			reader = DocReader.readDoc(this, key, "right", documentsRightList.size() - 1);	
 		}
 		
 		openLatestTab(side);
@@ -546,34 +546,4 @@ public class Collaborator extends Composite implements ClickHandler {
 			//contentsR.get(index).setEnabled(false);
 		}
 	}
-
-	/*
-	 * (non-Javadoc) Intercepts events from the list box.
-	 * 
-	 * @see
-	 * com.google.gwt.event.dom.client.ChangeHandler#onChange(com.google.gwt
-	 * .event.dom.client.ChangeEvent)
-	 */
-	/*
-	 * @Override public void onChange(ChangeEvent event) { if
-	 * (event.getSource().equals(documentList)) { String key =
-	 * documentList.getValue(documentList.getSelectedIndex());
-	 * reader.getDocument(key); } }
-	 */
-
-	/**
-	 * Used to release existing locks when the active document changes.
-	 * 
-	 * @param key
-	 *            the key of the new active document or null for a new document
-	 */
-	/*
-	 * private void discardExisting(String key) { if (lockedDoc != null) { if
-	 * (lockedDoc.getKey() == null) { statusUpdate("Discarding new document.");
-	 * } else if (!lockedDoc.getKey().equals(key)) {
-	 * releaser.releaseLock(lockedDoc); } else { // Newly active item is the
-	 * currently locked item. return; } lockedDoc = null; setDefaultButtons(); }
-	 * else if (readOnlyDoc != null) { if (readOnlyDoc.getKey().equals(key))
-	 * return; readOnlyDoc = null; } }
-	 */
 }
