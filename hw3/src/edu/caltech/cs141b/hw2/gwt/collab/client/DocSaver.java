@@ -3,6 +3,7 @@ package edu.caltech.cs141b.hw2.gwt.collab.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RichTextArea;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockExpired;
@@ -37,7 +38,7 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 		// save and fields are disabled
 
 		TextBox box = null;
-		RichTextArea area = null;
+		TextArea area = null;
 
 		if (side.equals("left"))
 		{

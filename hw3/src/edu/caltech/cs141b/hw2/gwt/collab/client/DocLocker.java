@@ -3,6 +3,7 @@ package edu.caltech.cs141b.hw2.gwt.collab.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RichTextArea;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockUnavailable;
@@ -33,7 +34,6 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 		this.side = side;
 		this.index = index;
 		//collaborator.lockButton.setEnabled(false);
-
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 
 	protected void gotDoc(LockedDocument result, String side, int index) {
 		TextBox box = null;
-		RichTextArea area = null;
+		TextArea area = null;
 
 		if (side.equals("left")) {
 			collaborator.documentsLeftList.set(index, result);
@@ -83,16 +83,15 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 
 		// set the title and contents of this doc to be the current thing on the page
 		box.setValue(result.getTitle());
-		area.setHTML(result.getContents());
-
+		
+		//area.setHTML(result.getContents());
+		area.setText(result.getContents());
+		
 		// the user can now edit the title and the contents of this doc
 		box.setEnabled(true);
 		area.setEnabled(true);
 
 		//collaborator.refreshDoc.setEnabled(false);
-
-
 	}
-
 }
 
