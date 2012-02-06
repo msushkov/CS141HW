@@ -51,10 +51,6 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 	@Override
 	public void onSuccess(UnlockedDocument result) {
 		if (result.getKey().equals(collaborator.waitingKey)) {
-<<<<<<< HEAD
-			int max = 15;
-=======
->>>>>>> f5da31e8dbf5a0c62cdad16c4b8f58ecdfd039e9
 			String title = result.getTitle();
 			if (title.length() > maxStrLen) {
 				title = title.substring(0, maxStrLen - 3) + "...";
