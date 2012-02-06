@@ -96,6 +96,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		docListPanel.add(new HTML("<h2>Available Documents</h2>"));
 		documentList.setWidth("100%");
 		docListPanel.add(documentList);
+		docListPanel.setWidth("320px");
 
 		// buttons inder the doc list
 		HorizontalPanel docListButtonPanel = new HorizontalPanel();
@@ -115,6 +116,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		consoleDP.setWidth("100%");
 		statusArea.setSpacing(10);
 		statusArea.add(new HTML("<h2>Console</h2>"));
+		statusArea.setStyleName("consoleBox");
+		statusArea.setHeight("300px");
 		consoleDP.add(statusArea);
 		docsAndConsoleVertPanel.add(consoleDP);
 		mainOuterPanel.add(docsAndConsoleVertPanel);
@@ -141,6 +144,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		// leftHPanel.add(saveButtonL);
 		// leftHPanel.add(removeTabL);
 		leftPanel.add(leftHPanel);
+		
+		leftPanel.setStyleName("left-area");
 
 		// holds the right tab panel
 		rightPanel.add(documentsR);
@@ -350,7 +355,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 *            the status to add to the console window
 	 */
 	protected void statusUpdate(String status) {
-		while (statusArea.getWidgetCount() > 10)
+		while (statusArea.getWidgetCount() > 5)
 			statusArea.remove(1);
 
 		final HTML statusUpd = new HTML(status);

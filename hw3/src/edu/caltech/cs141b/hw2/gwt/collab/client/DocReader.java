@@ -44,7 +44,12 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 	@Override
 	public void onSuccess(UnlockedDocument result) {
 		if (result.getKey().equals(collaborator.waitingKey)) {
-			collaborator.statusUpdate("Document '" + result.getTitle()
+			int max = 25;
+			String title = result.getTitle();
+			if (title.length() > max) {
+				title = title.substring(0, max - 3) + "...";
+			}
+			collaborator.statusUpdate("Document '" + title
 					+ "' successfully retrieved.");
 
 			collaborator.setDoc(result, index, side);

@@ -1,9 +1,10 @@
 body {
+
   color: black;
   margin: 10px;
   border: 0px;
   padding: 0px;
-  background: #fff;
+  background: #e1dfff;
   direction: ltr;
   margin-left: 0;
  margin-right: 0;
@@ -12,14 +13,16 @@ body {
 	text-align: center;
 
 }
-
+h1 {
+	color: black;
+}
 
 h2 {
 	font-stretch: narrower;
 	font-weight: 500;
 	margin: 4px;
-	color: blue;
-	text-decoration: underline; 
+	color: black;
+	/*text-decoration: bold; */ 
 	font-size: 1.8em;
 	font-weight: bold; 
 }
@@ -36,7 +39,7 @@ h2 {
 	display: inline;	
 	margin: 10px;
 	text-align: center;
-	color: navy;
+	color: black;
 	font-weight: bold;
 	text-align: center;
 }
@@ -60,7 +63,7 @@ h2 {
 .openDocsOuterPanel {
 	/*border-style: none;*/
 	background: none;
-	width: 800px;
+	width: 700px;
 }
 
 .openDocsInnerPanel {
@@ -71,7 +74,7 @@ h2 {
 /*The Tab Panels*/
 
 .gwt-TabPanel {
-
+	background: white;
 }
 
 .gwt-TabPanelBottom {
@@ -85,6 +88,9 @@ h2 {
 	border-color: white;
 	width: 350px;
 	height: 30px;
+	padding-top: 6px;
+	background-color: #c5c2ff;
+
 }
 
 
@@ -93,17 +99,18 @@ h2 {
   padding: 4px 8px 4px 8px;
   cursor: pointer;
   cursor: hand;
-  color: white;
+  color: black;
   font-weight: normal;
   text-align: center;
-  background: gray;
+  background: #9cc3f1;
+  /*background: #56A0D3;*/
   -moz-border-radius: 3px 3px 0px 0px;
   border-radius: 3px 3px 0px 0px;
 }
 .gwt-TabBar .gwt-TabBarItem-selected {
   cursor: default;
-  background: #56A0D3;
-  color: white;
+  background: white;
+  color: black;
   font-weight: bold;
 } 
 
@@ -131,14 +138,25 @@ h2 {
 }
 
 
-
+.leftarea {
+	background: black;
+}
 
 
 /*The document list*/
 .gwt-ListBox {
+	height: 200px;
 	overflow: hidden;
-	color: green;
-	background-color: black;
+	color: black;
+	background-color: white;
+}
+
+.consoleBox {
+	height: 200px;
+}
+
+.consoleBox tr {
+	height: 20px;
 }
 
 
@@ -150,6 +168,72 @@ h2 {
 	font-weight: light;
 }
 
+.consoleDP h2 {
+	color: white;
+}
+
+.openDocsInnerPanel {
+	border: solid;
+	border-width: 1px;
+	border-radius: 20px;
+}
+
 .openDocsDP {
 	/*border-style: solid;*/
+}
+
+
+
+/* Decorator panel BS */
+
+.gwt-DecoratorPanel {
+		border: solid;
+	border-width: 1px;
+	border-radius: 20px;
+}
+/*
+.gwt-DecoratorPanel .topCenter {
+  border-top: 1px solid #bbb;
+  line-height: 0px;
+}
+.gwt-DecoratorPanel .bottomCenter {
+  border-bottom: 1px solid #bbb;
+  line-height: 0px;
+}
+.gwt-DecoratorPanel .topCenterInner,
+.gwt-DecoratorPanel .bottomCenterInner {
+  height: 1px;
+  line-height: 0px;
+  font-size: 1px;
+}
+.gwt-DecoratorPanel .middleLeft {
+  border-left: 1px solid #bbb;
+}
+.gwt-DecoratorPanel .middleRight {
+  border-right: 1px solid #bbb;
+}
+.gwt-DecoratorPanel .middleLeftInner,
+.gwt-DecoratorPanel .middleRightInner {
+  width: 1px;
+  line-height: 1px;
+}
+*/
+.gwt-DecoratorPanel .topLeftInner,
+.gwt-DecoratorPanel .topRightInner,
+.gwt-DecoratorPanel .bottomLeftInner,
+.gwt-DecoratorPanel .bottomRightInner {
+  width: 5px;
+  height: 5px;
+  zoom: 1;
+  font-size: 1px;
+  overflow: hidden;
+}
+
+* html .gwt-DecoratorPanel .topLeftInner,
+* html .gwt-DecoratorPanel .topRightInner,
+* html .gwt-DecoratorPanel .bottomLeftInner,
+* html .gwt-DecoratorPanel .bottomRightInner {
+  width: 5px;
+  height: 5px;
+  overflow: hidden;
 }
