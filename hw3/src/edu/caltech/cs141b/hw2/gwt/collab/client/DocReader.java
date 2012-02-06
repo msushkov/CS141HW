@@ -26,11 +26,16 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 	}
 
 	public void getDocument(String key, String side, int ind) {
-		collaborator.statusUpdate("Fetching document " + key + ".");
-		collaborator.waitingKey = key;
-		this.index = ind;
-		this.side = side;
-		collaborator.collabService.getDocument(key, this);
+		if (key != null)
+		{
+			collaborator.statusUpdate("Fetching document " + key + ".");
+			collaborator.waitingKey = key;
+			this.index = ind;
+			this.side = side;
+			collaborator.collabService.getDocument(key, this);
+		}
+		else
+			collaborator.statusUpdate("Can't fetch a doc with a null key!");
 	}
 
 	@Override
@@ -44,7 +49,7 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 	@Override
 	public void onSuccess(UnlockedDocument result) {
 		if (result.getKey().equals(collaborator.waitingKey)) {
-			int max = 25;
+			int max = 15;
 			String title = result.getTitle();
 			if (title.length() > max) {
 				title = title.substring(0, max - 3) + "...";
@@ -54,7 +59,7 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 
 			collaborator.setDoc(result, index, side);
 		} else
-			collaborator
-					.statusUpdate("Returned document that is no longer expected; discarding.");
+			collaborator.statusUpdate("Returned " +
+					"document that is no longer expected; discarding.");
 	}
 }
