@@ -15,6 +15,7 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 	private LockedDocument lockedDocument;
 	private String side; // is the current doc on the left or the right?
 	private int index; // which tab is the current doc on?
+	private final static int maxStrLen = 25;
 
 	public static void saveDoc(Collaborator col, LockedDocument ld,
 			String side, int ind) {
@@ -73,7 +74,11 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 
 	@Override
 	public void onSuccess(UnlockedDocument result) {
-		collaborator.statusUpdate("Document '" + result.getTitle()
+		String title = result.getTitle();
+		if (title.length() > maxStrLen) {
+			title = title.substring(0, maxStrLen - 3) + "...";
+		}
+		collaborator.statusUpdate("Document '" + title
 				+ "' successfully saved.");
 		if (collaborator.waitingKey == null
 				|| result.getKey().equals(collaborator.waitingKey)) {

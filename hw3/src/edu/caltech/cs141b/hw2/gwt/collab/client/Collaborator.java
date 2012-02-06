@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -71,7 +72,9 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected String waitingKey = null;
 
 	// Status tracking.
-	private VerticalPanel statusArea = new VerticalPanel();
+	private VerticalPanel consoleArea = new VerticalPanel();
+
+
 
 	/**
 	 * UI initialization.
@@ -117,9 +120,10 @@ public class Collaborator extends Composite implements ClickHandler {
 		DecoratorPanel consoleDP = new DecoratorPanel();
 		consoleDP.setStyleName("consoleDP");
 		consoleDP.setWidth("100%");
-		statusArea.setSpacing(10);
-		statusArea.add(new HTML("<h2>Console</h2>"));
-		consoleDP.add(statusArea);
+		consoleArea.setSpacing(10);
+		consoleArea.add(new HTML("<h2>Console</h2>"));
+		consoleArea.setVerticalAlignment(HasVerticalAlignment.ALIGN_TOP);
+		consoleDP.add(consoleArea);
 		docsAndConsoleVertPanel.add(consoleDP);
 		mainOuterPanel.add(docsAndConsoleVertPanel);
 
@@ -133,7 +137,9 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		VerticalPanel openDocsInnerPanel = new VerticalPanel();
 		openDocsInnerPanel.setStyleName("openDocsInnerPanel");
-		openDocsInnerPanel.add(new HTML("<h2>Open Documents</h2>"));
+		HTML openDocsTitle = new HTML("<h2>Open Documents</h2>");
+		openDocsTitle.setStyleName("openDocsTitle");
+		openDocsInnerPanel.add(openDocsTitle);
 
 		// holds the left tab panel
 		HorizontalPanel innerHp = new HorizontalPanel();
@@ -268,7 +274,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		TextArea areaBox = new TextArea();
 		areaBox.setWidth("97%");
 		areaBox.setStyleName("documentTextBox");
-		//areaBox.setHeight("200px");
 		// areaBox.setHTML(content);
 		areaBox.setText(content);
 
@@ -391,11 +396,11 @@ public class Collaborator extends Composite implements ClickHandler {
 	 *            the status to add to the console window
 	 */
 	protected void statusUpdate(String status) {
-		while (statusArea.getWidgetCount() > maxConsoleEnt)
-			statusArea.remove(1);
+		while (consoleArea.getWidgetCount() > maxConsoleEnt)
+			consoleArea.remove(1);
 
 		final HTML statusUpd = new HTML(status);
-		statusArea.add(statusUpd);
+		consoleArea.add(statusUpd);
 	}
 
 	/*

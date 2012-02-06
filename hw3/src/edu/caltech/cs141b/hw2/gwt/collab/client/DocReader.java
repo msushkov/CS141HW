@@ -13,6 +13,8 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 	private Collaborator collaborator;
 	private String side; // is the current doc on the left or the right?
 	private int index; // which tab is the current doc on?
+	private final static int maxStrLen = 25;
+
 
 	public static DocReader readDoc(Collaborator collaborator, String key,
 			String side, int ind) {
@@ -44,10 +46,9 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 	@Override
 	public void onSuccess(UnlockedDocument result) {
 		if (result.getKey().equals(collaborator.waitingKey)) {
-			int max = 25;
 			String title = result.getTitle();
-			if (title.length() > max) {
-				title = title.substring(0, max - 3) + "...";
+			if (title.length() > maxStrLen) {
+				title = title.substring(0, maxStrLen - 3) + "...";
 			}
 			collaborator.statusUpdate("Document '" + title
 					+ "' successfully retrieved.");
