@@ -335,7 +335,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			documentsRightList.add(null);
 			addTab(title, "", false);
 			DocReader
-					.readDoc(this, key, "right", documentsRightList.size() - 1);
+			.readDoc(this, key, "right", documentsRightList.size() - 1);
 		}
 
 		openLatestTab(side);
@@ -376,198 +376,40 @@ public class Collaborator extends Composite implements ClickHandler {
 			createNewDocument("left");
 
 		// pressed left 'get lock' button
-		else if (event.getSource().equals(lockButtonL)) {
-			// get the index of the selected tab on the left tabpanel
-			int ind = documentsL.getTabBar().getSelectedTab();
-
-			// get the selected doc
-			AbstractDocument doc = documentsLeftList.get(ind);
-
-			// Lock only if it can be locked.
-			if (doc instanceof UnlockedDocument) {
-				DocLocker.lockDoc(this, doc.getKey(), "left", ind);
-				leftHPanel.clear();
-				leftHPanel.add(saveButtonL);
-				leftHPanel.add(removeTabL);
-			}
-		}
+		else if (event.getSource().equals(lockButtonL))
+			lockDocumentButtonHandler(true);
 
 		// pressed right 'get lock' button
-		else if (event.getSource().equals(lockButtonR)) {
-			// get the index of the selected tab on the right tabpanel
-			int ind = documentsR.getTabBar().getSelectedTab();
-
-			// get the selected doc
-			AbstractDocument doc = documentsRightList.get(ind);
-
-			// Lock only if it can be locked.
-			if (doc instanceof UnlockedDocument) {
-				DocLocker.lockDoc(this, doc.getKey(), "right", ind);
-				rightHPanel.clear();
-				rightHPanel.add(saveButtonR);
-				rightHPanel.add(removeTabR);
-			}
-
-		}
+		else if (event.getSource().equals(lockButtonR))
+			lockDocumentButtonHandler(false);
 
 		// pressed left 'save doc' button
-		else if (event.getSource().equals(saveButtonL)) {
-			int ind = documentsL.getTabBar().getSelectedTab();
-			AbstractDocument doc = documentsLeftList.get(ind);
-
-			// if we can save this document
-			if (doc instanceof LockedDocument) {
-				// if the title and contents have not been changed, no need to
-				// save
-				if (doc.getTitle().equals(titleL.get(ind).getValue())
-						&& doc.getContents().equals(
-								contentsL.get(ind).getText()))
-					statusUpdate("No document changes; not saving.");
-				// otherwise if stuff was changed, save
-				else {
-					LockedDocument ld = (LockedDocument) doc;
-					ld.setTitle(titleL.get(ind).getValue());
-
-					ld.setContents(contentsL.get(ind).getText());
-
-					DocSaver.saveDoc(this, ld, "left", ind);
-					saveButtonL.setEnabled(true);
-					saveButtonL.removeFromParent();
-					leftHPanel.add(lockButtonL);
-					leftHPanel.add(removeTabL);
-
-					// refresh in docsaver instead
-					// WHY AREN"T WE DOING THIS CALL
-					// refresh our doc list (in case titles were changed)
-					// lister.getDocumentList();
-				}
-			}
-		}
+		else if (event.getSource().equals(saveButtonL)) 
+			saveDocumentButtonHandler(true);
 
 		// pressed right 'save doc' button
-		else if (event.getSource().equals(saveButtonR)) {
-			int ind = documentsR.getTabBar().getSelectedTab();
-			AbstractDocument doc = documentsRightList.get(ind);
-
-			// if we can save this document
-			if (doc instanceof LockedDocument) {
-				// if the title and contents have not been changed, no need to
-				// save
-				if (doc.getTitle().equals(titleR.get(ind).getValue())
-						&& doc.getContents().equals(
-								contentsR.get(ind).getText()))
-					statusUpdate("No document changes; not saving.");
-				// otherwise if stuff was changed, save
-				else {
-					LockedDocument ld = (LockedDocument) doc;
-					ld.setTitle(titleR.get(ind).getValue());
-
-					ld.setContents(contentsR.get(ind).getText());
-
-					DocSaver.saveDoc(this, ld, "right", ind);
-					saveButtonR.setEnabled(true);
-					saveButtonR.removeFromParent();
-					rightHPanel.add(lockButtonR);
-					rightHPanel.add(removeTabR);
-
-					// refresh in docsaver instead
-					// WHY AREN'T WE DOING THIS
-					// refresh our doc list (in case titles were changed)
-					// lister.getDocumentList();
-				}
-			}
-		}
+		else if (event.getSource().equals(saveButtonR)) 
+			saveDocumentButtonHandler(false);
 
 		// if show left is pressed, add doc to the left tab panel
-		else if (event.getSource().equals(showButtonL)) {
-			String key = documentList.getValue(documentList.getSelectedIndex());
-			// if we arent already showing this doc, add it to the panel
-			if (!contained(key, documentsLeftList, documentsRightList))
-				openDocument("left");
-
-			// this is already up on the tabpanels, so disable these buttons
-			showButtonL.setEnabled(false);
-			showButtonR.setEnabled(false);
-		}
+		else if (event.getSource().equals(showButtonL))
+			showDocumentButtonHandler(true);
 
 		// if show right is pressed, add doc to the right tab panel
-		else if (event.getSource().equals(showButtonR)) {
-			String key = documentList.getValue(documentList.getSelectedIndex());
-			// if we arent already showing this doc, add it to the panel
-			if (!contained(key, documentsLeftList, documentsRightList))
-				openDocument("right");
-
-			// this is already up on the tabpanels, so disable these buttons
-			showButtonL.setEnabled(false);
-			showButtonR.setEnabled(false);
-		}
+		else if (event.getSource().equals(showButtonR))
+			showDocumentButtonHandler(false);
 
 		// if user wants to remove current tab on left
-		else if (event.getSource().equals(removeTabL)) {
-			int ind = documentsL.getTabBar().getSelectedTab();
-
-			documentsL.remove(ind); // remove from the tabpanel
-			documentsLeftList.remove(ind); // remove from the list of things on
-											// the left
-			contentsL.remove(ind);
-			titleL.remove(ind);
-
-			// select the previous tab
-			documentsL.selectTab(ind - 1);
-
-			// if we have another open tab before the deleted one
-			if (ind > 0) {
-				// set the fields of the prev doc to non-editable
-				titleL.get(ind - 1).setEnabled(false);
-				contentsL.get(ind - 1).setEnabled(false);
-			}
-			// otherwise, if this tab was the only one open
-			else {
-				// enable show left and show right
-				showButtonL.setEnabled(true);
-				showButtonR.setEnabled(true);
-
-				// since we no longer have any tabs on the left, disable lock +
-				// removeTab
-				lockButtonL.setEnabled(false);
-				removeTabL.setEnabled(false);
-			}
-		}
+		else if (event.getSource().equals(removeTabL))
+			removeTabButtonHandler(true);
 
 		// if user wants to remove current tab on right
-		else if (event.getSource().equals(removeTabR)) {
-			int ind = documentsR.getTabBar().getSelectedTab();
-			documentsR.remove(ind); // remove from the tabpanel
-			documentsRightList.remove(ind); // remove from the list of things on
-											// the right
-			contentsR.remove(ind);
-			titleR.remove(ind);
-
-			// select the previous tab
-			documentsR.selectTab(ind - 1);
-
-			// if we have another open tab before the deleted one
-			if (ind > 0) {
-				titleR.get(ind - 1).setEnabled(false);
-				contentsR.get(ind - 1).setEnabled(false);
-			}
-			// otherwise, if this tab was the only one open
-			else {
-				// enable show left and show right
-				showButtonL.setEnabled(true);
-				showButtonR.setEnabled(true);
-
-				// since we no longer have any tabs on the right, disable lock +
-				// removeTab
-				lockButtonR.setEnabled(false);
-				removeTabR.setEnabled(false);
-			}
-		}
+		else if (event.getSource().equals(removeTabR)) 
+			removeTabButtonHandler(false);
 
 		else if (event.getSource().equals(documentList)) {
 			String key = documentList.getValue(documentList.getSelectedIndex());
-			// if we arent already showing this doc, disable show left and show
-			// right
+			// if we arent already showing this doc, disable showLeft + showRight
 			if (contained(key, documentsLeftList, documentsRightList)) {
 				showButtonL.setEnabled(false);
 				showButtonR.setEnabled(false);
@@ -578,6 +420,229 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 	}
 
+	
+	/**
+	 * Remove a tab from the correct side. Claled after user presses 
+	 * either right or left removeTab button.
+	 * @param left true if we want to remove left tab, fasle if right.
+	 */
+	private void removeTabButtonHandler(boolean left)
+	{
+		TabPanel tabPanel = null;
+		ArrayList<AbstractDocument> docList = null;
+		ArrayList<TextArea> contentsList = null;
+		ArrayList<TextBox> titleList = null;
+		Button lockButton = null;
+		Button removeTabButton = null;
+		
+		if (left)
+		{
+			tabPanel = documentsL;
+			docList = documentsLeftList;
+			contentsList = contentsL;
+			titleList = titleL;
+			lockButton = lockButtonL;
+			removeTabButton = removeTabL;
+		}
+		else
+		{
+			tabPanel = documentsR;
+			docList = documentsRightList;
+			contentsList = contentsR;
+			titleList = titleR;
+			lockButton = lockButtonR;
+			removeTabButton = removeTabR;
+		}
+		
+		int ind = tabPanel.getTabBar().getSelectedTab();
+		tabPanel.remove(ind);
+		
+		// remove from the lists of things on the right
+		docList.remove(ind); 
+		contentsList.remove(ind);
+		titleList.remove(ind);
+
+		// if we have another open tab before the deleted one
+		if (ind > 0) {
+			// select the previous tab
+			tabPanel.selectTab(ind - 1);
+
+			// set the fields of the prev doc to non-editable
+			titleList.get(ind - 1).setEnabled(false);
+			contentsList.get(ind - 1).setEnabled(false);
+		}
+		// otherwise, if this tab has no tabs to its left
+		else {
+			int numTabsLeft = tabPanel.getTabBar().getTabCount();
+
+			// if we still have tabs left, select the next tab to the right
+			if (numTabsLeft > 0)
+			{					
+				tabPanel.selectTab(numTabsLeft - 1);
+
+				// enable lock and remove buttons
+				lockButton.setEnabled(true);
+				removeTabButton.setEnabled(true);
+
+			}
+			// if no longer have any tabs on the left, disable lock and removeTab
+			else
+			{
+				lockButton.setEnabled(false);
+				removeTabButton.setEnabled(false);
+			}
+
+		}
+
+		// enable show left and show right
+		showButtonL.setEnabled(true);
+		showButtonR.setEnabled(true);
+	}
+	
+	/**
+	 * Called after user presses either right or left 'save doc' button.
+	 * @param left true if side is left, false if right.
+	 */
+	private void saveDocumentButtonHandler(boolean left)
+	{
+		TabPanel tabPanel = null;
+		ArrayList<AbstractDocument> docList = null;
+		ArrayList<TextArea> contentsList = null;
+		ArrayList<TextBox> titleList = null;
+		Button removeTabButton = null;
+		Button saveButton = null;
+		Button lockButton = null;
+		String side = null;
+		HorizontalPanel hPanel = null;
+		
+		if (left)
+		{
+			tabPanel = documentsL;
+			docList = documentsLeftList;
+			contentsList = contentsL;
+			titleList = titleL;
+			removeTabButton = removeTabL;
+			saveButton = saveButtonL;
+			lockButton = lockButtonL;
+			side = "left";
+			hPanel = leftHPanel;
+		}
+		else
+		{
+			tabPanel = documentsR;
+			docList = documentsRightList;
+			contentsList = contentsR;
+			titleList = titleR;
+			removeTabButton = removeTabL;
+			saveButton = saveButtonR;
+			lockButton = lockButtonR;
+			side = "right";
+			hPanel = rightHPanel;
+		}
+		
+		int ind = tabPanel.getTabBar().getSelectedTab();
+		AbstractDocument doc = docList.get(ind);
+
+		// if we can save this document
+		if (doc instanceof LockedDocument) 
+		{
+			// if title and contents have not been changed, no need to save
+			if (doc.getTitle().equals(titleList.get(ind).getValue())
+					&& doc.getContents().equals(contentsList.get(ind).getText()))
+				statusUpdate("No document changes; not saving.");
+			
+			// otherwise if stuff was changed, save
+			else {
+				LockedDocument ld = (LockedDocument) doc;
+				ld.setTitle(titleList.get(ind).getValue());
+
+				ld.setContents(contentsList.get(ind).getText());
+
+				DocSaver.saveDoc(this, ld, side, ind);
+				saveButton.setEnabled(true);
+				saveButton.removeFromParent();
+				hPanel.add(lockButton);
+				hPanel.add(removeTabButton);
+
+				// refresh in docsaver instead
+				// WHY AREN'T WE DOING THIS
+				// refresh our doc list (in case titles were changed)
+				// lister.getDocumentList();
+			}
+		}
+	}
+	
+	/**
+	 * Called after user presses either right of left 'lock doc' button.
+	 * @param left
+	 */
+	private void lockDocumentButtonHandler(boolean left)
+	{
+		TabPanel tabPanel = null;
+		ArrayList<AbstractDocument> docList = null;
+		Button removeTabButton = null;
+		Button saveButton = null;
+		String side = null;
+		HorizontalPanel hPanel = null;
+		
+		if (left)
+		{
+			tabPanel = documentsL;
+			docList = documentsLeftList;
+			removeTabButton = removeTabL;
+			saveButton = saveButtonL;
+			side = "left";
+			hPanel = leftHPanel;
+		}
+		else
+		{
+			tabPanel = documentsR;
+			docList = documentsRightList;
+			removeTabButton = removeTabL;
+			saveButton = saveButtonR;
+			side = "right";
+			hPanel = rightHPanel;
+		}
+		
+		// get the index of the selected tab on the right tabpanel
+		int ind = tabPanel.getTabBar().getSelectedTab();
+
+		// get the selected doc
+		AbstractDocument doc = docList.get(ind);
+
+		// Lock only if it can be locked.
+		if (doc instanceof UnlockedDocument) {
+			DocLocker.lockDoc(this, doc.getKey(), side, ind);
+			
+			hPanel.clear();
+			hPanel.add(saveButton);
+			hPanel.add(removeTabButton);
+		}
+	}
+	
+	/**
+	 * Called after user presses either right of left 'show' button.
+	 * @param left
+	 */
+	private void showDocumentButtonHandler(boolean left)
+	{
+		String side = null;
+		
+		if (left)
+			side = "left";
+		else
+			side = "right";
+		
+		String key = documentList.getValue(documentList.getSelectedIndex());
+		// if we arent already showing this doc, add it to the panel
+		if (!contained(key, documentsLeftList, documentsRightList))
+			openDocument(side);
+
+		// this is already up on the tabpanels, so disable these buttons
+		showButtonL.setEnabled(false);
+		showButtonR.setEnabled(false);
+	}
+	
 	/**
 	 * Returns true of key is in either of the lists, false otherwise.
 	 * 
