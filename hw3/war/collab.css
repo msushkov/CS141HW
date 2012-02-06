@@ -11,7 +11,7 @@ body {
    	padding: 0;
    	width: 100%;
 	text-align: center;
-
+   min-height: 100%;
 }
 h1 {
 	color: black;
@@ -87,7 +87,7 @@ h2 {
 .gwt-TabBar {
 	border-color: white;
 	width: 350px;
-	height: 30px;
+	height: 33px;
 	padding-top: 6px;
 	background-color: #c5c2ff;
 
@@ -97,15 +97,18 @@ h2 {
 .gwt-TabBar .gwt-TabBarItem {
   margin-left: 4px;
   padding: 4px 8px 4px 8px;
+  height: 20px;
   cursor: pointer;
   cursor: hand;
   color: black;
+  font-size: 1em;
+  vertical-align: auto;
   font-weight: normal;
   text-align: center;
-  background: #9cc3f1;
+  background: #bed9f9; /*#9cc3f1; */
   /*background: #56A0D3;*/
-  -moz-border-radius: 3px 3px 0px 0px;
-  border-radius: 3px 3px 0px 0px;
+  -moz-border-radius: 6px 6px 0px 0px;
+  border-radius: 6px 6px 0px 0px;
 }
 .gwt-TabBar .gwt-TabBarItem-selected {
   cursor: default;
@@ -159,18 +162,25 @@ h2 {
 	height: 20px;
 }
 
+.documentTextBox {
+	resize: none;
+	border-radius: 5px;
+	height: 100%;
+	margin-top: 0px;
+}
 
 .consoleDP {
-	width: 100%
+	/*width: 100% */
 	border-style: solid;
-	background-color: black;
-	color: white; 
+	border-color: black;
+	background-color: white;
+	color: black; 
+	border-radius: 15px;
+	border-width: 1px;
 	font-weight: light;
 }
 
-.consoleDP h2 {
-	color: white;
-}
+
 
 .openDocsInnerPanel {
 	border: solid;

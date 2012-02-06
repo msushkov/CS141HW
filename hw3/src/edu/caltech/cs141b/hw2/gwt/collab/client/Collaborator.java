@@ -29,6 +29,7 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 public class Collaborator extends Composite implements ClickHandler {
 
 	final private int maxTabTextLen = 15;
+	final private int maxConsoleEnt = 6;
 	protected CollaboratorServiceAsync collabService;
 
 	// Track document information.
@@ -99,7 +100,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		docListPanel.add(new HTML("<h2>Available Documents</h2>"));
 		documentList.setWidth("100%");
 		docListPanel.add(documentList);
-		docListPanel.setWidth("320px");
 
 		// buttons inder the doc list
 		HorizontalPanel docListButtonPanel = new HorizontalPanel();
@@ -119,8 +119,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		consoleDP.setWidth("100%");
 		statusArea.setSpacing(10);
 		statusArea.add(new HTML("<h2>Console</h2>"));
-		statusArea.setStyleName("consoleBox");
-		statusArea.setHeight("300px");
 		consoleDP.add(statusArea);
 		docsAndConsoleVertPanel.add(consoleDP);
 		mainOuterPanel.add(docsAndConsoleVertPanel);
@@ -147,8 +145,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		// leftHPanel.add(saveButtonL);
 		// leftHPanel.add(removeTabL);
 		leftPanel.add(leftHPanel);
-		
-		leftPanel.setStyleName("left-area");
 
 		// holds the right tab panel
 		rightPanel.add(documentsR);
@@ -271,8 +267,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		// the document contents
 		TextArea areaBox = new TextArea();
 		areaBox.setWidth("97%");
-		areaBox.setHeight("200px");
-
+		areaBox.setStyleName("documentTextBox");
+		//areaBox.setHeight("200px");
 		// areaBox.setHTML(content);
 		areaBox.setText(content);
 
@@ -341,13 +337,18 @@ public class Collaborator extends Composite implements ClickHandler {
 	private void createNewDocument(String side) {
 		LockedDocument ld = new LockedDocument(null, null, null,
 				"Enter the document title.", "Enter the document contents.");
+		int ind = 0;
 		if (side.equals("left")) {
 			documentsLeftList.add(ld);
 			addTab(ld.getTitle(), ld.getContents(), true);
+			ind = documentsLeftList.size()- 1;
 		} else {
 			documentsRightList.add(ld);
 			addTab(ld.getTitle(), ld.getContents(), false);
+			ind = documentsRightList.size() - 1;
 		}
+		setTabText(ld.getTitle(), ind, side);
+		
 		openLatestTab(side);
 	}
 
@@ -390,7 +391,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 *            the status to add to the console window
 	 */
 	protected void statusUpdate(String status) {
-		while (statusArea.getWidgetCount() > 5)
+		while (statusArea.getWidgetCount() > maxConsoleEnt)
 			statusArea.remove(1);
 
 		final HTML statusUpd = new HTML(status);
