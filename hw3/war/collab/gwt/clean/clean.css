@@ -25,7 +25,7 @@ body {
   margin: 10px;
   border: 0px;
   padding: 0px;
-  background: #fff;
+  /*background: #fff; */
   direction: ltr;
 }
 a, a:visited {
@@ -859,12 +859,12 @@ select {
   overflow: hidden;
 }
 
-/*.gwt-TabBar {
+.gwt-TabBar {
   background: #ccc;
   padding-top: 6px;
 }
 .gwt-TabBar .gwt-TabBarFirst {
-  width: 5px;  /* first tab distance from the left
+  width: 5px;  /* first tab distance from the left */
 }
 .gwt-TabBar .gwt-TabBarRest {
 }
@@ -890,7 +890,6 @@ select {
   cursor: default;
   color: #999999;
 }
-*/
 .gwt-TabPanel {
 }
 .gwt-TabPanelBottom {
