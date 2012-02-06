@@ -434,6 +434,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		ArrayList<TextBox> titleList = null;
 		Button lockButton = null;
 		Button removeTabButton = null;
+		Button saveDocButton = null;
 		
 		if (left)
 		{
@@ -443,6 +444,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			titleList = titleL;
 			lockButton = lockButtonL;
 			removeTabButton = removeTabL;
+			saveDocButton = saveButtonL;
 		}
 		else
 		{
@@ -452,6 +454,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			titleList = titleR;
 			lockButton = lockButtonR;
 			removeTabButton = removeTabR;
+			saveDocButton = saveButtonR;
 		}
 		
 		int ind = tabPanel.getTabBar().getSelectedTab();
@@ -488,6 +491,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			// if no longer have any tabs on the left, disable lock and removeTab
 			else
 			{
+				saveDocButton.setEnabled(false);
 				lockButton.setEnabled(false);
 				removeTabButton.setEnabled(false);
 			}
