@@ -102,7 +102,7 @@ h2 {
 }
 .gwt-TabBar .gwt-TabBarItem-selected {
   cursor: default;
-  background: blue;
+  background: #56A0D3;
   color: white;
   font-weight: bold;
 } 
