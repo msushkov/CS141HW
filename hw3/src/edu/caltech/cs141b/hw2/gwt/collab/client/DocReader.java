@@ -9,21 +9,22 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  * Used in conjunction with <code>CollaboratorService.getDocument()</code>.
  */
 public class DocReader implements AsyncCallback<UnlockedDocument> {
-	
+
 	private Collaborator collaborator;
 	private String side; // is the current doc on the left or the right?
-	private int index;   // which tab is the current doc on?
-	
-	public static DocReader readDoc(Collaborator collaborator, String key, String side, int ind) {
+	private int index; // which tab is the current doc on?
+
+	public static DocReader readDoc(Collaborator collaborator, String key,
+			String side, int ind) {
 		DocReader r = new DocReader(collaborator);
 		r.getDocument(key, side, ind);
 		return r;
 	}
-	
+
 	public DocReader(Collaborator collaborator) {
 		this.collaborator = collaborator;
 	}
-	
+
 	public void getDocument(String key, String side, int ind) {
 		collaborator.statusUpdate("Fetching document " + key + ".");
 		collaborator.waitingKey = key;
@@ -35,8 +36,8 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 	@Override
 	public void onFailure(Throwable caught) {
 		collaborator.statusUpdate("Error retrieving document"
-				+ "; caught exception " + caught.getClass()
-				+ " with message: " + caught.getMessage());
+				+ "; caught exception " + caught.getClass() + " with message: "
+				+ caught.getMessage());
 		GWT.log("Error getting document lock.", caught);
 	}
 
@@ -45,11 +46,10 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 		if (result.getKey().equals(collaborator.waitingKey)) {
 			collaborator.statusUpdate("Document '" + result.getTitle()
 					+ "' successfully retrieved.");
-			
+
 			collaborator.setDoc(result, index, side);
-		} 
-		else 
-			collaborator.statusUpdate("Returned document that is no longer expected; discarding.");
+		} else
+			collaborator
+					.statusUpdate("Returned document that is no longer expected; discarding.");
 	}
 }
-

@@ -2,7 +2,6 @@ package edu.caltech.cs141b.hw2.gwt.collab.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 
@@ -15,9 +14,10 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 	private Collaborator collaborator;
 	private LockedDocument lockedDocument;
 	private String side; // is the current doc on the left or the right?
-	private int index;   // which tab is the current doc on?
+	private int index; // which tab is the current doc on?
 
-	public static void saveDoc(Collaborator col, LockedDocument ld, String side, int ind) {
+	public static void saveDoc(Collaborator col, LockedDocument ld,
+			String side, int ind) {
 		DocSaver ds = new DocSaver(col);
 		ds.saveDocument(ld, side, ind);
 	}
@@ -40,16 +40,11 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 		TextBox box = null;
 		TextArea area = null;
 
-		if (side.equals("left"))
-		{
-			//collaborator.lockButtonL.setEnabled(false);
+		if (side.equals("left")) {
 			collaborator.saveButtonL.setEnabled(false);
 			box = collaborator.titleL.get(index);
 			area = collaborator.contentsL.get(index);
-		}
-		else if (side.equals("right"))
-		{
-			//collaborator.lockButtonR.setEnabled(false);
+		} else if (side.equals("right")) {
 			collaborator.saveButtonR.setEnabled(false);
 			box = collaborator.titleR.get(index);
 			area = collaborator.contentsR.get(index);
@@ -62,7 +57,7 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 
 	@Override
 	public void onFailure(Throwable caught) {
-		if (caught instanceof LockExpired) 
+		if (caught instanceof LockExpired)
 			collaborator.statusUpdate("Lock had already expired; save failed.");
 		else {
 			collaborator.statusUpdate("Error saving document"
@@ -78,16 +73,15 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 
 	@Override
 	public void onSuccess(UnlockedDocument result) {
-		collaborator.statusUpdate("Document '" + result.getTitle() + "' successfully saved.");
-		if (collaborator.waitingKey == null || result.getKey().equals(collaborator.waitingKey)) 
-		{
-			collaborator.setDoc(result, index, side);		
-			
+		collaborator.statusUpdate("Document '" + result.getTitle()
+				+ "' successfully saved.");
+		if (collaborator.waitingKey == null
+				|| result.getKey().equals(collaborator.waitingKey)) {
+			collaborator.setDoc(result, index, side);
+
 			// Refresh list in case title was changed.
 			collaborator.lister.getDocumentList();
-		} 
-		else 
+		} else
 			GWT.log("Saved document is not the anticipated document.");
 	}
 }
-
