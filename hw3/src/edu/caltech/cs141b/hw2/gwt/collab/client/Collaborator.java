@@ -178,8 +178,13 @@ public class Collaborator extends Composite implements ClickHandler {
 		mainOuterPanel.setCellWidth(openDocsOuterPanel, "100%");
 		innerHp.setCellWidth(leftPanel, "50%");
 		innerHp.setCellWidth(rightPanel, "50%");
+		
 		innerHp.setWidth("100%");
 		innerHp.setHeight("100%");
+		
+		// Fixing the vertical
+		innerHp.setCellHeight(leftPanel, "100%");
+		innerHp.setCellHeight(rightPanel, "100%");
 		
 		
 		//Setting up the document sizes
