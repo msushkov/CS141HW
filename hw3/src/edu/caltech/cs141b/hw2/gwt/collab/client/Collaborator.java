@@ -8,10 +8,14 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasAlignment;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -182,13 +186,15 @@ public class Collaborator extends Composite implements ClickHandler {
 		VerticalPanel openDocsOuterPanel = new VerticalPanel();
 		openDocsOuterPanel.setStyleName("openDocsOuterPanel");
 		openDocsOuterPanel.setSpacing(20);
-		DecoratorPanel openDocsDP = new DecoratorPanel();
+		HorizontalPanel openDocsDP = new HorizontalPanel();
 		openDocsDP.setStyleName("openDocsDP");
 		openDocsDP.setWidth("100%");
 
 		VerticalPanel openDocsInnerPanel = new VerticalPanel();
 		openDocsInnerPanel.setStyleName("openDocsInnerPanel");
-		openDocsInnerPanel.add(new HTML("<h2>Open Documents</h2>"));
+		HTML openDocumentsText = new HTML("<h2>Open Documents</h2>");
+		openDocsInnerPanel.add(openDocumentsText);
+		openDocsInnerPanel.setCellHeight(openDocumentsText, "2em");
 
 		// holds the left tab panel
 		HorizontalPanel innerHp = new HorizontalPanel();
@@ -216,6 +222,56 @@ public class Collaborator extends Composite implements ClickHandler {
 		openDocsDP.add(openDocsInnerPanel);
 		openDocsOuterPanel.add(openDocsDP);
 		mainOuterPanel.add(openDocsOuterPanel);
+		
+				// Divide up the horizontal space
+		mainOuterPanel.setWidth("100%");
+		mainOuterPanel.setHeight("100%");
+		mainOuterPanel.setCellWidth(docsAndConsoleVertPanel, "200px");
+		mainOuterPanel.setCellWidth(openDocsOuterPanel, "100%");
+		
+		openDocsOuterPanel.setWidth("100%");
+		innerHp.setCellWidth(leftPanel, "50%");
+		innerHp.setCellWidth(rightPanel, "50%");
+		
+		innerHp.setWidth("100%");
+		innerHp.setHeight("100%");
+		
+		// Fixing the vertical
+		innerHp.setCellHeight(leftPanel, "100%");
+		innerHp.setCellHeight(rightPanel, "100%");
+		
+		// Vertical textboxes
+		leftPanel.setCellHeight(documentsL, "100%");
+		rightPanel.setCellHeight(documentsR, "100%");
+		
+		
+		//Setting up the document sizes
+		// the panels
+		
+		openDocsDP.setCellVerticalAlignment(openDocsInnerPanel, HasAlignment.ALIGN_TOP);
+		openDocsDP.setHeight("100%");
+		openDocsOuterPanel.setHeight("100%");
+		openDocsInnerPanel.setHeight("100%");
+
+		leftPanel.setStyleName("leftPanel");
+		rightPanel.setStyleName("rightPanel");
+		leftPanel.setWidth("100%");
+		leftPanel.setHeight("100%");
+		rightPanel.setWidth("100%");
+		rightPanel.setHeight("100%");
+
+
+		// fixing space issues
+		leftPanel.setCellHeight(leftHPanel, "30px");
+		rightPanel.setCellHeight(rightHPanel, "30px");
+
+		// Setting console/document space
+		docsAndConsoleVertPanel.setCellHeight(consoleDP, "200px");
+		
+		// Tab bars
+		documentsL.setWidth("100%");
+		documentsR.setWidth("100%");
+
 	}
 
 	/**
@@ -360,14 +416,22 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// holds the title and the contents
 		VerticalPanel vp = new VerticalPanel();
-		vp.setSpacing(5);
+		//vp.setSpacing(5);
 
 		// the document title
 		TextBox titleBox = new TextBox();
+		titleBox.setValue(title);
+		titleBox.setEnabled(true);
+		titleBox.setWidth("250px");
+
+		
+		// prevent spacing issues
+		// titleBox.setHeight("1.2em");
 
 		// the document contents
 		TextArea areaBox = new TextArea();
 		areaBox.setWidth("97%");
+		areaBox.setHeight("100%");
 		areaBox.setStyleName("documentTextBox");
 
 		titleBox.setText(title);
@@ -378,6 +442,10 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		vp.add(titleBox);
 		vp.add(areaBox);
+		vp.setCellHeight(titleBox, "2em");
+		
+		// Centering the title box
+		//vp.setCellHorizontalAlignment(titleBox, HasHorizontalAlignment.ALIGN_CENTER);
 
 		setGenericObjects(left);
 
@@ -390,6 +458,15 @@ public class Collaborator extends Composite implements ClickHandler {
 		refresh.setEnabled(true);
 
 		final int ind = titleList.size();
+			titleBox.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+				@Override
+				public void onValueChange(ValueChangeEvent<String> event) {
+					setTabText(titleL.get(ind).getText(), ind, "left");
+				}
+
+			});
+			
 
 		// add key handler to the title box - update the tab text
 		// as the user is typing the title
@@ -665,8 +742,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		AbstractDocument doc = docList.get(ind);
 
 		// if we can save this document
-		if (doc instanceof LockedDocument) 
-		{
+		if (doc instanceof LockedDocument) {
 			// if title and contents have not been changed, no need to save
 			if (doc.getTitle().equals(titleList.get(ind).getValue())
 					&& doc.getContents().equals(contentsList.get(ind).getText()))

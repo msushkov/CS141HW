@@ -1,4 +1,91 @@
+body {
+	color: black;
+	margin: 0px;
+	border: 0px;
+	padding: 0px;
+	background: white;
+	direction: ltr;
+	margin-left: 0;
+	font-family: sans-serif;
+	margin-right: 0;
+	/*margin-top: 0;
+	margin-bottom: 0;*/
+	padding: 0;
+	height: 95%;
+	width: 100%;
+	text-align: center;
+	/*min-height: 100%;*/
+	
+}
+h1 {
+	color: black;
+}
+h2 {
+	font-stretch: narrower;
+	font-weight: 500;
+	margin: 4px;
+	color: black;
+	/*text-decoration: bold; */
+	font-size: 1.8em;
+	font-weight: bold;
+}
+#application {
+	height: 95%;
+	width: 100%;
+	/*margin-left: auto;
+	margin-right: auto; */
+}
+.app-title {
+	font-size: 4em;
+	font-family: sans-serif;
+	display: inline;
+	margin: 10px;
+	text-align: center;
+	color: black;
+	font-weight: bold;
+	text-align: center;
+}
 
+.mainOuterPanel {
+	width: 100%;
+}
+
+.docsAndConsoleVertPanel {
+	width: 200px;
+	float: left;
+}
+
+.docListPanel {
+	width: 100%;
+	/*width: 200px;
+	max-width: 200px;*/
+}
+
+.openDocsOuterPanel, .openDocsInnerPanel {
+	width: 100%;
+}
+
+
+
+.gwt-TabPanel {
+	background: white;
+	height: 100%;
+	/*min-height: 400px;*/
+	/*height: 100%;
+	width: 350px;*/
+}
+
+.gwt-TabPanelBottom {
+	/*background: white;
+	height: 100%;
+	min-height: 400px;*/
+	height: 100%;
+} 
+.gwt-TabBar {
+	border-color: white;
+	/*width: 350px; */
+	height: 35px;
+	padding-top: 6px;
 	background-color: #c5c2ff;
 }
 .gwt-TabBar .gwt-TabBarItem {
@@ -14,7 +101,7 @@
 	text-align: center;
 	background: #bed9f9; /*#9cc3f1; */
 	/*background: #56A0D3;*/
-
+	
 	-moz-border-radius: 6px 6px 0px 0px;
 	border-radius: 6px 6px 0px 0px;
 }
