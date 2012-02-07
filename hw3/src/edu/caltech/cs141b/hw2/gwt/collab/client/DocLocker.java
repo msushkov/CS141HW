@@ -29,28 +29,26 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 	public void lockDocument(String key, String side, int index) {
 		collaborator.statusUpdate("Attempting to lock document.");
 		collaborator.waitingKey = key;
-		collaborator.collabService.lockDocument(key, this);
 		this.side = side;
 		this.index = index;
-		//collaborator.lockButton.setEnabled(false);
+		
+		collaborator.collabService.lockDocument(key, this);
 	}
 
 	@Override
 	public void onFailure(Throwable caught) {
-		if (caught instanceof LockUnavailable) {
+		if (caught instanceof LockUnavailable) 
 			collaborator.statusUpdate("LockUnavailable: " + caught.getMessage());
-		} else {
+		else 
+		{
 			collaborator.statusUpdate("Error retrieving lock"
 					+ "; caught exception " + caught.getClass()
 					+ " with message: " + caught.getMessage());
 			GWT.log("Error getting document lock.", caught);
 		}
 
-		// enable lock button for the correct side
-		if (side.equals("left"))
-			collaborator.lockButtonL.setEnabled(true);
-		else if (side.equals("right"))
-			collaborator.lockButtonR.setEnabled(true);
+		// set and enable/disable correct buttons
+		lockFailed();
 	}
 
 	@Override
@@ -64,22 +62,55 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 			collaborator.releaser.releaseLock(result);
 		}
 	}
+	
+	/**
+	 * Called by when docLocker failed to acquire lock.
+	 * @param side
+	 * @param index
+	 */
+	protected void lockFailed()
+	{				
+		if (side.equals("left"))
+			collaborator.setGenericObjects(true);
+		else
+			collaborator.setGenericObjects(false);				
+		
+		TextBox box = collaborator.titleList.get(index);
+		TextArea area = collaborator.contentsList.get(index);
+		
+		// the user cannot edit the title and the contents of this doc
+		box.setEnabled(false);
+		area.setEnabled(false);
+
+		// we need lock, removeTab, and refresh buttons
+		collaborator.hPanel.clear();
+		collaborator.hPanel.add(collaborator.lockButton);
+		collaborator.hPanel.add(collaborator.removeTabButton);
+		collaborator.hPanel.add(collaborator.refresh);
+
+		collaborator.lockButton.setEnabled(true);
+		collaborator.removeTabButton.setEnabled(true);
+		collaborator.refresh.setEnabled(true);
+	}
 
 
+	/**
+	 * If we successfully acquired the locker - can now edit the doc.
+	 * @param result
+	 * @param side
+	 * @param index
+	 */
 	protected void gotDoc(LockedDocument result, String side, int index) {
-		TextBox box = null;
-		TextArea area = null;
+		if (side.equals("left"))
+			collaborator.setGenericObjects(true);
+		else
+			collaborator.setGenericObjects(false);				
+		
+		TextBox box = collaborator.titleList.get(index);
+		TextArea area = collaborator.contentsList.get(index);		
 
-		if (side.equals("left")) {
-			collaborator.documentsLeftList.set(index, result);
-			box = collaborator.titleL.get(index);
-			area = collaborator.contentsL.get(index);
-		} else if (side.equals("right")) {
-			collaborator.documentsRightList.set(index, result);
-			box = collaborator.titleR.get(index);
-			area = collaborator.contentsR.get(index);
-		} 			
-
+		collaborator.docList.set(index, result);
+		
 		// set the title and contents of this doc to be the current thing on the page
 		box.setValue(result.getTitle());
 		area.setText(result.getContents());
@@ -87,6 +118,16 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 		// the user can now edit the title and the contents of this doc
 		box.setEnabled(true);
 		area.setEnabled(true);
+
+		// we need save, removeTab, and refresh buttons
+		collaborator.hPanel.clear();
+		collaborator.hPanel.add(collaborator.saveDocButton);
+		collaborator.hPanel.add(collaborator.removeTabButton);
+		collaborator.hPanel.add(collaborator.refresh);
+
+		collaborator.saveDocButton.setEnabled(true);
+		collaborator.removeTabButton.setEnabled(true);
+		collaborator.refresh.setEnabled(false);
 	}
 }
 

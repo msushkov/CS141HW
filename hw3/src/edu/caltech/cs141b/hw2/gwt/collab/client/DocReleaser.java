@@ -13,12 +13,19 @@ public class DocReleaser implements AsyncCallback<Void> {
 	
 	private Collaborator collaborator;
 	
+	private final static int maxStrLen = 25;
+
+	
 	public DocReleaser(Collaborator collaborator) {
 		this.collaborator = collaborator;
 	}
 	
 	public void releaseLock(LockedDocument lockedDoc) {
-		collaborator.statusUpdate("Releasing lock on '" + lockedDoc.getTitle()
+		String title = lockedDoc.getTitle();
+		if (title.length() > maxStrLen) {
+			title = title.substring(0, maxStrLen - 3) + "...";
+		}
+		collaborator.statusUpdate("Releasing lock on '" + title
 				+ "'.");
 		collaborator.collabService.releaseLock(lockedDoc, this);
 	}
