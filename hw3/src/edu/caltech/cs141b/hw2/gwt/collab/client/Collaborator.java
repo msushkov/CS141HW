@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -72,6 +73,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected DocReleaser releaser = new DocReleaser(this);
 	protected String waitingKey = null;
 
+	
 	// Status tracking.
 	private VerticalPanel statusArea = new VerticalPanel();
 
@@ -129,13 +131,15 @@ public class Collaborator extends Composite implements ClickHandler {
 		VerticalPanel openDocsOuterPanel = new VerticalPanel();
 		openDocsOuterPanel.setStyleName("openDocsOuterPanel");
 		openDocsOuterPanel.setSpacing(20);
-		DecoratorPanel openDocsDP = new DecoratorPanel();
+		HorizontalPanel openDocsDP = new HorizontalPanel();
 		openDocsDP.setStyleName("openDocsDP");
 		openDocsDP.setWidth("100%");
 
 		VerticalPanel openDocsInnerPanel = new VerticalPanel();
 		openDocsInnerPanel.setStyleName("openDocsInnerPanel");
-		openDocsInnerPanel.add(new HTML("<h2>Open Documents</h2>"));
+		HTML openDocumentsText = new HTML("<h2>Open Documents</h2>");
+		openDocsInnerPanel.add(openDocumentsText);
+		openDocsInnerPanel.setCellHeight(openDocumentsText, "2em");
 
 		// holds the left tab panel
 		HorizontalPanel innerHp = new HorizontalPanel();
@@ -163,6 +167,52 @@ public class Collaborator extends Composite implements ClickHandler {
 		openDocsDP.add(openDocsInnerPanel);
 		openDocsOuterPanel.add(openDocsDP);
 		mainOuterPanel.add(openDocsOuterPanel);
+		
+		
+		// Divide up the horizontal space
+		mainOuterPanel.setWidth("100%");
+		mainOuterPanel.setHeight("100%");
+		mainOuterPanel.setCellWidth(docsAndConsoleVertPanel, "200px");
+		mainOuterPanel.setCellWidth(openDocsOuterPanel, "100%");
+		innerHp.setCellWidth(leftPanel, "50%");
+		innerHp.setCellWidth(rightPanel, "50%");
+		
+		innerHp.setWidth("100%");
+		innerHp.setHeight("100%");
+		
+		// Fixing the vertical
+		innerHp.setCellHeight(leftPanel, "100%");
+		innerHp.setCellHeight(rightPanel, "100%");
+		
+		
+		//Setting up the document sizes
+		// the panels
+		
+		openDocsDP.setCellVerticalAlignment(openDocsInnerPanel, HasAlignment.ALIGN_TOP);
+		openDocsDP.setHeight("100%");
+		openDocsOuterPanel.setHeight("100%");
+		openDocsInnerPanel.setHeight("100%");
+
+		leftPanel.setStyleName("leftPanel");
+		rightPanel.setStyleName("rightPanel");
+		leftPanel.setWidth("100%");
+		leftPanel.setHeight("100%");
+		rightPanel.setWidth("100%");
+		rightPanel.setHeight("100%");
+
+
+		// fixing space issues
+		leftPanel.setCellHeight(leftHPanel, "30px");
+		rightPanel.setCellHeight(rightHPanel, "30px");
+
+		// Setting console/document space
+		docsAndConsoleVertPanel.setCellHeight(consoleDP, "200px");
+		
+		// Tab bars
+		documentsL.setWidth("100%");
+		documentsR.setWidth("100%");
+		
+		
 
 		// buttons
 		refreshList.addClickHandler(this);
@@ -264,11 +314,18 @@ public class Collaborator extends Composite implements ClickHandler {
 		TextBox titleBox = new TextBox();
 		titleBox.setValue(title);
 		titleBox.setEnabled(true);
+		titleBox.setWidth("250px");
 		vp.add(titleBox);
+		vp.setCellHeight(titleBox, "1.5em");
+		//vp.setCellHorizontalAlignment(titleBox, HasHorizontalAlignment.ALIGN_CENTER);
+		
+		// prevent spacing issues
+		// titleBox.setHeight("1.2em");
 
 		// the document contents
 		TextArea areaBox = new TextArea();
 		areaBox.setWidth("97%");
+		areaBox.setHeight("100%");
 		areaBox.setStyleName("documentTextBox");
 		//areaBox.setHeight("200px");
 		// areaBox.setHTML(content);
@@ -276,6 +333,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		areaBox.setEnabled(true);
 		vp.add(areaBox);
+		
 
 		// add the doc title and contents to the appropriate tabpanel
 		if (left) {
@@ -312,7 +370,6 @@ public class Collaborator extends Composite implements ClickHandler {
 
 			// add the doc to the left tab panel
 			documentsL.add(vp, Integer.toString(leftTabCount));
-			leftTabCount++;
 		} else {
 			// enable the right 'get lock' and 'remove tab' buttons
 			lockButtonR.setEnabled(true);
@@ -333,7 +390,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 				@Override
 				public void onKeyUp(KeyUpEvent event) {
-					setTabText(titleR.get(ind).getText(), ind, "left");
+					setTabText(titleR.get(ind).getText(), ind, "right");
 
 				}
 			});
@@ -347,7 +404,6 @@ public class Collaborator extends Composite implements ClickHandler {
 
 			// add the doc to the right tab panel
 			documentsR.add(vp, Integer.toString(rightTabCount));
-			rightTabCount++;
 		}
 	}
 
