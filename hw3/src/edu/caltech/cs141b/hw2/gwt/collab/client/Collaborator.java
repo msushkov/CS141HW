@@ -223,7 +223,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		openDocsOuterPanel.add(openDocsDP);
 		mainOuterPanel.add(openDocsOuterPanel);
 		
-				// Divide up the horizontal space
+		// Divide up the horizontal space
 		mainOuterPanel.setWidth("100%");
 		mainOuterPanel.setHeight("100%");
 		mainOuterPanel.setCellWidth(docsAndConsoleVertPanel, "200px");
@@ -415,9 +415,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * @param left
 	 */
 	public void addTab(String title, String content, boolean left) {	
-		//if (title.length() > maxTabTextLen) 
-		//title = title.substring(0, maxTabTextLen - 3) + "...";
-
 		// holds the title and the contents
 		VerticalPanel vp = new VerticalPanel();
 		//vp.setSpacing(5);
@@ -427,7 +424,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		titleBox.setValue(title);
 		titleBox.setEnabled(true);
 		titleBox.setWidth("250px");
-
 		
 		// prevent spacing issues
 		// titleBox.setHeight("1.2em");
@@ -462,16 +458,18 @@ public class Collaborator extends Composite implements ClickHandler {
 		refresh.setEnabled(true);
 
 		final int ind = titleList.size();
-			titleBox.addValueChangeHandler(new ValueChangeHandler<String>() {
+		
+		// set a value-change handler to the title box (so that it updates even when user 
+		// pastes stuff to it
+		titleBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 
-				@Override
-				public void onValueChange(ValueChangeEvent<String> event) {
-					setTabText(titleL.get(ind).getText(), ind, "left");
-				}
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event) {
+				setTabText(titleL.get(ind).getText(), ind, side);
+			}
 
-			});
+		});
 			
-
 		// add key handler to the title box - update the tab text
 		// as the user is typing the title
 		titleBox.addKeyUpHandler(new KeyUpHandler() {
@@ -586,17 +584,21 @@ public class Collaborator extends Composite implements ClickHandler {
 	/**
 	 * Behaves similarly to locking a document, except without a key/lock obj.
 	 */
-	private void createNewDocument(String side) {
+	private void createNewDocument(String side) {		
 		LockedDocument ld = new LockedDocument(null, null, null,
 				"Enter the document title.", "Enter the document contents.");
 
+		boolean left = false;
+		
 		if (side.equals("left"))
-			setGenericObjects(true);
+			left = true;
 		else
-			setGenericObjects(false);
+			left = false;
+		
+		setGenericObjects(left);
 
 		docList.add(ld);
-		addTab(ld.getTitle(), ld.getContents(), true);
+		addTab(ld.getTitle(), ld.getContents(), left);
 		setTabText(ld.getTitle(), docList.size() - 1, side);
 		openLatestTab(side);
 
