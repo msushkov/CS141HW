@@ -413,7 +413,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * @param content
 	 * @param left
 	 */
-	public void addTab(String title, String content, boolean left) {	
+	public void addTab(String title, String content, boolean left) {
+		
 		// holds the title and the contents
 		VerticalPanel vp = new VerticalPanel();
 		//vp.setSpacing(5);
@@ -484,7 +485,9 @@ public class Collaborator extends Composite implements ClickHandler {
 		contentsList.add(areaBox);
 
 		// add the doc to the left tab panel
-		tabPanel.add(vp, title);
+		
+		String subString = (title.length() > maxTabTextLen) ? title.substring(0, maxTabTextLen - 3) + "..." : title;
+		tabPanel.add(vp, subString);
 
 		int numLeftTabs = documentsL.getTabBar().getTabCount();
 		int numRightTabs = documentsR.getTabBar().getTabCount();
