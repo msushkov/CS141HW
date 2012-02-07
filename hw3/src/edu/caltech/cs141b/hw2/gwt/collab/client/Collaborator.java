@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -33,7 +34,7 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 public class Collaborator extends Composite implements ClickHandler {
 
 	final private int maxTabTextLen = 15;
-	final private int maxConsoleEnt = 6;
+	final private int maxConsoleEnt = 3;
 	final private int maxTabsOnOneSide = 4;
 
 	protected CollaboratorServiceAsync collabService;
@@ -172,12 +173,16 @@ public class Collaborator extends Composite implements ClickHandler {
 		dp.add(docListPanel);
 		docsAndConsoleVertPanel.add(dp);
 
-		DecoratorPanel consoleDP = new DecoratorPanel();
+		VerticalPanel consoleDP = new VerticalPanel();
 		consoleDP.setStyleName("consoleDP");
 		consoleDP.setWidth("100%");
+		consoleDP.setHeight("250px");
 		statusArea.setSpacing(10);
 		statusArea.add(new HTML("<h2>Console</h2>"));
 		consoleDP.add(statusArea);
+		
+		consoleDP.setCellVerticalAlignment(statusArea, HasVerticalAlignment.ALIGN_TOP);
+		
 		docsAndConsoleVertPanel.add(consoleDP);
 		mainOuterPanel.add(docsAndConsoleVertPanel);
 
@@ -221,21 +226,20 @@ public class Collaborator extends Composite implements ClickHandler {
 		openDocsDP.add(openDocsInnerPanel);
 		openDocsOuterPanel.add(openDocsDP);
 		mainOuterPanel.add(openDocsOuterPanel);
-		
+
 		// Divide up the horizontal space
 		mainOuterPanel.setWidth("100%");
 		mainOuterPanel.setHeight("100%");
 		mainOuterPanel.setCellWidth(docsAndConsoleVertPanel, "200px");
 		mainOuterPanel.setCellWidth(openDocsOuterPanel, "100%");
-		
-		
+
 		openDocsOuterPanel.setWidth("100%");
 		innerHp.setCellWidth(leftPanel, "50%");
 		innerHp.setCellWidth(rightPanel, "50%");
-		
+
 		innerHp.setWidth("100%");
 		innerHp.setHeight("100%");
-		
+
 		// Fixing the vertical
 		mainOuterPanel.setCellHeight(docsAndConsoleVertPanel,"100%");
 		
@@ -413,8 +417,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * @param content
 	 * @param left
 	 */
-	public void addTab(String title, String content, boolean left) {
-		
+	public void addTab(String title, String content, boolean left) {	
 		// holds the title and the contents
 		VerticalPanel vp = new VerticalPanel();
 		//vp.setSpacing(5);
@@ -485,7 +488,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		contentsList.add(areaBox);
 
 		// add the doc to the left tab panel
-		
 		String subString = (title.length() > maxTabTextLen) ? title.substring(0, maxTabTextLen - 3) + "..." : title;
 		tabPanel.add(vp, subString);
 
@@ -931,5 +933,4 @@ public class Collaborator extends Composite implements ClickHandler {
 		removeTabButton.setEnabled(true);
 		refresh.setEnabled(true);
 	}
-
 }
