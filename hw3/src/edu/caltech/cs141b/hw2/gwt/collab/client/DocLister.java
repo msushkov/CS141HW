@@ -52,6 +52,11 @@ public class DocLister implements AsyncCallback<List<DocumentMetadata>> {
 			// iterate through the docs list and add each to the listbox as well as our lists
 			for (DocumentMetadata meta : result) 
 				collaborator.documentList.addItem(meta.getTitle(), meta.getKey());
+					
+			// after doc list refreshes, select the more recent 
+			// document (at the very bottom)
+			int num = collaborator.documentList.getItemCount();
+			collaborator.documentList.setSelectedIndex(num - 1);
 		}
 		
 		// we can press the refresh button again

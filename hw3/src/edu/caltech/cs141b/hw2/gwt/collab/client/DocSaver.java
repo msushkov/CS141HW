@@ -35,25 +35,19 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 		this.side = side;
 		this.index = ind;
 
-		// Disable buttons, disable edit fields
-		// save and fields are disabled
-
-		TextBox box = null;
-		TextArea area = null;
-
-		if (side.equals("left")) {
-			collaborator.saveButtonL.setEnabled(false);
-			box = collaborator.titleL.get(index);
-			area = collaborator.contentsL.get(index);
-		} else if (side.equals("right")) {
-			collaborator.saveButtonR.setEnabled(false);
-			box = collaborator.titleR.get(index);
-			area = collaborator.contentsR.get(index);
-		}
-
+		if (side.equals("left"))
+			collaborator.setGenericObjects(true);
+		else
+			collaborator.setGenericObjects(false);				
+		
 		// the user cannot edit the title and the contents of this doc
+		TextBox box = collaborator.titleList.get(index);
+		TextArea area = collaborator.contentsList.get(index);
 		box.setEnabled(false);
 		area.setEnabled(false);
+		
+		// disable the save doc button for this side (until this doc is saved)
+		collaborator.saveDocButton.setEnabled(false);
 	}
 
 	@Override

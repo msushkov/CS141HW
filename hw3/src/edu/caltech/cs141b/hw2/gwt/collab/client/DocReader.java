@@ -46,6 +46,12 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 				+ "; caught exception " + caught.getClass() + " with message: "
 				+ caught.getMessage());
 		GWT.log("Error getting document lock.", caught);
+		
+		// make sure the correct 'show button' is still enabled
+		if (side.equals("left"))
+			collaborator.showButtonL.setEnabled(true);
+		else
+			collaborator.showButtonR.setEnabled(true);
 	}
 
 	@Override
