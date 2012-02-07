@@ -157,7 +157,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		docListPanel.setHeight("100%");
 		docListPanel.setSpacing(10);
 		docListPanel.add(new HTML("<h2>Available Documents</h2>"));
-		documentList.setWidth("100%");
+		documentList.setWidth("220px");
 		docListPanel.add(documentList);
 
 		// buttons inder the doc list
@@ -229,6 +229,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		mainOuterPanel.setCellWidth(docsAndConsoleVertPanel, "200px");
 		mainOuterPanel.setCellWidth(openDocsOuterPanel, "100%");
 		
+		
 		openDocsOuterPanel.setWidth("100%");
 		innerHp.setCellWidth(leftPanel, "50%");
 		innerHp.setCellWidth(rightPanel, "50%");
@@ -237,6 +238,9 @@ public class Collaborator extends Composite implements ClickHandler {
 		innerHp.setHeight("100%");
 		
 		// Fixing the vertical
+		mainOuterPanel.setCellHeight(docsAndConsoleVertPanel,"100%");
+		
+		
 		innerHp.setCellHeight(leftPanel, "100%");
 		innerHp.setCellHeight(rightPanel, "100%");
 		
