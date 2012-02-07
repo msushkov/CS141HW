@@ -695,7 +695,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			docList = documentsRightList;
 			contentsList = contentsR;
 			titleList = titleR;
-			removeTabButton = removeTabL;
+			removeTabButton = removeTabR;
 			lockButton = lockButtonR;
 			side = "right";
 			hPanel = rightHPanel;
@@ -761,7 +761,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		} else {
 			tabPanel = documentsR;
 			docList = documentsRightList;
-			removeTabButton = removeTabL;
+			removeTabButton = removeTabR;
 			saveButton = saveButtonR;
 			side = "right";
 			hPanel = rightHPanel;
