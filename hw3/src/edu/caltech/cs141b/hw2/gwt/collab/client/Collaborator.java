@@ -443,6 +443,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		titleBox.setValue(title);
 		titleBox.setEnabled(true);
 		titleBox.setWidth("250px");
+		titleBox.setStyleName("titleBox");
 
 		// prevent spacing issues
 		// titleBox.setHeight("1.2em");
