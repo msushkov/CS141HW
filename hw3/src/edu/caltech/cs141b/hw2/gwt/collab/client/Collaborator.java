@@ -39,6 +39,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	final private int maxTabsOnOneSide = 4;
 	final private int maxTitleLength = 100;
 	final private int maxContentsLength = 10000;
+	final private int maxListItems = 18;
+
 	final private String disabledCSS = "Disabled";
 
 	protected CollaboratorServiceAsync collabService;
@@ -125,7 +127,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// the list of documents
 		documentList.addClickHandler(this);
-		documentList.setVisibleItemCount(20);
+		documentList.setVisibleItemCount(maxListItems);
 		documentList.setHeight("100%");
 
 		// the 'get lock' button should be initially disabled 
