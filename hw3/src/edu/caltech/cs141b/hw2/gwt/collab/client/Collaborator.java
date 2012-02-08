@@ -34,8 +34,10 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 public class Collaborator extends Composite implements ClickHandler {
 
 	final private int maxTabTextLen = 15;
-	final private int maxConsoleEnt = 5;
+	final private int maxConsoleEnt = 20;
 	final private int maxTabsOnOneSide = 4;
+	final private int maxTitleLength = 100;
+	final private int maxContentsLength = 10000;
 
 	protected CollaboratorServiceAsync collabService;
 
@@ -180,9 +182,9 @@ public class Collaborator extends Composite implements ClickHandler {
 		statusArea.setSpacing(10);
 		statusArea.add(new HTML("<h2>Console</h2>"));
 		consoleDP.add(statusArea);
-		
+
 		consoleDP.setCellVerticalAlignment(statusArea, HasVerticalAlignment.ALIGN_TOP);
-		
+
 		docsAndConsoleVertPanel.add(consoleDP);
 		mainOuterPanel.add(docsAndConsoleVertPanel);
 
@@ -242,19 +244,19 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// Fixing the vertical
 		mainOuterPanel.setCellHeight(docsAndConsoleVertPanel,"100%");
-		
-		
+
+
 		innerHp.setCellHeight(leftPanel, "100%");
 		innerHp.setCellHeight(rightPanel, "100%");
-		
+
 		// Vertical textboxes
 		leftPanel.setCellHeight(documentsL, "100%");
 		rightPanel.setCellHeight(documentsR, "100%");
-		
-		
+
+
 		//Setting up the document sizes
 		// the panels
-		
+
 		openDocsDP.setCellVerticalAlignment(openDocsInnerPanel, HasAlignment.ALIGN_TOP);
 		openDocsDP.setHeight("100%");
 		openDocsOuterPanel.setHeight("100%");
@@ -274,7 +276,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// Setting console/document space
 		docsAndConsoleVertPanel.setCellHeight(consoleDP, "200px");
-		
+
 		// Tab bars
 		documentsL.setWidth("100%");
 		documentsR.setWidth("100%");
@@ -314,7 +316,7 @@ public class Collaborator extends Composite implements ClickHandler {
 					// Enable the fields since have the lock
 					titleListFinal.get(ind).setEnabled(true);
 					contentsListFinal.get(ind).setEnabled(true);
-					
+
 					// disable the refresh button
 					refreshFinal.setEnabled(false);
 				} 
@@ -326,7 +328,7 @@ public class Collaborator extends Composite implements ClickHandler {
 					// Disabling the fields since you don't have the lock
 					titleListFinal.get(ind).setEnabled(false);
 					contentsListFinal.get(ind).setEnabled(false);
-					
+
 					// enable the refresh button
 					refreshFinal.setEnabled(true);
 				}
@@ -439,7 +441,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		titleBox.setValue(title);
 		titleBox.setEnabled(true);
 		titleBox.setWidth("250px");
-		
+
 		// prevent spacing issues
 		// titleBox.setHeight("1.2em");
 
@@ -458,7 +460,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		vp.add(titleBox);
 		vp.add(areaBox);
 		vp.setCellHeight(titleBox, "2em");
-		
+
 		// Centering the title box
 		//vp.setCellHorizontalAlignment(titleBox, HasHorizontalAlignment.ALIGN_CENTER);
 
@@ -473,7 +475,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		refresh.setEnabled(true);
 
 		final int ind = titleList.size();
-		
+
 		// set a value-change handler to the title box (so that it updates even when user 
 		// pastes stuff to it
 		titleBox.addValueChangeHandler(new ValueChangeHandler<String>() {
@@ -484,7 +486,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			}
 
 		});
-			
+
 		// add key handler to the title box - update the tab text
 		// as the user is typing the title
 		titleBox.addKeyUpHandler(new KeyUpHandler() {
@@ -605,12 +607,12 @@ public class Collaborator extends Composite implements ClickHandler {
 				"Enter the document title.", "Enter the document contents.");
 
 		boolean left = false;
-		
+
 		if (side.equals("left"))
 			left = true;
 		else
 			left = false;
-		
+
 		setGenericObjects(left);
 
 		docList.add(ld);
@@ -773,9 +775,22 @@ public class Collaborator extends Composite implements ClickHandler {
 			// otherwise if stuff was changed, save
 			else {
 				LockedDocument ld = (LockedDocument) doc;
-				ld.setTitle(titleList.get(ind).getValue());
-				ld.setContents(contentsList.get(ind).getText());
-				DocSaver.saveDoc(this, ld, side, ind);
+				String title = titleList.get(ind).getText();
+				String contents = contentsList.get(ind).getText();
+
+				// if the title and contents are less than the max length,
+				// then save this doc
+				if (title.length() < maxTitleLength && contents.length() < maxContentsLength)
+				{
+					ld.setTitle(title);
+					ld.setContents(contents);
+					DocSaver.saveDoc(this, ld, side, ind);
+				}
+				// otherwise, print error message to console
+				else if (contents.length() >= maxContentsLength)
+					statusUpdate("Error: Can't save; contents must be less than " + maxContentsLength + " characters.");
+				else if (title.length() >= maxTitleLength)
+					statusUpdate("Error: Can't save; title must be less than " + maxTitleLength + " characters.");
 			}
 		}
 	}
@@ -843,31 +858,35 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	private void docListHandler()
 	{
-		String key = documentList.getValue(documentList.getSelectedIndex());
-
-		// if not already showing this doc, disable showLeft + showRight
-		if (contained(key, documentsLeftList, documentsRightList)) {
-			showButtonL.setEnabled(false);
-			showButtonR.setEnabled(false);
-		} else {
-			showButtonL.setEnabled(true);
-			showButtonR.setEnabled(true);
-		}
-
-		// disable show left or right based on how many tabs are open
-		int numLeftTabs = documentsL.getTabBar().getTabCount();
-		int numRightTabs = documentsR.getTabBar().getTabCount();
-
-		if (numLeftTabs >= maxTabsOnOneSide)
-			showButtonL.setEnabled(false);
-		if (numRightTabs >= maxTabsOnOneSide)
-			showButtonR.setEnabled(false);
-
-		// disable new doc if no more space anywhere
-		if (numLeftTabs >= maxTabsOnOneSide && numRightTabs >= maxTabsOnOneSide)
+		// if we selected something valid in the doc list
+		if (documentList.getSelectedIndex() >= 0)
 		{
-			createNew.setEnabled(false);
-			statusUpdate("No more space on the tab panels!");
+			String key = documentList.getValue(documentList.getSelectedIndex());
+
+			// if not already showing this doc, disable showLeft + showRight
+			if (contained(key, documentsLeftList, documentsRightList)) {
+				showButtonL.setEnabled(false);
+				showButtonR.setEnabled(false);
+			} else {
+				showButtonL.setEnabled(true);
+				showButtonR.setEnabled(true);
+			}
+
+			// disable show left or right based on how many tabs are open
+			int numLeftTabs = documentsL.getTabBar().getTabCount();
+			int numRightTabs = documentsR.getTabBar().getTabCount();
+
+			if (numLeftTabs >= maxTabsOnOneSide)
+				showButtonL.setEnabled(false);
+			if (numRightTabs >= maxTabsOnOneSide)
+				showButtonR.setEnabled(false);
+
+			// disable new doc if no more space anywhere
+			if (numLeftTabs >= maxTabsOnOneSide && numRightTabs >= maxTabsOnOneSide)
+			{
+				createNew.setEnabled(false);
+				statusUpdate("No more space on the tab panels!");
+			}
 		}
 	}
 
