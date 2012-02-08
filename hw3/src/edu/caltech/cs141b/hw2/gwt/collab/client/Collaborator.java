@@ -307,6 +307,8 @@ public class Collaborator extends Composite implements ClickHandler {
 				hPanelFinal.clear();
 
 				if (docListFinal.get(ind) instanceof LockedDocument) {
+					// enable and add the save button
+					saveDocButtonFinal.setEnabled(true);
 					hPanelFinal.add(saveDocButtonFinal);
 
 					// Enable the fields since have the lock
@@ -314,6 +316,8 @@ public class Collaborator extends Composite implements ClickHandler {
 					contentsListFinal.get(ind).setEnabled(true);
 				} 
 				else {
+					// enable and add the lock button
+					lockButtonFinal.setEnabled(true);
 					hPanelFinal.add(lockButtonFinal);
 
 					// Disabling the fields since you don't have the lock
@@ -321,6 +325,9 @@ public class Collaborator extends Composite implements ClickHandler {
 					contentsListFinal.get(ind).setEnabled(false);
 				}
 
+				// add removeTab and refresh buttons and enable them
+				removeTabButtonFinal.setEnabled(true);
+				refreshFinal.setEnabled(true);
 				hPanelFinal.add(removeTabButtonFinal);
 				hPanelFinal.add(refreshFinal);
 			}
