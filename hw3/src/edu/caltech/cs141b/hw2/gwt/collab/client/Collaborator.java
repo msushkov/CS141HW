@@ -39,6 +39,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	final private int maxTabsOnOneSide = 4;
 	final private int maxTitleLength = 100;
 	final private int maxContentsLength = 10000;
+	final private String disabledCSS = "Disabled";
 
 	protected CollaboratorServiceAsync collabService;
 
@@ -69,6 +70,10 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected Button removeTabR = new Button("Remove Tab");
 	protected Button refreshButtonL = new Button("Refresh Doc");
 	protected Button refreshButtonR = new Button("Refresh Doc");
+	
+	
+	
+	
 
 	// Panels
 	VerticalPanel leftPanel = new VerticalPanel();
@@ -93,7 +98,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected Button refresh = null;
 	protected HorizontalPanel hPanel = null;
 	protected String side = null;
-
+	
+	
 	// Status tracking.
 	private VerticalPanel statusArea = new VerticalPanel();
 
@@ -120,19 +126,21 @@ public class Collaborator extends Composite implements ClickHandler {
 		// the list of documents
 		documentList.addClickHandler(this);
 		documentList.setVisibleItemCount(20);
+		documentList.setHeight("100%");
 
 		// the 'get lock' button should be initially disabled 
 		// since there are no tabs open
-		lockButtonL.setEnabled(false);
-		lockButtonR.setEnabled(false);
+		disableButton(lockButtonL);
+		disableButton(lockButtonR);
 
 		// cant refresh doc since no docs open yet
-		refreshButtonL.setEnabled(false);
-		refreshButtonR.setEnabled(false);
+		disableButton(refreshButtonL);
+		disableButton(refreshButtonR);
 
 		// nothing selected on list yet, so disable these
-		showButtonL.setEnabled(false);
-		showButtonR.setEnabled(false);
+		disableButton(showButtonL);
+		disableButton(showButtonR);
+
 
 		initWidget(mainOuterPanel);
 		lister.getDocumentList();
@@ -159,12 +167,45 @@ public class Collaborator extends Composite implements ClickHandler {
 		docListPanel.setStyleName("docListPanel");
 		docListPanel.setHeight("100%");
 		docListPanel.setSpacing(10);
-		docListPanel.add(new HTML("<h2>Available Documents</h2>"));
+		
+		HTML docListPanelTitle =  new HTML("<h2>Available Documents</h2>");
+		docListPanel.add(docListPanelTitle);
 		documentList.setWidth("100%");
 		docListPanel.add(documentList);
 
 	
 		docListPanel.setWidth("320px");
+
+		// button styles
+		
+		refreshDoc.setStylePrimaryName("refreshButton");
+		lockButtonL.setStylePrimaryName("lockButton");
+		saveButtonL.setStylePrimaryName("saveButton");
+		lockButtonR.setStylePrimaryName("lockButton");
+		saveButtonR.setStylePrimaryName("saveButton");
+		showButtonL.setStylePrimaryName("showLButton");
+		showButtonR.setStylePrimaryName("showRButton");
+		removeTabL.setStylePrimaryName("removeButton");
+		removeTabR.setStylePrimaryName("removeButton");
+		refreshButtonL.setStylePrimaryName("refreshButton");
+		refreshButtonR.setStylePrimaryName("refreshButton");
+		createNew.setStylePrimaryName("createNewButton");
+		refreshList.setStylePrimaryName("refreshButton");
+		
+		
+		refreshDoc.addStyleName("gwt-Button");
+		lockButtonL.addStyleName("gwt-Button");
+		saveButtonL.addStyleName("gwt-Button");
+		lockButtonR.addStyleName("gwt-Button");
+		saveButtonR.addStyleName("gwt-Button");
+		showButtonL.addStyleName("gwt-Button");
+		showButtonR.addStyleName("gwt-Button");
+		removeTabL.addStyleName("gwt-Button");
+		removeTabR.addStyleName("gwt-Button");
+		refreshButtonL.addStyleName("gwt-Button");
+		refreshButtonR.addStyleName("gwt-Button");
+		createNew.addStyleName("gwt-Button");
+		refreshList.addStyleName("gwt-Button");
 
 		// buttons inder the doc list
 		HorizontalPanel docListButtonPanel = new HorizontalPanel();
@@ -183,8 +224,11 @@ public class Collaborator extends Composite implements ClickHandler {
 		consoleDP.setStyleName("consoleDP");
 		consoleDP.setWidth("320px");
 		consoleDP.setHeight("250px");
+		HTML consoleTitle = new HTML("<h2>Console</h2>");
 		statusArea.setSpacing(10);
-		statusArea.add(new HTML("<h2>Console</h2>"));
+		statusArea.add(consoleTitle);
+		statusArea.setCellWidth(consoleTitle, "100%");
+		statusArea.setWidth("100%");
 		consoleDP.add(statusArea);
 
 		consoleDP.setCellVerticalAlignment(statusArea, HasVerticalAlignment.ALIGN_TOP);
@@ -255,6 +299,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// Vertical textboxes
 		leftPanel.setCellHeight(documentsL, "100%");
 		rightPanel.setCellHeight(documentsR, "100%");
+		
 
 
 		//Setting up the document sizes
@@ -313,7 +358,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 				if (docListFinal.get(ind) instanceof LockedDocument) {
 					// enable and add the save button
-					saveDocButtonFinal.setEnabled(true);
+					enableButton(saveDocButtonFinal);
 					hPanelFinal.add(saveDocButtonFinal);
 
 					// Enable the fields since have the lock
@@ -321,11 +366,11 @@ public class Collaborator extends Composite implements ClickHandler {
 					contentsListFinal.get(ind).setEnabled(true);
 
 					// disable the refresh button
-					refreshFinal.setEnabled(false);
+					disableButton(refreshFinal);
 				} 
 				else {
 					// enable and add the lock button
-					lockButtonFinal.setEnabled(true);
+					enableButton(lockButtonFinal);
 					hPanelFinal.add(lockButtonFinal);
 
 					// Disabling the fields since you don't have the lock
@@ -333,11 +378,11 @@ public class Collaborator extends Composite implements ClickHandler {
 					contentsListFinal.get(ind).setEnabled(false);
 
 					// enable the refresh button
-					refreshFinal.setEnabled(true);
+					enableButton(refreshFinal);
 				}
 
 				// add removeTab and refresh buttons, enable removeTab
-				removeTabButtonFinal.setEnabled(true);
+				enableButton(removeTabButtonFinal);
 				hPanelFinal.add(removeTabButtonFinal);
 				hPanelFinal.add(refreshFinal);
 			}
@@ -443,7 +488,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		TextBox titleBox = new TextBox();
 		titleBox.setValue(title);
 		titleBox.setEnabled(true);
-		titleBox.setWidth("250px");
+		titleBox.setWidth("99%");
 		titleBox.setStyleName("titleBox");
 
 		// prevent spacing issues
@@ -451,7 +496,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// the document contents
 		TextArea areaBox = new TextArea();
-		areaBox.setWidth("97%");
+		areaBox.setWidth("99%");
 		areaBox.setHeight("100%");
 		areaBox.setStyleName("documentTextBox");
 
@@ -473,10 +518,10 @@ public class Collaborator extends Composite implements ClickHandler {
 		// add the doc title and contents to the appropriate tabpanel
 
 		// enable the lock, removeTab, save, and refresh buttons
-		lockButton.setEnabled(true);
-		removeTabButton.setEnabled(true);
-		saveDocButton.setEnabled(true);
-		refresh.setEnabled(true);
+		enableButton(lockButton);
+		enableButton(removeTabButton);
+		enableButton(saveDocButton);
+		enableButton(refresh);
 
 		final int ind = titleList.size();
 
@@ -514,21 +559,21 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// if we have space for new doc, enable the button
 		if (numLeftTabs < maxTabsOnOneSide && numRightTabs < maxTabsOnOneSide)
-			createNew.setEnabled(true);
+			enableButton(createNew);
 		else if (numLeftTabs >= maxTabsOnOneSide && numRightTabs >= maxTabsOnOneSide)
-			createNew.setEnabled(false);
+			disableButton(createNew);
 
 		// can we add more tabs on the left?
 		if (numLeftTabs < maxTabsOnOneSide)
-			showButtonL.setEnabled(true);
+			enableButton(showButtonL);
 		else 
-			showButtonL.setEnabled(false);
+			disableButton(showButtonL);
 
 		// can we add more tabs on the right?
 		if (numRightTabs < maxTabsOnOneSide)
-			showButtonR.setEnabled(true);
+			enableButton(showButtonR);
 		else 
-			showButtonR.setEnabled(false);
+			disableButton(showButtonR);
 	}
 
 	/*
@@ -624,9 +669,10 @@ public class Collaborator extends Composite implements ClickHandler {
 		setTabText(ld.getTitle(), docList.size() - 1, side);
 		openLatestTab(side);
 
-		refresh.setEnabled(false);
-		showButtonL.setEnabled(false);
-		showButtonR.setEnabled(false);
+		
+		disableButton(refresh);
+		disableButton(showButtonL);
+		disableButton(showButtonR);
 	}
 
 	/**
@@ -697,21 +743,21 @@ public class Collaborator extends Composite implements ClickHandler {
 			if (!titleList.get(ind - 1).isEnabled())
 			{
 				hPanel.add(lockButton);
-				lockButton.setEnabled(true);
-				refresh.setEnabled(true);
+				enableButton(lockButton);
+				enableButton(refresh);
 			}
 			// title and contents are editable, so add 'save', 'remove', and 
 			// 'refresh' buttons (refresh must be disabled)
 			else
 			{
 				hPanel.add(saveDocButton);
-				saveDocButton.setEnabled(true);
-				refresh.setEnabled(false);
+				enableButton(saveDocButton);
+				disableButton(refresh);
 			}
 
 			hPanel.add(removeTabButton);
 			hPanel.add(refresh);
-			removeTabButton.setEnabled(true);
+			enableButton(removeTabButton);
 		}
 
 		// otherwise, if this tab has no tabs to its left
@@ -731,31 +777,31 @@ public class Collaborator extends Composite implements ClickHandler {
 				if (!titleList.get(0).isEnabled())
 				{
 					hPanel.add(lockButton);
-					lockButton.setEnabled(true);
-					refresh.setEnabled(true);
+					enableButton(lockButton);
+					enableButton(refresh);
 				}
 				// title and contents are editable, so add 'save', 'remove', and 
 				// 'refresh' buttons (refresh must be disabled)
 				else
 				{
 					hPanel.add(saveDocButton);
-					saveDocButton.setEnabled(true);
-					refresh.setEnabled(false);
+					enableButton(saveDocButton);
+					disableButton(refresh);
 				}
 
 				hPanel.add(removeTabButton);
 				hPanel.add(refresh);
-				removeTabButton.setEnabled(true);
+				enableButton(removeTabButton);
 			}
 			// if no longer have any tabs on the left, disable all buttons
 			else {
 				for (Widget w : hPanel)
-					((Button) w).setEnabled(false);
+					disableButton((Button) w);
 			}
 		}
 
 		// enable 'new doc' button
-		createNew.setEnabled(true);
+		enableButton(createNew);
 	}
 
 	/**
@@ -835,8 +881,8 @@ public class Collaborator extends Composite implements ClickHandler {
 			openDocument(side);
 
 		// this is already up on the tabpanels, so disable these buttons
-		showButtonL.setEnabled(false);
-		showButtonR.setEnabled(false);
+		disableButton(showButtonL);
+		enableButton(showButtonR);
 	}
 
 	public void openDocument(String side) {
@@ -869,11 +915,11 @@ public class Collaborator extends Composite implements ClickHandler {
 
 			// if not already showing this doc, disable showLeft + showRight
 			if (contained(key, documentsLeftList, documentsRightList)) {
-				showButtonL.setEnabled(false);
-				showButtonR.setEnabled(false);
+				disableButton(showButtonL);
+				enableButton(showButtonR);
 			} else {
-				showButtonL.setEnabled(true);
-				showButtonR.setEnabled(true);
+				enableButton(showButtonL);
+				enableButton(showButtonR);
 			}
 
 			// disable show left or right based on how many tabs are open
@@ -881,14 +927,14 @@ public class Collaborator extends Composite implements ClickHandler {
 			int numRightTabs = documentsR.getTabBar().getTabCount();
 
 			if (numLeftTabs >= maxTabsOnOneSide)
-				showButtonL.setEnabled(false);
+				disableButton(showButtonL);
 			if (numRightTabs >= maxTabsOnOneSide)
-				showButtonR.setEnabled(false);
+				enableButton(showButtonR);
 
 			// disable new doc if no more space anywhere
 			if (numLeftTabs >= maxTabsOnOneSide && numRightTabs >= maxTabsOnOneSide)
 			{
-				createNew.setEnabled(false);
+				disableButton(createNew);
 				statusUpdate("No more space on the tab panels!");
 			}
 		}
@@ -964,8 +1010,30 @@ public class Collaborator extends Composite implements ClickHandler {
 		hPanel.add(refresh);
 
 		// enable lock, refreshDoc, and removeTab buttons
-		lockButton.setEnabled(true);
-		removeTabButton.setEnabled(true);
-		refresh.setEnabled(true);
+		enableButton(lockButton);
+		enableButton(removeTabButton);
+		enableButton(refresh);
+	}
+	
+	protected void enableButton(Button b) {
+		/* Enable button */
+		b.setEnabled(true);
+
+		/* Replace CSS image */
+		String curClass = b.getStylePrimaryName();
+		if (curClass.contains(disabledCSS)) {
+			curClass = curClass.replace(disabledCSS, "");
+			b.setStylePrimaryName(curClass);
+		}
+	}
+	protected void disableButton(Button b) {
+		/* Disable button */
+		b.setEnabled(false);
+		/* Replace CSS image */
+		String curClass = b.getStylePrimaryName();
+		if (!curClass.contains(disabledCSS)) {
+			curClass += disabledCSS;
+			b.setStylePrimaryName(curClass);
+		}
 	}
 }

@@ -1,9 +1,9 @@
 body {
-	color: black;
+	color: white;
 	margin: 0px;
 	border: 0px;
 	padding: 0px;
-	background: white;
+	background: #141414;
 	direction: ltr;
 	margin-left: 0;
 	font-family: sans-serif;
@@ -24,11 +24,23 @@ h2 {
 	font-stretch: narrower;
 	font-weight: 500;
 	margin: 4px;
-	color: black;
+	color: #e7e0e0;
 	/*text-decoration: bold; */
-	font-size: 1.8em;
+	font-size: 1.7em;
 	font-weight: bold;
 }
+
+.gwt-HTML h2 {
+background: rgb(53,3,215); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(53,3,215,1) 0%, rgba(47,14,168,1) 40%, rgba(31,3,125,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(53,3,215,1)), color-stop(40%,rgba(47,14,168,1)), color-stop(100%,rgba(31,3,125,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, rgba(53,3,215,1) 0%,rgba(47,14,168,1) 40%,rgba(31,3,125,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, rgba(53,3,215,1) 0%,rgba(47,14,168,1) 40%,rgba(31,3,125,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, rgba(53,3,215,1) 0%,rgba(47,14,168,1) 40%,rgba(31,3,125,1) 100%); /* IE10+ */
+background: linear-gradient(top, rgba(53,3,215,1) 0%,rgba(47,14,168,1) 40%,rgba(31,3,125,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3503d7', endColorstr='#1f037d',GradientType=0 ); /* IE6-9 */
+}
+
 #application {
 	height: 50%;
 	width: 100%;
@@ -69,8 +81,9 @@ h2 {
 
 
 .gwt-TabPanel {
-	background: white;
+	background: #555050;
 	height: 100%;
+	border-radius: 12px;
 	/*min-height: 400px;*/
 	/*height: 100%;
 	width: 350px;*/
@@ -87,7 +100,16 @@ h2 {
 	/*width: 350px; */
 	height: 35px;
 	padding-top: 6px;
-	background-color: #c5c2ff;
+	/*background-color: #c5c2ff; */
+	background-color: navy;
+	
+	-webkit-border-top-left-radius: 12px;
+	-webkit-border-top-right-radius: 12px;
+	-moz-border-radius-topleft: 12px;
+	-moz-border-radius-topright: 12px;
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+	
 }
 .gwt-TabBar .gwt-TabBarItem {
 	margin-left: 4px;
@@ -118,13 +140,24 @@ h2 {
 	font-size: 1.1em;
 	resize: none;
 	border-radius: 5px;
+	background: #555050;
+	color: white;
+	
 }
 
 .titleBox {
+	color: white;
 	font-size: 1.4em;
 	resize: none;
 	border-radius: 5px;
 	font-weight: bold;
+	background: #555050;
+}
+
+.gwt-ListBox {
+	border-radius: 5px;
+	background-color: black;
+	color: white;
 }
 
 .consoleDP {
@@ -133,19 +166,23 @@ h2 {
 
 
 /* Sexy borders */
-.consoleDP, .openDocsInnerPanel, .docListPanel {
+/*.consoleDP {
 	border: solid;
 	border-width: 1px;
 	border-radius: 15px;
-}
+	
+} */
 
-.leftPanel {
+/*.leftPanel {
 	border-right: solid;
 	border-width: 2px;
-}
+}*/
 textarea {
 	font-family: sans-serif;
+	border-color: blue;
+	border: 0px;
 }
+
 
 
 
@@ -162,11 +199,70 @@ textarea {
 
 
 
+/* BUTTONS */
 
+.gwt-Button{
+  width: 55px;
+  height: 50px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  text-indent: -1000em;
+  cursor: pointer; /* hand-shaped cursor */
+  cursor: hand; /* for IE 5.x */
+}
 
+.saveButton {
+    background:transparent url(Save.png) no-repeat center top;
+}
 
+.saveButtonDisabled {
+	
+}
 
+.lockButton {
+    background:transparent url(Lock.png) no-repeat center top;
 
+}
+.lockButtonDisabled {
+    background:transparent url(Lock-grey.png) no-repeat center top;
+}
+
+.createNewButton {
+    background:transparent url(NewDoc.png) no-repeat center top;
+}
+
+.refreshButton {
+    background:transparent url(Refresh.png) no-repeat center top;
+}
+
+.refreshButtonDisabled {
+    background:transparent url(Refresh-grey.png) no-repeat center top;
+}
+
+.showLButton {
+	background:transparent url(L.png) no-repeat center top;
+}
+
+.showLButtonDisabled {
+	background:transparent url(L-grey.png) no-repeat center top;
+}
+
+.showRButton {
+	background:transparent url(R.png) no-repeat center top;
+}
+
+.showRButtonDisabled {
+	background:transparent url(R-grey.png) no-repeat center top;
+}
+
+.removeButton {
+	background:transparent url(Close.png) no-repeat center top;
+}
+
+.removeButtonDisabled {
+	background:transparent url(Close-grey.png) no-repeat center top;
+}
 
 
 /* ADDING JUNK */
