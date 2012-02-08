@@ -882,7 +882,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// this is already up on the tabpanels, so disable these buttons
 		disableButton(showButtonL);
-		enableButton(showButtonR);
+		disableButton(showButtonR);
 	}
 
 	public void openDocument(String side) {
@@ -916,7 +916,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			// if not already showing this doc, disable showLeft + showRight
 			if (contained(key, documentsLeftList, documentsRightList)) {
 				disableButton(showButtonL);
-				enableButton(showButtonR);
+				disableButton(showButtonR);
 			} else {
 				enableButton(showButtonL);
 				enableButton(showButtonR);

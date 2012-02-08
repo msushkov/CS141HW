@@ -139,7 +139,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3503d7', end
 .documentTextBox {
 	font-size: 1.1em;
 	resize: none;
-	border-radius: 5px;
+	border-radius: 12px;
 	background: #555050;
 	color: white;
 	
