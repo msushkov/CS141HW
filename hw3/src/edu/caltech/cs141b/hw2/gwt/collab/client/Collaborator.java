@@ -314,6 +314,9 @@ public class Collaborator extends Composite implements ClickHandler {
 					// Enable the fields since have the lock
 					titleListFinal.get(ind).setEnabled(true);
 					contentsListFinal.get(ind).setEnabled(true);
+					
+					// disable the refresh button
+					refreshFinal.setEnabled(false);
 				} 
 				else {
 					// enable and add the lock button
@@ -323,11 +326,13 @@ public class Collaborator extends Composite implements ClickHandler {
 					// Disabling the fields since you don't have the lock
 					titleListFinal.get(ind).setEnabled(false);
 					contentsListFinal.get(ind).setEnabled(false);
+					
+					// enable the refresh button
+					refreshFinal.setEnabled(true);
 				}
 
-				// add removeTab and refresh buttons and enable them
+				// add removeTab and refresh buttons, enable removeTab
 				removeTabButtonFinal.setEnabled(true);
-				refreshFinal.setEnabled(true);
 				hPanelFinal.add(removeTabButtonFinal);
 				hPanelFinal.add(refreshFinal);
 			}
