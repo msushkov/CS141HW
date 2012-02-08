@@ -587,7 +587,7 @@ public class Collaborator extends Composite implements ClickHandler {
 				refreshButtonHandler(true);
 
 			else if (event.getSource().equals(refreshButtonR))
-				refreshButtonHandler(true);
+				refreshButtonHandler(false);
 
 			// if user selects a doc from the doc list
 			else if (event.getSource().equals(documentList)) 
