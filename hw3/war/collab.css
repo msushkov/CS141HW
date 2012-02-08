@@ -101,7 +101,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3503d7', end
 	height: 35px;
 	padding-top: 6px;
 	/*background-color: #c5c2ff; */
-	background-color: navy;
+	/*background-color: navy;*/
 	
 	-webkit-border-top-left-radius: 12px;
 	-webkit-border-top-right-radius: 12px;
@@ -109,6 +109,20 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3503d7', end
 	-moz-border-radius-topright: 12px;
 	border-top-left-radius: 12px;
 	border-top-right-radius: 12px;
+	
+	background: #2d2d2d; /* Old browsers */
+background: #272727; /* Old browsers */
+background: -moz-linear-gradient(top,  #272727 0%, #202020 40%, #171717 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#272727), color-stop(40%,#202020), color-stop(100%,#171717)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* IE10+ */
+background: linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#272727', endColorstr='#171717',GradientType=0 ); /* IE6-9 */
+
+	
+	
+	
 	
 }
 .gwt-TabBar .gwt-TabBarItem {
@@ -130,8 +144,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3503d7', end
 }
 .gwt-TabBar .gwt-TabBarItem-selected {
 	cursor: default;
-	background: white;
-	color: black;
+	background-color: #555050;
+	color: white;
 	font-weight: bold;
 }
 
@@ -142,22 +156,32 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3503d7', end
 	border-radius: 12px;
 	background: #555050;
 	color: white;
+	outline-color: white;
+	outline-style: 
+
 	
 }
 
 .titleBox {
 	color: white;
-	font-size: 1.4em;
+	font-size: 2.8em;
 	resize: none;
 	border-radius: 5px;
 	font-weight: bold;
 	background: #555050;
+	outline-color: white;
+	border: 0px;
+
+	
 }
 
 .gwt-ListBox {
 	border-radius: 5px;
 	background-color: black;
 	color: white;
+	border 0px;
+	outline-width: 0;
+
 }
 
 .consoleDP {
@@ -179,7 +203,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3503d7', end
 }*/
 textarea {
 	font-family: sans-serif;
-	border-color: blue;
 	border: 0px;
 }
 
@@ -267,7 +290,7 @@ textarea {
 
 /* ADDING JUNK */
 
-.gwt-TabBar .gwt-TabBarItem {
+/*.gwt-TabBar .gwt-TabBarItem {
 	margin-left: 4px;
 	padding: 4px 8px 4px 8px;
 	height: 20px;
@@ -278,8 +301,8 @@ textarea {
 	vertical-align: auto;
 	font-weight: normal;
 	text-align: center;
-	background: #bed9f9; /*#9cc3f1; */
-	/*background: #56A0D3;*/
+	background: #bed9f9; /*#9cc3f1; 
+	/*background: #56A0D3;
 	-moz-border-radius: 6px 6px 0px 0px;
 	border-radius: 6px 6px 0px 0px;
 }
@@ -290,8 +313,7 @@ textarea {
 	background: white;
 	color: black;
 	font-weight: bold;
-}
-
+}*/
 .gwt-DecoratedTabBar .tabMiddleLeft, .gwt-DecoratedTabBar .tabMiddleRight {
 	width: 3px;
 	padding: 0px;
