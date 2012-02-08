@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasAlignment;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ListBox;
@@ -159,8 +160,11 @@ public class Collaborator extends Composite implements ClickHandler {
 		docListPanel.setHeight("100%");
 		docListPanel.setSpacing(10);
 		docListPanel.add(new HTML("<h2>Available Documents</h2>"));
-		documentList.setWidth("220px");
+		documentList.setWidth("100%");
 		docListPanel.add(documentList);
+
+	
+		docListPanel.setWidth("320px");
 
 		// buttons inder the doc list
 		HorizontalPanel docListButtonPanel = new HorizontalPanel();
@@ -177,7 +181,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		VerticalPanel consoleDP = new VerticalPanel();
 		consoleDP.setStyleName("consoleDP");
-		consoleDP.setWidth("100%");
+		consoleDP.setWidth("320px");
 		consoleDP.setHeight("250px");
 		statusArea.setSpacing(10);
 		statusArea.add(new HTML("<h2>Console</h2>"));
@@ -231,7 +235,6 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// Divide up the horizontal space
 		mainOuterPanel.setWidth("100%");
-		mainOuterPanel.setHeight("100%");
 		mainOuterPanel.setCellWidth(docsAndConsoleVertPanel, "200px");
 		mainOuterPanel.setCellWidth(openDocsOuterPanel, "100%");
 

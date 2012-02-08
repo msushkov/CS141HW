@@ -30,8 +30,10 @@ h2 {
 	font-weight: bold;
 }
 #application {
-	height: 95%;
+	height: 50%;
 	width: 100%;
+	/*margin-left: auto;
+	margin-right: auto; */
 }
 .app-title {
 	font-size: 4em;
@@ -46,6 +48,7 @@ h2 {
 
 .mainOuterPanel {
 	width: 100%;
+	max-height: 500px;
 }
 
 .docsAndConsoleVertPanel {
@@ -116,6 +119,10 @@ h2 {
 	border-radius: 5px;
 }
 
+.consoleDP {
+	font-size: 0.9em;
+}
+
 
 /* Sexy borders */
 .consoleDP, .openDocsInnerPanel, .docListPanel {
@@ -132,12 +139,18 @@ textarea {
 	font-family: sans-serif;
 }
 
+
+
+
 /* Sizes */
 
 
 
 
-
+/* Remove yellow border selected */
+.gwt-TabBar .gwt-TabBarItem-wrapper-selected {
+	border-color: white;
+}
 
 
 
@@ -166,6 +179,8 @@ textarea {
 	-moz-border-radius: 6px 6px 0px 0px;
 	border-radius: 6px 6px 0px 0px;
 }
+
+
 .gwt-TabBar .gwt-TabBarItem-selected {
 	cursor: default;
 	background: white;
