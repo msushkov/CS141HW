@@ -115,8 +115,16 @@ h2 {
 
 
 .documentTextBox {
+	font-size: 1.1em;
 	resize: none;
 	border-radius: 5px;
+}
+
+.titleBox {
+	font-size: 1.4em;
+	resize: none;
+	border-radius: 5px;
+	font-weight: bold;
 }
 
 .consoleDP {
