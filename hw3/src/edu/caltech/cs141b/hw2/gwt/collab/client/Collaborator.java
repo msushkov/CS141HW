@@ -386,8 +386,8 @@ public class Collaborator extends Composite implements ClickHandler {
 
 				// add removeTab and refresh buttons, enable removeTab
 				enableButton(removeTabButtonFinal);
-				hPanelFinal.add(removeTabButtonFinal);
 				hPanelFinal.add(refreshFinal);
+				hPanelFinal.add(removeTabButtonFinal);
 			}
 		});
 	}
