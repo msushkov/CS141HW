@@ -796,9 +796,8 @@ public class Collaborator extends Composite implements ClickHandler {
 					enableButton(saveDocButton);
 					disableButton(refresh);
 				}
-
-				hPanel.add(removeTabButton);
 				hPanel.add(refresh);
+				hPanel.add(removeTabButton);
 				enableButton(removeTabButton);
 			}
 			// if no longer have any tabs on the left, disable all buttons
