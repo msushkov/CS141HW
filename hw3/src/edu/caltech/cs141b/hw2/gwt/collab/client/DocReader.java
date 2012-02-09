@@ -30,7 +30,7 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 	public void getDocument(String key, String side, int ind) {
 		if (key != null)
 		{
-			collaborator.statusUpdate("Fetching document " + key + ".");
+			//collaborator.statusUpdate("Fetching document " + key + ".");
 			collaborator.waitingKey = key;
 			this.index = ind;
 			this.side = side;

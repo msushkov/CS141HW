@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -34,7 +38,7 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 public class Collaborator extends Composite implements ClickHandler {
 
 	final private int maxTabTextLen = 15;
-	final private int maxConsoleEnt = 4;
+	final private int maxConsoleEnt = 5;
 	final private int maxTabsOnOneSide = 4;
 	final private int maxTitleLength = 100;
 	final private int maxContentsLength = 10000;
@@ -161,6 +165,9 @@ public class Collaborator extends Composite implements ClickHandler {
 		mainOuterPanel.setWidth("100%");
 		mainOuterPanel.setHeight("100%");
 
+		// console
+		statusArea.setStyleName("statusArea");
+		
 		// left side - the doc list and the console
 		VerticalPanel docsAndConsoleVertPanel = new VerticalPanel();
 		docsAndConsoleVertPanel.setStyleName("docsAndConsoleVertPanel");
@@ -482,7 +489,10 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * @param content
 	 * @param left
 	 */
-	public void addTab(String title, String content, boolean left) {	
+	public void addTab(final String title, String content, boolean left) {	
+		// are we dealing with a new doc?
+		final boolean isNewDoc = title.equals("Enter the document title.");
+
 		// holds the title and the contents
 		VerticalPanel vp = new VerticalPanel();
 		//vp.setSpacing(5);
@@ -498,7 +508,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// titleBox.setHeight("1.2em");
 
 		// the document contents
-		TextArea areaBox = new TextArea();
+		final TextArea areaBox = new TextArea();
 		areaBox.setWidth("99%");
 		areaBox.setHeight("100%");
 		areaBox.setStyleName("documentTextBox");
@@ -508,10 +518,29 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		titleBox.setEnabled(true);
 		areaBox.setEnabled(true);
+		
+		// if user hits the 'enter' key anywhere in the title box, move cursor 
+		// to the end of the contents box
+		titleBox.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				// if user hits the 'enter' key
+				if (event.getNativeKeyCode() == 13)
+				{
+					areaBox.setCursorPos(areaBox.getText().length());
+					areaBox.setFocus(true);
+					
+					// if we are dealing with a new doc (or one that has the default title, 
+					// automatically select all the text in the contents
+					if (isNewDoc)
+						areaBox.selectAll();
+				}
+			}
+		});
 
 		vp.add(titleBox);
 		vp.add(areaBox);
-		vp.setCellHeight(titleBox, "2em");
+		vp.setCellHeight(titleBox, "20px");
 
 		// Centering the title box
 		//vp.setCellHorizontalAlignment(titleBox, HasHorizontalAlignment.ALIGN_CENTER);

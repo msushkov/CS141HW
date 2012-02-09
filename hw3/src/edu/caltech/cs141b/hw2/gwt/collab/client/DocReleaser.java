@@ -25,8 +25,7 @@ public class DocReleaser implements AsyncCallback<Void> {
 			title = title.substring(0, maxStrLen - 3) + "...";
 		}
 		
-		collaborator.statusUpdate("Releasing lock on '" + title
-				+ "'.");
+		//collaborator.statusUpdate("Releasing lock on '" + title + "'.");
 		collaborator.collabService.releaseLock(lockedDoc, this);
 	}
 

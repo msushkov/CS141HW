@@ -27,7 +27,7 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 	}
 
 	public void lockDocument(String key, String side, int index) {
-		collaborator.statusUpdate("Attempting to lock document.");
+		//collaborator.statusUpdate("Attempting to lock document.");
 		collaborator.waitingKey = key;
 		this.side = side;
 		this.index = index;

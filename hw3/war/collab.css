@@ -26,7 +26,7 @@ h2 {
 	margin: 4px;
 	color: #e7e0e0;
 	/*text-decoration: bold; */
-	font-size: 1.7em;
+	font-size: 28px;
 	font-weight: bold;
 }
 
@@ -172,14 +172,14 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#272727', end
 
 .titleBox {
 	color: white;
-	font-size: 2.8em;
+	font-size: 28px;
 	resize: none;
 	border-radius: 5px;
 	font-weight: bold;
 	background: #555050;
 	outline-color: white;
 	border: 0px;
-
+	text-decoration: underline;
 	
 }
 
@@ -203,7 +203,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#050208', end
 }
 
 .consoleDP {
-	font-size: 6px;
+	/*font-size: 4px;*/
+}
+
+.statusArea {
+	font-size: 14px;
 }
 
 
