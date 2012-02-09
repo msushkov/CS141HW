@@ -72,10 +72,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected Button removeTabR = new Button("Remove Tab");
 	protected Button refreshButtonL = new Button("Refresh Doc");
 	protected Button refreshButtonR = new Button("Refresh Doc");
-	
-	
-	
-	
 
 	// Panels
 	VerticalPanel leftPanel = new VerticalPanel();
@@ -138,11 +134,18 @@ public class Collaborator extends Composite implements ClickHandler {
 		// cant refresh doc since no docs open yet
 		disableButton(refreshButtonL);
 		disableButton(refreshButtonR);
+		
+		// disable the save buttons
+		disableButton(saveButtonL);
+		disableButton(saveButtonR);
+		
+		// disable the refresh buttons
+		disableButton(removeTabL);
+		disableButton(removeTabR);
 
 		// nothing selected on list yet, so disable these
 		disableButton(showButtonL);
 		disableButton(showButtonR);
-
 
 		initWidget(mainOuterPanel);
 		lister.getDocumentList();
@@ -194,7 +197,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		createNew.setStylePrimaryName("createNewButton");
 		refreshList.setStylePrimaryName("refreshButton");
 		
-		
 		refreshDoc.addStyleName("gwt-Button");
 		lockButtonL.addStyleName("gwt-Button");
 		saveButtonL.addStyleName("gwt-Button");
@@ -209,7 +211,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		createNew.addStyleName("gwt-Button");
 		refreshList.addStyleName("gwt-Button");
 
-		// buttons inder the doc list
+		// buttons under the doc list
 		HorizontalPanel docListButtonPanel = new HorizontalPanel();
 		docListButtonPanel.setSpacing(10);
 		docListButtonPanel.add(refreshList);
@@ -258,16 +260,23 @@ public class Collaborator extends Composite implements ClickHandler {
 		leftPanel.add(documentsL);
 
 		// holds the buttons for the left tab panel
-		leftHPanel.add(lockButtonL);
-		// leftHPanel.add(saveButtonL);
-		// leftHPanel.add(removeTabL);
+		// initially add the save, refresh, and removeTab buttons
+		//leftHPanel.add(lockButtonL);
+		leftHPanel.add(saveButtonL);
+		leftHPanel.add(refreshButtonL);
+		leftHPanel.add(removeTabL);
+		
 		leftPanel.add(leftHPanel);
 
 		// holds the right tab panel
 		rightPanel.add(documentsR);
 
 		// holds the buttons for the right tab panel
-		rightHPanel.add(lockButtonR);
+		//rightHPanel.add(lockButtonR);
+		rightHPanel.add(saveButtonR);
+		rightHPanel.add(refreshButtonR);
+		rightHPanel.add(removeTabR);
+		
 		rightPanel.add(rightHPanel);
 
 		innerHp.add(leftPanel);
@@ -302,8 +311,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		leftPanel.setCellHeight(documentsL, "100%");
 		rightPanel.setCellHeight(documentsR, "100%");
 		
-
-
 		//Setting up the document sizes
 		// the panels
 
@@ -319,7 +326,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		rightPanel.setWidth("100%");
 		rightPanel.setHeight("100%");
 
-
 		// fixing space issues
 		leftPanel.setCellHeight(leftHPanel, "30px");
 		rightPanel.setCellHeight(rightHPanel, "30px");
@@ -330,7 +336,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		// Tab bars
 		documentsL.setWidth("100%");
 		documentsR.setWidth("100%");
-
 	}
 
 	/**
@@ -517,8 +522,6 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		setGenericObjects(left);
 
-		// add the doc title and contents to the appropriate tabpanel
-
 		// enable the lock, removeTab, save, and refresh buttons
 		enableButton(lockButton);
 		enableButton(removeTabButton);
@@ -671,8 +674,15 @@ public class Collaborator extends Composite implements ClickHandler {
 		setTabText(ld.getTitle(), docList.size() - 1, side);
 		openLatestTab(side);
 
+		// add save, refresh, and removeTab buttons
+		hPanel.clear();
+		hPanel.add(saveDocButton);
+		hPanel.add(refresh);
+		hPanel.add(removeTabButton);
 		
+		enableButton(saveDocButton);
 		disableButton(refresh);
+		enableButton(removeTabButton);
 		disableButton(showButtonL);
 		disableButton(showButtonR);
 	}
@@ -757,8 +767,8 @@ public class Collaborator extends Composite implements ClickHandler {
 				disableButton(refresh);
 			}
 
-			hPanel.add(removeTabButton);
 			hPanel.add(refresh);
+			hPanel.add(removeTabButton);
 			enableButton(removeTabButton);
 		}
 
@@ -1008,8 +1018,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		// add lock, remove tab, and refresh buttons
 		hPanel.clear();
 		hPanel.add(lockButton);
-		hPanel.add(removeTabButton);
 		hPanel.add(refresh);
+		hPanel.add(removeTabButton);
 
 		// enable lock, refreshDoc, and removeTab buttons
 		enableButton(lockButton);
@@ -1028,6 +1038,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			b.setStylePrimaryName(curClass);
 		}
 	}
+	
 	protected void disableButton(Button b) {
 		/* Disable button */
 		b.setEnabled(false);
