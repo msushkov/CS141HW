@@ -38,7 +38,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	final private int maxTabsOnOneSide = 4;
 	final private int maxTitleLength = 100;
 	final private int maxContentsLength = 10000;
-	final private int maxListItems = 18;
+	final private int maxListItems = 15;
 
 	final private String disabledCSS = "Disabled";
 
