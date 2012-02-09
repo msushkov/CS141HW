@@ -4,10 +4,6 @@ import java.util.ArrayList;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -199,6 +195,21 @@ public class Collaborator extends Composite implements ClickHandler {
 		refreshButtonR.setStylePrimaryName("refreshButton");
 		createNew.setStylePrimaryName("createNewButton");
 		refreshList.setStylePrimaryName("refreshButton");
+		
+		// add button tooltips
+		refreshDoc.setTitle("Refresh the doc list.");
+		lockButtonL.setTitle("Start editing this document.");
+		saveButtonL.setTitle("Save the changes to this document.");
+		lockButtonR.setTitle("Start editing this document.");
+		saveButtonR.setTitle("Save the changes to this document.");
+		showButtonL.setTitle("Display on the left tab panel.");
+		showButtonR.setTitle("Display on the right tab panel.");
+		removeTabL.setTitle("Remove from this panel.");
+		removeTabR.setTitle("Remove from this panel.");
+		refreshButtonL.setTitle("Refresh this document.");
+		refreshButtonR.setTitle("Refresh this document.");
+		createNew.setTitle("Create a new document.");
+		refreshList.setTitle("Refresh the documents list.");
 		
 		refreshDoc.addStyleName("gwt-Button");
 		lockButtonL.addStyleName("gwt-Button");
