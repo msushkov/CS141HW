@@ -1,9 +1,9 @@
 body {
-	color: black;
+	color: white;
 	margin: 0px;
 	border: 0px;
 	padding: 0px;
-	background: white;
+	background: #141414;
 	direction: ltr;
 	margin-left: 0;
 	font-family: sans-serif;
@@ -24,14 +24,31 @@ h2 {
 	font-stretch: narrower;
 	font-weight: 500;
 	margin: 4px;
-	color: black;
+	color: #e7e0e0;
 	/*text-decoration: bold; */
-	font-size: 1.8em;
+	font-size: 1.7em;
 	font-weight: bold;
 }
+
+.gwt-HTML h2 {
+
+background: #3c455e; /* Old browsers */
+background: -moz-linear-gradient(top,  #3c455e 0%, #2e3548 24%, #1b2131 50%, #292f3f 79%, #31394d 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#3c455e), color-stop(24%,#2e3548), color-stop(50%,#1b2131), color-stop(79%,#292f3f), color-stop(100%,#31394d)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #3c455e 0%,#2e3548 24%,#1b2131 50%,#292f3f 79%,#31394d 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #3c455e 0%,#2e3548 24%,#1b2131 50%,#292f3f 79%,#31394d 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #3c455e 0%,#2e3548 24%,#1b2131 50%,#292f3f 79%,#31394d 100%); /* IE10+ */
+background: linear-gradient(top,  #3c455e 0%,#2e3548 24%,#1b2131 50%,#292f3f 79%,#31394d 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3c455e', endColorstr='#31394d',GradientType=0 ); /* IE6-9 */
+
+border-radius: 5px;
+
+}
+
 #application {
-	height: 50%;
+	height: 100%;
 	width: 100%;
+	min-width: 1026px;
 	/*margin-left: auto;
 	margin-right: auto; */
 }
@@ -69,8 +86,9 @@ h2 {
 
 
 .gwt-TabPanel {
-	background: white;
+	background: #555050;
 	height: 100%;
+	border-radius: 12px;
 	/*min-height: 400px;*/
 	/*height: 100%;
 	width: 350px;*/
@@ -87,7 +105,30 @@ h2 {
 	/*width: 350px; */
 	height: 35px;
 	padding-top: 6px;
-	background-color: #c5c2ff;
+	/*background-color: #c5c2ff; */
+	/*background-color: navy;*/
+	
+	-webkit-border-top-left-radius: 12px;
+	-webkit-border-top-right-radius: 12px;
+	-moz-border-radius-topleft: 12px;
+	-moz-border-radius-topright: 12px;
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+	
+	background: #2d2d2d; /* Old browsers */
+background: #272727; /* Old browsers */
+background: -moz-linear-gradient(top,  #272727 0%, #202020 40%, #171717 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#272727), color-stop(40%,#202020), color-stop(100%,#171717)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* IE10+ */
+background: linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#272727', endColorstr='#171717',GradientType=0 ); /* IE6-9 */
+
+	
+	
+	
+	
 }
 .gwt-TabBar .gwt-TabBarItem {
 	margin-left: 4px;
@@ -95,12 +136,15 @@ h2 {
 	height: 20px;
 	cursor: pointer;
 	cursor: hand;
-	color: black;
+	color: white;
 	font-size: 1em;
 	vertical-align: auto;
 	font-weight: normal;
 	text-align: center;
-	background: #bed9f9; /*#9cc3f1; */
+	background: #928989;
+	/*background: #bed9f9; #9cc3f1; */
+	outline-width: 0px;
+
 	/*background: #56A0D3;*/
 	
 	-moz-border-radius: 6px 6px 0px 0px;
@@ -108,23 +152,54 @@ h2 {
 }
 .gwt-TabBar .gwt-TabBarItem-selected {
 	cursor: default;
-	background: white;
-	color: black;
+	background-color: #555050;
+	color: white;
 	font-weight: bold;
+
 }
 
 
 .documentTextBox {
 	font-size: 1.1em;
 	resize: none;
-	border-radius: 5px;
+	border-radius: 12px;
+	background: #555050;
+	color: white;
+	outline-color: white;
+
+	
 }
 
 .titleBox {
-	font-size: 1.4em;
+	color: white;
+	font-size: 2.8em;
 	resize: none;
 	border-radius: 5px;
 	font-weight: bold;
+	background: #555050;
+	outline-color: white;
+	border: 0px;
+
+	
+}
+
+.gwt-ListBox {
+	border-radius: 5px;
+	/*background-color: black; */
+	color: white;
+	border 0px;
+	outline-width: 0;
+	
+	
+background: rgb(5,2,8); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(5,2,8,1) 0%, rgba(5,2,10,1) 50%, rgba(5,2,10,1) 51%, rgba(7,3,15,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(5,2,8,1)), color-stop(50%,rgba(5,2,10,1)), color-stop(51%,rgba(5,2,10,1)), color-stop(100%,rgba(7,3,15,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, rgba(5,2,8,1) 0%,rgba(5,2,10,1) 50%,rgba(5,2,10,1) 51%,rgba(7,3,15,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, rgba(5,2,8,1) 0%,rgba(5,2,10,1) 50%,rgba(5,2,10,1) 51%,rgba(7,3,15,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, rgba(5,2,8,1) 0%,rgba(5,2,10,1) 50%,rgba(5,2,10,1) 51%,rgba(7,3,15,1) 100%); /* IE10+ */
+background: linear-gradient(top, rgba(5,2,8,1) 0%,rgba(5,2,10,1) 50%,rgba(5,2,10,1) 51%,rgba(7,3,15,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#050208', endColorstr='#07030f',GradientType=0 ); /* IE6-9 */
+
 }
 
 .consoleDP {
@@ -133,19 +208,22 @@ h2 {
 
 
 /* Sexy borders */
-.consoleDP, .openDocsInnerPanel, .docListPanel {
+/*.consoleDP {
 	border: solid;
 	border-width: 1px;
 	border-radius: 15px;
-}
+	
+} */
 
-.leftPanel {
+/*.leftPanel {
 	border-right: solid;
 	border-width: 2px;
-}
+}*/
 textarea {
 	font-family: sans-serif;
+	border: 0px;
 }
+
 
 
 
@@ -162,16 +240,75 @@ textarea {
 
 
 
+/* BUTTONS */
 
+.gwt-Button{
+  width: 55px;
+  height: 50px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  text-indent: -1000em;
+  cursor: pointer; /* hand-shaped cursor */
+  cursor: hand; /* for IE 5.x */
+}
 
+.saveButton {
+    background:transparent url(Save.png) no-repeat center top;
+}
 
+.saveButtonDisabled {
+	
+}
 
+.lockButton {
+    background:transparent url(Lock.png) no-repeat center top;
 
+}
+.lockButtonDisabled {
+    background:transparent url(Lock-grey.png) no-repeat center top;
+}
+
+.createNewButton {
+    background:transparent url(NewDoc.png) no-repeat center top;
+}
+
+.refreshButton {
+    background:transparent url(Refresh.png) no-repeat center top;
+}
+
+.refreshButtonDisabled {
+    background:transparent url(Refresh-grey.png) no-repeat center top;
+}
+
+.showLButton {
+	background:transparent url(L.png) no-repeat center top;
+}
+
+.showLButtonDisabled {
+	background:transparent url(L-grey.png) no-repeat center top;
+}
+
+.showRButton {
+	background:transparent url(R.png) no-repeat center top;
+}
+
+.showRButtonDisabled {
+	background:transparent url(R-grey.png) no-repeat center top;
+}
+
+.removeButton {
+	background:transparent url(Close.png) no-repeat center top;
+}
+
+.removeButtonDisabled {
+	background:transparent url(Close-grey.png) no-repeat center top;
+}
 
 
 /* ADDING JUNK */
 
-.gwt-TabBar .gwt-TabBarItem {
+/*.gwt-TabBar .gwt-TabBarItem {
 	margin-left: 4px;
 	padding: 4px 8px 4px 8px;
 	height: 20px;
@@ -182,8 +319,8 @@ textarea {
 	vertical-align: auto;
 	font-weight: normal;
 	text-align: center;
-	background: #bed9f9; /*#9cc3f1; */
-	/*background: #56A0D3;*/
+	background: #bed9f9; /*#9cc3f1; 
+	/*background: #56A0D3;
 	-moz-border-radius: 6px 6px 0px 0px;
 	border-radius: 6px 6px 0px 0px;
 }
@@ -194,8 +331,7 @@ textarea {
 	background: white;
 	color: black;
 	font-weight: bold;
-}
-
+}*/
 .gwt-DecoratedTabBar .tabMiddleLeft, .gwt-DecoratedTabBar .tabMiddleRight {
 	width: 3px;
 	padding: 0px;

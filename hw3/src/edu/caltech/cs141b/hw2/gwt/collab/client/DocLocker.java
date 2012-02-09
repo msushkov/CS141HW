@@ -85,8 +85,8 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 		// we need lock, removeTab, and refresh buttons
 		collaborator.hPanel.clear();
 		collaborator.hPanel.add(collaborator.lockButton);
-		collaborator.hPanel.add(collaborator.removeTabButton);
 		collaborator.hPanel.add(collaborator.refresh);
+		collaborator.hPanel.add(collaborator.removeTabButton);
 
 		collaborator.lockButton.setEnabled(true);
 		collaborator.removeTabButton.setEnabled(true);
@@ -122,8 +122,8 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 		// we need save, removeTab, and refresh buttons
 		collaborator.hPanel.clear();
 		collaborator.hPanel.add(collaborator.saveDocButton);
-		collaborator.hPanel.add(collaborator.removeTabButton);
 		collaborator.hPanel.add(collaborator.refresh);
+		collaborator.hPanel.add(collaborator.removeTabButton);
 
 		collaborator.saveDocButton.setEnabled(true);
 		collaborator.removeTabButton.setEnabled(true);
