@@ -13,7 +13,6 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService;
-import edu.caltech.cs141b.hw2.gwt.collab.shared.Document;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.DocumentMetadata;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockExpired;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockUnavailable;
@@ -45,11 +44,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 		ArrayList<DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
 
-		Transaction t = pm.currentTransaction();
 		try {
-			// Starting transaction...
-			t.begin();
-
 			// Query the Datastore and iterate through all the Documents in the
 			// Datastore
 			for (Document doc : (List<Document>) query.execute()) {
@@ -59,19 +54,13 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				docList.add(metaDoc);
 			}
 
-			// ...Ending transaction
-			t.commit();
+			// Return the list of docs
+			return docList;
 		} finally {
 			// Do cleanup
-			if (t.isActive()) {
-				t.rollback();
-			}
 			query.closeAll();
 			pm.close();
 		}
-
-		// Return the list of docs
-		return docList;
 	}
 
 	/*
@@ -83,33 +72,22 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	@Override
 	public UnlockedDocument getDocument(String documentKey) {
-		Document doc;
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
-		Transaction t = pm.currentTransaction();
 		try {
-			// Starting transaction...
-			t.begin();
 
 			// Create the key for this document
 			Key key = KeyFactory.stringToKey(documentKey);
 			// Use the key to retrieve the document
-			doc = pm.getObjectById(Document.class, key);
+			Document doc = pm.getObjectById(Document.class, key);
 
-			// ...Ending transaction
-			t.commit();
+			// Return the unlocked document
+			return doc.getUnlockedDoc();
 		} finally {
 			// Do cleanup
-			if (t.isActive()) {
-				t.rollback();
-			}
 			pm.close();
 		}
-
-		// Return the unlocked document
-		return doc.getUnlockedDoc();
-
 	}
 
 	/*
@@ -171,6 +149,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			// ...Ending transaction
 			t.commit();
+
+			// Return the unlocked document
+			return toSave.getUnlockedDoc();
 		} finally {
 			// Do some cleanup
 			if (t.isActive()) {
@@ -178,10 +159,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			}
 			pm.close();
 		}
-
-		// Return the unlocked document
-		return toSave.getUnlockedDoc();
-
 	}
 
 	/*
@@ -207,11 +184,25 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// Use the key to retrieve the doc
 			Document toSave = pm.getObjectById(Document.class, key);
 
-			// Unlock it
-			toSave.unlock();
+			// Get the lock information - saveDocument can only be called if
+			// there is a lock or if it's a new document
+			String lockedBy = toSave.getLockedBy();
 
-			// And store it in the Datastore
-			pm.makePersistent(toSave);
+			// Get the IP Address
+			String identity = getThreadLocalRequest().getRemoteAddr();
+
+			// Make sure that the person unlocking is the person who locked the
+			// doc.
+			if (lockedBy.equals(identity)) {
+				// Unlock it
+				toSave.unlock();
+
+				// And store it in the Datastore
+				pm.makePersistent(toSave);
+			} else {
+				// Otherwise, throw an exception
+				throw new LockExpired("You no longer have the lock");
+			}
 
 			// ...Ending transaction
 			t.commit();
@@ -237,7 +228,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
-		Document toSave;
 		Transaction t = pm.currentTransaction();
 		try {
 			// Starting transaction...
@@ -247,35 +237,42 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			Key key = KeyFactory.stringToKey(documentKey);
 
 			// Get the document from the Datastore
-			toSave = pm.getObjectById(Document.class, key);
+			Document toSave = pm.getObjectById(Document.class, key);
 
 			// If the doc is locked...
 			if (toSave.isLocked()) {
 				// But it should be unlocked...
-				//System.out.println(toSave.getLockedUntil());
+				// System.out.println(toSave.getLockedUntil());
 				if (toSave.getLockedUntil().before(
 						new Date(System.currentTimeMillis()))) {
 					// Unlock it
 					toSave.unlock();
 				} else {
 					// Otherwise notify the client that it lock is unavailable
-					throw new LockUnavailable("\'" + toSave.getTitle()
-							+ "\' is locked until "
-							+ toSave.getLockedUntil().toString());
+					throw new LockUnavailable("\'"
+							+ toSave.getTitle()
+							+ "\' is locked for "
+							+ (toSave.getLockedUntil().getTime() - System
+									.currentTimeMillis()) / 1000L
+							+ " more seconds.");
 				}
 			}
 
 			// At this point, the doc should be unlocked
-			// Get the IP Address of th euser
+			// Get the IP Address of the user
 			String identity = getThreadLocalRequest().getRemoteAddr();
 
 			// Lock the document for 30 seconds
-			toSave.lock(new Date(System.currentTimeMillis() + 30000L), identity);
+			toSave.lock(new Date(System.currentTimeMillis() + 30000L),
+							identity);
 			// Write this to the Datastore
 			pm.makePersistent(toSave);
 
 			// ...Ending transaction
 			t.commit();
+
+			// Return the locked document
+			return toSave.getLockedDoc();
 		} finally {
 			// Do some cleanup
 			if (t.isActive()) {
@@ -283,9 +280,5 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			}
 			pm.close();
 		}
-
-		// Return the locked document
-		return toSave.getLockedDoc();
 	}
-
 }

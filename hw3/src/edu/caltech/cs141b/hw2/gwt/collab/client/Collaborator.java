@@ -176,12 +176,9 @@ public class Collaborator extends Composite implements ClickHandler {
 		docListPanel.add(docListPanelTitle);
 		documentList.setWidth("100%");
 		docListPanel.add(documentList);
-
-	
 		docListPanel.setWidth("320px");
 
-		// button styles
-		
+		// button styles	
 		refreshDoc.setStylePrimaryName("refreshButton");
 		lockButtonL.setStylePrimaryName("lockButton");
 		saveButtonL.setStylePrimaryName("saveButton");

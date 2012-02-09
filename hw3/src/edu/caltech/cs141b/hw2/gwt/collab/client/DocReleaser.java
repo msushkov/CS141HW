@@ -15,7 +15,6 @@ public class DocReleaser implements AsyncCallback<Void> {
 	
 	private final static int maxStrLen = 25;
 
-	
 	public DocReleaser(Collaborator collaborator) {
 		this.collaborator = collaborator;
 	}
@@ -25,6 +24,7 @@ public class DocReleaser implements AsyncCallback<Void> {
 		if (title.length() > maxStrLen) {
 			title = title.substring(0, maxStrLen - 3) + "...";
 		}
+		
 		collaborator.statusUpdate("Releasing lock on '" + title
 				+ "'.");
 		collaborator.collabService.releaseLock(lockedDoc, this);

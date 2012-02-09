@@ -1,4 +1,4 @@
-package edu.caltech.cs141b.hw2.gwt.collab.shared;
+package edu.caltech.cs141b.hw2.gwt.collab.server;
 
 import java.util.Date;
 
@@ -10,6 +10,9 @@ import javax.jdo.annotations.PrimaryKey;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
+
+import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
+import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 
 // Datastore "JDO interface" class for documents.
 @PersistenceCapable
@@ -24,9 +27,6 @@ public class Document {
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key docKey; // Automatically assigned GAE key
-
-	@Persistent
-	private boolean locked;
 
 	@Persistent
 	private String lockedBy;
@@ -44,7 +44,6 @@ public class Document {
 	public Document(UnlockedDocument doc) {
 		title = doc.getTitle();
 		content = new Text(doc.getContents());
-		locked = false;
 	}
 
 	/**
@@ -58,7 +57,6 @@ public class Document {
 		title = doc.getTitle();
 		content = new Text(doc.getContents());
 
-		locked = true;
 		lockedBy = doc.getLockedBy();
 		lockedUntil = doc.getLockedUntil();
 	}
@@ -97,20 +95,7 @@ public class Document {
 	 * @return Whether the document is locked
 	 */
 	public boolean isLocked() {
-		return locked;
-	}
-
-	// Update Functions
-
-	/**
-	 * Updates the Document with new data
-	 * 
-	 * @param doc
-	 *            The UnlockedDocument whose data we should update it with
-	 */
-	public void update(UnlockedDocument doc) {
-		title = doc.getTitle();
-		content = new Text(doc.getContents());
+		return lockedBy != null && lockedUntil != null;
 	}
 
 	/**
@@ -135,7 +120,6 @@ public class Document {
 	 *            The document is locked by this person
 	 */
 	public void lock(Date lockedTil, String lockedBy) {
-		this.locked = true;
 		this.lockedUntil = lockedTil;
 		this.lockedBy = lockedBy;
 	}
@@ -146,7 +130,6 @@ public class Document {
 	public void unlock() {
 		this.lockedUntil = null;
 		this.lockedBy = null;
-		this.locked = false;
 	}
 
 	// Document type converters
