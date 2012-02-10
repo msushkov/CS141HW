@@ -34,7 +34,7 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  */
 public class Collaborator extends Composite implements ClickHandler {
 
-	final private static int maxTabTextLen = 15;
+	final private static int maxTabTextLen = 10;
 	final private int maxConsoleEnt = 5;
 	final private int maxTabsOnOneSide = 4;
 	final private int maxTitleLength = 100;
