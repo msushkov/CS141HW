@@ -937,6 +937,14 @@ public class Collaborator extends Composite implements ClickHandler {
 		disableButton(showButtonR);
 	}
 
+	
+	
+	/**
+	 * Opens a new document on the tab of the given side and puts it in focus.
+	 * 
+	 * @param String side:
+	 *            Side to open new document in, "left" or "right".
+	 */
 	public void openDocument(String side) {
 		int docIndx = documentList.getSelectedIndex();
 		String title = documentList.getItemText(docIndx);
@@ -1065,6 +1073,13 @@ public class Collaborator extends Composite implements ClickHandler {
 		enableButton(refresh);
 	}
 
+	
+	/**
+	 * Enables the given button and removes the disabledCSS string part of the CSS class
+	 *  
+	 * @param Button b
+	 *            the button to be enabled
+	 */
 	protected void enableButton(Button b) {
 		/* Enable button */
 		b.setEnabled(true);
@@ -1077,6 +1092,12 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 	}
 
+	/**
+	 * Disables the given button and adds the disabledCSS string to the current CSS class
+	 *  
+	 * @param Button b
+	 *            the button to be disabled
+	 */
 	protected void disableButton(Button b) {
 		/* Disable button */
 		b.setEnabled(false);
