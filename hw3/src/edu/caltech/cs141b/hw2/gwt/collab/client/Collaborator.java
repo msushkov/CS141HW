@@ -193,7 +193,22 @@ public class Collaborator extends Composite implements ClickHandler {
 		refreshButtonR.setStylePrimaryName("refreshButton");
 		createNew.setStylePrimaryName("createNewButton");
 		refreshList.setStylePrimaryName("refreshButton");
-
+		
+		// add button tooltips
+		refreshDoc.setTitle("Refresh the doc list.");
+		lockButtonL.setTitle("Start editing this document.");
+		saveButtonL.setTitle("Save the changes to this document.");
+		lockButtonR.setTitle("Start editing this document.");
+		saveButtonR.setTitle("Save the changes to this document.");
+		showButtonL.setTitle("Display on the left tab panel.");
+		showButtonR.setTitle("Display on the right tab panel.");
+		removeTabL.setTitle("Remove from this panel.");
+		removeTabR.setTitle("Remove from this panel.");
+		refreshButtonL.setTitle("Refresh this document.");
+		refreshButtonR.setTitle("Refresh this document.");
+		createNew.setTitle("Create a new document.");
+		refreshList.setTitle("Refresh the documents list.");
+		
 		refreshDoc.addStyleName("gwt-Button");
 		lockButtonL.addStyleName("gwt-Button");
 		saveButtonL.addStyleName("gwt-Button");
@@ -501,7 +516,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		TextBox titleBox = new TextBox();
 		titleBox.setValue(title);
 		titleBox.setEnabled(true);
-		titleBox.setWidth("99%");
+		titleBox.setWidth("100%");
 		titleBox.setStyleName("titleBox");
 
 		// prevent spacing issues
@@ -509,7 +524,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// the document contents
 		final TextArea areaBox = new TextArea();
-		areaBox.setWidth("99%");
+		areaBox.setWidth("100%");
 		areaBox.setHeight("100%");
 		areaBox.setStyleName("documentTextBox");
 
