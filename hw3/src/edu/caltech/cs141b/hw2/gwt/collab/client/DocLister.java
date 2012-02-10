@@ -14,6 +14,11 @@ public class DocLister implements AsyncCallback<List<DocumentMetadata>> {
 
 	private Collaborator collaborator;
 
+	/**
+	 * DocLister doesn't need a static constructor method. No internal state
+	 * needs to be saved. 
+	 * @param collaborator
+	 */
 	public DocLister(Collaborator collaborator) {
 		this.collaborator = collaborator;
 	}

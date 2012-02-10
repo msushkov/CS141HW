@@ -17,16 +17,34 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 	private int index; // which tab is the current doc on?
 	private final static int maxStrLen = 25;
 
+	/**
+	 * This function creates a new DocSaver and calls it.  This 
+	 * function basically allows for multiple requests to be sent
+	 * at the same time and allows for internal state to be saved.
+	 * @param col The collaborator
+	 * @param ld The doc we want to save
+	 * @param side Which side the doc is on
+	 * @param ind Which index the doc is on
+	 */
 	public static void saveDoc(Collaborator col, LockedDocument ld,
 			String side, int ind) {
 		DocSaver ds = new DocSaver(col);
 		ds.saveDocument(ld, side, ind);
 	}
 
+	/**
+	 * Constructs a new doc saver
+	 */
 	public DocSaver(Collaborator collaborator) {
 		this.collaborator = collaborator;
 	}
 
+	/**
+	 * Starts the save request
+	 * @param lockedDoc The document to lock
+	 * @param side The panel in which it is sitting
+	 * @param ind The index of the doc
+	 */
 	public void saveDocument(LockedDocument lockedDoc, String side, int ind) {
 		this.lockedDocument = lockedDoc;
 		collaborator.collabService.saveDocument(lockedDoc, this);

@@ -36,6 +36,7 @@ public class DocReleaser implements AsyncCallback<Void> {
 
 	@Override
 	public void onSuccess(Void result) {
+		// Do nothing...
 	}
 	
 }
