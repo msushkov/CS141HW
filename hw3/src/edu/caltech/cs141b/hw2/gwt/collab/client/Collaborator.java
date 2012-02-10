@@ -506,7 +506,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	public void addTab(final String title, String content, boolean left) {
 		// are we dealing with a new doc?
-		final boolean isNewDoc = title.equals("Enter the document title.");
+		final boolean isNewDoc = title.equals("Enter the document title.") && 
+				content.equals("Enter the document contents.");
 
 		// holds the title and the contents
 		VerticalPanel vp = new VerticalPanel();
@@ -545,7 +546,7 @@ public class Collaborator extends Composite implements ClickHandler {
 					areaBox.setFocus(true);
 
 					// if we are dealing with a new doc (or one that has the
-					// default title,
+					// default title and contents,
 					// automatically select all the text in the contents
 					if (isNewDoc)
 						areaBox.selectAll();
