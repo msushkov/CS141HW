@@ -28,6 +28,9 @@ import com.google.gwt.user.client.ui.Widget;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.AbstractDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
+import edu.caltech.cs141b.hw2.gwt.collab.client.DocReleaser;
+import edu.caltech.cs141b.hw2.gwt.collab.client.DocLister;
+import edu.caltech.cs141b.hw2.gwt.collab.client.DocReader;
 
 /**
  * Main class for a single Collaborator widget.
@@ -514,7 +517,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// vp.setSpacing(5);
 
 		// the document title
-		TextBox titleBox = new TextBox();
+		final TextBox titleBox = new TextBox();
 		titleBox.setValue(title);
 		titleBox.setEnabled(true);
 		titleBox.setWidth("100%");
@@ -708,6 +711,12 @@ public class Collaborator extends Composite implements ClickHandler {
 		addTab(ld.getTitle(), ld.getContents(), left);
 		setTabText(ld.getTitle(), docList.size() - 1, side);
 		openLatestTab(side);
+	
+		// when a new doc is opened, set the cursor to the title
+		TextBox title = titleList.get(titleList.size() - 1);
+		title.setCursorPos(title.getText().length());
+		title.setFocus(true);
+		title.selectAll();
 
 		// add save, refresh, and removeTab buttons
 		hPanel.clear();
