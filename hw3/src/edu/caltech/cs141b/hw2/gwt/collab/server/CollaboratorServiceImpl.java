@@ -249,9 +249,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					toSave.unlock();
 				} else {
 					// Otherwise notify the client that it lock is unavailable
-					throw new LockUnavailable("\'"
-							+ toSave.getTitle()
-							+ "\' is locked for "
+					throw new LockUnavailable("Document is locked for "
 							+ (toSave.getLockedUntil().getTime() - System
 									.currentTimeMillis()) / 1000L
 							+ " more seconds.");
@@ -263,7 +261,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			String identity = getThreadLocalRequest().getRemoteAddr();
 
 			// Lock the document for 30 seconds
-			toSave.lock(new Date(System.currentTimeMillis() + 30000L),
+			toSave
+					.lock(new Date(System.currentTimeMillis() + 30000L),
 							identity);
 			// Write this to the Datastore
 			pm.makePersistent(toSave);

@@ -27,8 +27,6 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 	}
 
 	public void lockDocument(String key, String side, int index) {
-		//collaborator.statusUpdate("Attempting to lock document.");
-		collaborator.waitingKey = key;
 		this.side = side;
 		this.index = index;
 		
@@ -38,12 +36,10 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 	@Override
 	public void onFailure(Throwable caught) {
 		if (caught instanceof LockUnavailable) 
-			collaborator.statusUpdate("LockUnavailable: " + caught.getMessage());
+			collaborator.statusUpdate("Lock unavailable: " + caught.getMessage());
 		else 
 		{
-			collaborator.statusUpdate("Error retrieving lock"
-					+ "; caught exception " + caught.getClass()
-					+ " with message: " + caught.getMessage());
+			collaborator.statusUpdate("Error retrieving lock");
 			GWT.log("Error getting document lock.", caught);
 		}
 
@@ -53,14 +49,8 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 
 	@Override
 	public void onSuccess(LockedDocument result) {
-		if (result.getKey().equals(collaborator.waitingKey)) {
-			collaborator.statusUpdate("Lock retrieved for document.");
+			collaborator.statusUpdate("Document is now editable.");
 			gotDoc(result, side, index);
-		} else {
-			collaborator.statusUpdate("Got lock for document which is "
-					+ "no longer active.  Releasing lock.");
-			collaborator.releaser.releaseLock(result);
-		}
 	}
 	
 	/**

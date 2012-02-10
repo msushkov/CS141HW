@@ -29,8 +29,6 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 
 	public void saveDocument(LockedDocument lockedDoc, String side, int ind) {
 		this.lockedDocument = lockedDoc;
-		//collaborator.statusUpdate("Attemping to save document.");
-		collaborator.waitingKey = lockedDoc.getKey();
 		collaborator.collabService.saveDocument(lockedDoc, this);
 		this.side = side;
 		this.index = ind;
@@ -38,14 +36,14 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 		if (side.equals("left"))
 			collaborator.setGenericObjects(true);
 		else
-			collaborator.setGenericObjects(false);				
-		
+			collaborator.setGenericObjects(false);
+
 		// the user cannot edit the title and the contents of this doc
 		TextBox box = collaborator.titleList.get(index);
 		TextArea area = collaborator.contentsList.get(index);
 		box.setEnabled(false);
 		area.setEnabled(false);
-		
+
 		// disable the save doc button for this side (until this doc is saved)
 		collaborator.saveDocButton.setEnabled(false);
 	}
@@ -68,19 +66,14 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 
 	@Override
 	public void onSuccess(UnlockedDocument result) {
-		String title = result.getTitle();
-		if (title.length() > maxStrLen) {
-			title = title.substring(0, maxStrLen - 3) + "...";
-		}
-		collaborator.statusUpdate("Document '" + title
+		collaborator.statusUpdate("Document '"
+				+ Collaborator.shortenText(result.getTitle(), maxStrLen)
 				+ "' successfully saved.");
-		if (collaborator.waitingKey == null
-				|| result.getKey().equals(collaborator.waitingKey)) {
-			collaborator.setDoc(result, index, side);
 
-			// Refresh list in case title was changed.
-			collaborator.lister.getDocumentList();
-		} else
-			GWT.log("Saved document is not the anticipated document.");
+		collaborator.setDoc(result, index, side);
+
+		// Refresh list in case title was changed.
+		collaborator.lister.getDocumentList();
+
 	}
 }

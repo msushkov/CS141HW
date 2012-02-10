@@ -13,8 +13,6 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 	private Collaborator collaborator;
 	private String side; // is the current doc on the left or the right?
 	private int index; // which tab is the current doc on?
-	private final static int maxStrLen = 25;
-
 
 	public static DocReader readDoc(Collaborator collaborator, String key,
 			String side, int ind) {
@@ -28,15 +26,11 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 	}
 
 	public void getDocument(String key, String side, int ind) {
-		if (key != null)
-		{
-			//collaborator.statusUpdate("Fetching document " + key + ".");
-			collaborator.waitingKey = key;
+		if (key != null) {
 			this.index = ind;
 			this.side = side;
 			collaborator.collabService.getDocument(key, this);
-		}
-		else
+		} else
 			collaborator.statusUpdate("Can't fetch a doc with a null key!");
 	}
 
@@ -46,7 +40,7 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 				+ "; caught exception " + caught.getClass() + " with message: "
 				+ caught.getMessage());
 		GWT.log("Error getting document lock.", caught);
-		
+
 		// make sure the correct 'show button' is still enabled
 		if (side.equals("left"))
 			collaborator.showButtonL.setEnabled(true);
@@ -56,17 +50,6 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 
 	@Override
 	public void onSuccess(UnlockedDocument result) {
-		if (result.getKey().equals(collaborator.waitingKey)) {
-			String title = result.getTitle();
-			if (title.length() > maxStrLen) {
-				title = title.substring(0, maxStrLen - 3) + "...";
-			}
-			collaborator.statusUpdate("Document '" + title
-					+ "' successfully retrieved.");
-
-			collaborator.setDoc(result, index, side);
-		} else
-			collaborator.statusUpdate("Returned " +
-					"document that is no longer expected; discarding.");
+		collaborator.setDoc(result, index, side);
 	}
 }
