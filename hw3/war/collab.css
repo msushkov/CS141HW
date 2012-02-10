@@ -172,14 +172,13 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#272727', end
 
 .titleBox {
 	color: white;
-	font-size: 28px;
+	font-size: 32px;
 	resize: none;
 	border-radius: 5px;
 	font-weight: bold;
 	background: #555050;
 	outline-color: white;
 	border: 0px;
-	text-decoration: underline;
 	
 }
 

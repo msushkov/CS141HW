@@ -512,7 +512,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		TextBox titleBox = new TextBox();
 		titleBox.setValue(title);
 		titleBox.setEnabled(true);
-		titleBox.setWidth("99%");
+		titleBox.setWidth("100%");
 		titleBox.setStyleName("titleBox");
 
 		// prevent spacing issues
@@ -520,7 +520,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// the document contents
 		final TextArea areaBox = new TextArea();
-		areaBox.setWidth("99%");
+		areaBox.setWidth("100%");
 		areaBox.setHeight("100%");
 		areaBox.setStyleName("documentTextBox");
 
