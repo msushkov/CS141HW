@@ -20,7 +20,7 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 	/**
 	 * This function creates a new DocSaver and calls it.  This 
 	 * function basically allows for multiple requests to be sent
-	 * at the same time and allows for internal state to be saved.
+	 * at the same time with different internal state associated with them.
 	 * @param col The collaborator
 	 * @param ld The doc we want to save
 	 * @param side Which side the doc is on

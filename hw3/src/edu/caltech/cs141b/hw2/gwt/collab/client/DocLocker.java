@@ -14,10 +14,21 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 public class DocLocker implements AsyncCallback<LockedDocument> {
 
 	private Collaborator collaborator;
-	String side;         // is the current doc on the left or the right?
-	private int index;   // which tab is the current doc on?
+	String side; // is the current doc on the left or the right?
+	private int index; // which tab is the current doc on?
 
-	public static void lockDoc(Collaborator collab, String key, String side, int ind) {
+	/**
+	 * This function creates a new DocLocker and calls it. This function
+	 * basically allows for multiple requests to be sent at the same time with
+	 * different internal state associated with them.
+	 * @param collaborator
+	 * @param key
+	 * @param side
+	 * @param ind
+	 * @return
+	 */
+	public static void lockDoc(Collaborator collab, String key, String side,
+			int ind) {
 		DocLocker dl = new DocLocker(collab);
 		dl.lockDocument(key, side, ind);
 	}
@@ -26,19 +37,25 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 		this.collaborator = collaborator;
 	}
 
+	/**
+	 * Sends a request to lock a document
+	 * @param key
+	 * @param side
+	 * @param index
+	 */
 	public void lockDocument(String key, String side, int index) {
 		this.side = side;
 		this.index = index;
-		
+
 		collaborator.collabService.lockDocument(key, this);
 	}
 
 	@Override
 	public void onFailure(Throwable caught) {
-		if (caught instanceof LockUnavailable) 
-			collaborator.statusUpdate("Lock unavailable: " + caught.getMessage());
-		else 
-		{
+		if (caught instanceof LockUnavailable)
+			collaborator.statusUpdate("Lock unavailable: "
+					+ caught.getMessage());
+		else {
 			collaborator.statusUpdate("Error retrieving lock");
 			GWT.log("Error getting document lock.", caught);
 		}
@@ -49,25 +66,25 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 
 	@Override
 	public void onSuccess(LockedDocument result) {
-			collaborator.statusUpdate("Document is now editable.");
-			gotDoc(result, side, index);
+		collaborator.statusUpdate("Document is now editable.");
+		gotDoc(result, side, index);
 	}
-	
+
 	/**
 	 * Called by when docLocker failed to acquire lock.
+	 * 
 	 * @param side
 	 * @param index
 	 */
-	protected void lockFailed()
-	{				
+	protected void lockFailed() {
 		if (side.equals("left"))
 			collaborator.setGenericObjects(true);
 		else
-			collaborator.setGenericObjects(false);				
-		
+			collaborator.setGenericObjects(false);
+
 		TextBox box = collaborator.titleList.get(index);
 		TextArea area = collaborator.contentsList.get(index);
-		
+
 		// the user cannot edit the title and the contents of this doc
 		box.setEnabled(false);
 		area.setEnabled(false);
@@ -83,9 +100,9 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 		collaborator.refresh.setEnabled(true);
 	}
 
-
 	/**
 	 * If we successfully acquired the locker - can now edit the doc.
+	 * 
 	 * @param result
 	 * @param side
 	 * @param index
@@ -94,17 +111,18 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 		if (side.equals("left"))
 			collaborator.setGenericObjects(true);
 		else
-			collaborator.setGenericObjects(false);				
-		
+			collaborator.setGenericObjects(false);
+
 		TextBox box = collaborator.titleList.get(index);
-		TextArea area = collaborator.contentsList.get(index);		
+		TextArea area = collaborator.contentsList.get(index);
 
 		collaborator.docList.set(index, result);
-		
-		// set the title and contents of this doc to be the current thing on the page
+
+		// set the title and contents of this doc to be the current thing on the
+		// page
 		box.setValue(result.getTitle());
 		area.setText(result.getContents());
-		
+
 		// the user can now edit the title and the contents of this doc
 		box.setEnabled(true);
 		area.setEnabled(true);
@@ -120,4 +138,3 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 		collaborator.refresh.setEnabled(false);
 	}
 }
-

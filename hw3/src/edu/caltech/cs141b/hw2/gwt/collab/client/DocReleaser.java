@@ -13,12 +13,20 @@ public class DocReleaser implements AsyncCallback<Void> {
 	
 	private Collaborator collaborator;
 
+	/**
+	 * Constructor for DocReleaser.  Note that there is no internal state and
+	 * thus no static constructor method is necessary.
+	 * @param collaborator
+	 */
 	public DocReleaser(Collaborator collaborator) {
 		this.collaborator = collaborator;
 	}
 	
+	/**
+	 * Releases the lock on the specified doc
+	 * @param lockedDoc
+	 */
 	public void releaseLock(LockedDocument lockedDoc) {
-		
 		collaborator.collabService.releaseLock(lockedDoc, this);
 	}
 

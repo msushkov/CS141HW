@@ -15,7 +15,7 @@ public class DocLister implements AsyncCallback<List<DocumentMetadata>> {
 	private Collaborator collaborator;
 
 	/**
-	 * DocLister doesn't need a static constructor method. No internal state
+	 * Constructs a new DocLister.  DocLister doesn't need a static constructor method. No internal state
 	 * needs to be saved. 
 	 * @param collaborator
 	 */
@@ -23,6 +23,9 @@ public class DocLister implements AsyncCallback<List<DocumentMetadata>> {
 		this.collaborator = collaborator;
 	}
 
+	/**
+	 * Sends the request to obtain the document list.
+	 */
 	public void getDocumentList() {
 		// collaborator.statusUpdate("Fetching document list.");
 

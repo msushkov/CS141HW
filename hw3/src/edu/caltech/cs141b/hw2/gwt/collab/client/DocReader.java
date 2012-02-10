@@ -14,6 +14,16 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 	private String side; // is the current doc on the left or the right?
 	private int index; // which tab is the current doc on?
 
+	/**
+	 * This function creates a new DocReader and calls it.  This 
+	 * function basically allows for multiple requests to be sent
+	 * at the same time with different internal state associated with them.
+	 * @param collaborator
+	 * @param key
+	 * @param side
+	 * @param ind
+	 * @return
+	 */
 	public static DocReader readDoc(Collaborator collaborator, String key,
 			String side, int ind) {
 		DocReader r = new DocReader(collaborator);
@@ -25,6 +35,12 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 		this.collaborator = collaborator;
 	}
 
+	/**
+	 * Makes a request for a document
+	 * @param key
+	 * @param side
+	 * @param ind
+	 */
 	public void getDocument(String key, String side, int ind) {
 		if (key != null) {
 			this.index = ind;
