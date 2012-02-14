@@ -39,7 +39,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	final private static int maxTabTextLen = 13;
 	final private int maxConsoleEnt = 5;
-	final private int maxTabsOnOneSide = 4;
+	final private int maxTabsOnOneSide = 5;
 	final private int maxTitleLength = 100;
 	final private int maxContentsLength = 10000;
 	final private int maxListItems = 15;
