@@ -2,6 +2,9 @@ package edu.caltech.cs141b.hw2.gwt.collab.client;
 
 import java.util.ArrayList;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+
 import com.google.gwt.appengine.channel.client.Channel;
 import com.google.gwt.appengine.channel.client.ChannelFactory;
 import com.google.gwt.appengine.channel.client.ChannelFactory.ChannelCreatedCallback;
@@ -14,6 +17,12 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
@@ -153,7 +162,39 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		initWidget(mainOuterPanel);
 		lister.getDocumentList();
-		
+
+
+		RequestBuilder rb = new RequestBuilder(RequestBuilder.POST,
+				"http://127.0.0.1:8888/token/key123");
+		rb.setHeader("Content-Type",
+				"application/x-www-form-urlencoded");
+		try
+		{
+			rb.sendRequest("jsontext="+"hellothere".toString(),
+					new RequestCallback() {
+
+				@Override
+				public void onResponseReceived(Request request, Response response) {
+					System.out.println("Client got response!");
+					System.out.println(response.getText());
+
+				}
+
+				@Override
+				public void onError(Request request, Throwable exception) {
+					// TODO Auto-generated method stub
+
+				}
+			});
+		}
+		catch (RequestException e) {
+			Window.alert(e.toString());
+		}
+
+
+
+
+
 		ChannelFactory.createChannel("lolz", new ChannelCreatedCallback()
 		{
 
@@ -161,7 +202,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			public void onChannelCreated(Channel channel) {
 				System.out.println("created");				
 			}
-			
+
 		});
 	}
 
@@ -209,7 +250,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		refreshButtonR.setStylePrimaryName("refreshButton");
 		createNew.setStylePrimaryName("createNewButton");
 		refreshList.setStylePrimaryName("refreshButton");
-		
+
 		// add button tooltips
 		refreshDoc.setTitle("Refresh the doc list.");
 		lockButtonL.setTitle("Start editing this document.");
@@ -224,7 +265,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		refreshButtonR.setTitle("Refresh this document.");
 		createNew.setTitle("Create a new document.");
 		refreshList.setTitle("Refresh the documents list.");
-		
+
 		refreshDoc.addStyleName("gwt-Button");
 		lockButtonL.addStyleName("gwt-Button");
 		saveButtonL.addStyleName("gwt-Button");
@@ -365,6 +406,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// Tab bars
 		documentsL.setWidth("100%");
 		documentsR.setWidth("100%");
+
 	}
 
 	public static String shortenText(String title, int len) {
@@ -374,8 +416,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		return title;
 	}
 
-	
-	
+
+
 	/**
 	 * Add a selection handler to the tab panel. This allows us to refresh the
 	 * doc title in the tab name.
@@ -726,7 +768,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		addTab(ld.getTitle(), ld.getContents(), left);
 		setTabText(ld.getTitle(), docList.size() - 1, side);
 		openLatestTab(side);
-	
+
 		// when a new doc is opened, set the cursor to the title
 		TextBox title = titleList.get(titleList.size() - 1);
 		title.setCursorPos(title.getText().length());
@@ -884,7 +926,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			// if title and contents have not been changed, no need to save
 			if (doc.getTitle().equals(titleList.get(ind).getValue())
 					&& doc.getContents()
-							.equals(contentsList.get(ind).getText()))
+					.equals(contentsList.get(ind).getText()))
 				statusUpdate("No document changes; not saving.");
 
 			// otherwise if stuff was changed, save
@@ -952,8 +994,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		disableButton(showButtonR);
 	}
 
-	
-	
+
+
 	/**
 	 * Opens a new document on the tab of the given side and puts it in focus.
 	 * 
@@ -973,7 +1015,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			documentsRightList.add(null);
 			addTab(title, "", false);
 			DocReader
-					.readDoc(this, key, "right", documentsRightList.size() - 1);
+			.readDoc(this, key, "right", documentsRightList.size() - 1);
 		}
 
 		openLatestTab(side);
@@ -1088,7 +1130,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		enableButton(refresh);
 	}
 
-	
+
 	/**
 	 * Enables the given button and removes the disabledCSS string part of the CSS class
 	 *  
