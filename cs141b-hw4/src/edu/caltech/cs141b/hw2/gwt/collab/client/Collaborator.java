@@ -153,6 +153,16 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		initWidget(mainOuterPanel);
 		lister.getDocumentList();
+		
+		ChannelFactory.createChannel("lolz", new ChannelCreatedCallback()
+		{
+
+			@Override
+			public void onChannelCreated(Channel channel) {
+				System.out.println("created");				
+			}
+			
+		});
 	}
 
 	/**
@@ -355,16 +365,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		// Tab bars
 		documentsL.setWidth("100%");
 		documentsR.setWidth("100%");
-		
-		ChannelFactory.createChannel("lolz", new ChannelCreatedCallback()
-		{
-
-			@Override
-			public void onChannelCreated(Channel channel) {
-				System.out.println("created");				
-			}
-			
-		});
 	}
 
 	public static String shortenText(String title, int len) {
