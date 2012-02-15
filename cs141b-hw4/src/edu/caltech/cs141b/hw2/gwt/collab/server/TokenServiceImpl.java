@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -12,12 +13,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService;
+import edu.caltech.cs141b.hw2.gwt.collab.client.TokenService;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.DocumentMetadata;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockExpired;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockUnavailable;
@@ -28,144 +31,28 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  * The server side implementation of the RPC service.
  */
 @SuppressWarnings("serial")
-public class CollaboratorServiceImpl extends RemoteServiceServlet implements
-		CollaboratorService {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#getDocumentList
-	 * ()
-	 */
-	@SuppressWarnings("unchecked")
+public class TokenServiceImpl extends RemoteServiceServlet implements
+		TokenService {
+	private static final int LOGIN_STRING_LEN = 32;
+	
 	@Override
-	public List<DocumentMetadata> getDocumentList() {
-		// Get the PM
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-
-		// Make the Document query
-		Query query = pm.newQuery(Document.class);
-
-		ArrayList<DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
-
-		try {
-			// Query the Datastore and iterate through all the Documents in the
-			// Datastore
-			for (Document doc : (List<Document>) query.execute()) {
-				// Get the document metadata from the Documents
-				DocumentMetadata metaDoc = new DocumentMetadata(doc.getKey(),
-						doc.getTitle());
-				docList.add(metaDoc);
-			}
-
-			// Return the list of docs
-			return docList;
-		} finally {
-			// Do cleanup
-			query.closeAll();
-			pm.close();
+	public String login() {
+		Random r = new Random();
+		String randStr = "";
+		
+		for (int i = 0; i < LOGIN_STRING_LEN; i++) {
+			randStr += (char) (r.nextInt(95) + 32);
 		}
+		
+		getChannelService().createChannel(randStr);
+		
+		return randStr;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#getDocument
-	 * (java.lang.String)
-	 */
-	@Override
-	public UnlockedDocument getDocument(String documentKey) {
-		// Get the PM
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-
-		try {
-
-			// Create the key for this document
-			Key key = KeyFactory.stringToKey(documentKey);
-			// Use the key to retrieve the document
-			Document doc = pm.getObjectById(Document.class, key);
-
-			// Return the unlocked document
-			return doc.getUnlockedDoc();
-		} finally {
-			// Do cleanup
-			pm.close();
-		}
+	
+	private ChannelService getChannelService() {
+		return ChannelServiceFactory.getChannelService();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#saveDocument
-	 * (edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument)
-	 */
-	@Override
-	public UnlockedDocument saveDocument(LockedDocument doc) throws LockExpired {
-		// Get the PM
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-
-		Document toSave;
-		// Get the document's key
-		String stringKey = doc.getKey();
-
-		Transaction t = pm.currentTransaction();
-		try {
-			// Starting transaction...
-			t.begin();
-
-			// If the doc has no key, it's a new document, so create a new
-			// document
-			if (stringKey == null) {
-				// First unlock it
-				toSave = new Document(doc.unlock());
-			} else {
-				// Create the key
-				Key key = KeyFactory.stringToKey(stringKey);
-
-				// Get the document corresponding to the key
-				toSave = pm.getObjectById(Document.class, key);
-
-				// Get the lock information - saveDocument can only be called if
-				// there is a lock or if it's a new document
-				String lockedBy = toSave.getLockedBy();
-				Date lockedUntil = toSave.getLockedUntil();
-
-				// Get the IP Address
-				String identity = getThreadLocalRequest().getRemoteAddr();
-				// Check that the person trying to save has the lock and that
-				// the lock hasn't expired
-				if (lockedBy.equals(identity)
-						&& lockedUntil.after(new Date(System
-								.currentTimeMillis()))) {
-					// If both are fulfilled, update and unlock the doc
-					toSave.update(doc);
-					toSave.unlock();
-				} else {
-					// Otherwise, throw an exception
-					throw new LockExpired();
-				}
-			}
-
-			// Now write the results to Datastore
-			pm.makePersistent(toSave);
-
-			// ...Ending transaction
-			t.commit();
-
-			// Return the unlocked document
-			return toSave.getUnlockedDoc();
-		} finally {
-			// Do some cleanup
-			if (t.isActive()) {
-				t.rollback();
-			}
-			pm.close();
-		}
-	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 

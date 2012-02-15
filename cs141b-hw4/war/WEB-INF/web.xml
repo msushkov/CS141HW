@@ -15,6 +15,16 @@
     <servlet-name>greetServlet</servlet-name>
     <url-pattern>/collab/collab</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>tokenServlet</servlet-name>
+    <servlet-class>edu.caltech.cs141b.hw2.gwt.collab.server.TokenServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>tokenServlet</servlet-name>
+    <url-pattern>/collab/token</url-pattern>
+  </servlet-mapping>
   
   <!-- Default page to serve -->
   <welcome-file-list>
