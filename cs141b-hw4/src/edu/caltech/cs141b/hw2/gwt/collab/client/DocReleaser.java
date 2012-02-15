@@ -27,7 +27,7 @@ public class DocReleaser implements AsyncCallback<Void> {
 	 * @param lockedDoc
 	 */
 	public void releaseLock(LockedDocument lockedDoc) {
-		collaborator.collabService.releaseLock(lockedDoc, this);
+		collaborator.collabService.releaseLock(collaborator.clientID, lockedDoc, this);
 	}
 
 	@Override

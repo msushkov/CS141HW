@@ -17,6 +17,8 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 @RemoteServiceRelativePath("collab")
 public interface CollaboratorService extends RemoteService {
 	
+	String login(String clientID);
+	
 	/**
 	 * Used to get a list of the currently available documents.
 	 * 
@@ -32,7 +34,7 @@ public interface CollaboratorService extends RemoteService {
 	 *         and the locking primites necessary to save the document
 	 * @throws LockUnavailable if a lock cannot be obtained
 	 */
-	LockedDocument lockDocument(String documentKey) throws LockUnavailable;
+	LockedDocument lockDocument(String clientID, String documentKey) throws LockUnavailable;
 	
 	/**
 	 * Used to retrieve a document in read-only mode.
@@ -64,7 +66,7 @@ public interface CollaboratorService extends RemoteService {
 	 * @throws LockExpired if the locking primitives in the supplied
 	 *         LockedDocument object cannot be used to release the lock
 	 */
-	void releaseLock(LockedDocument doc) throws LockExpired;
+	void releaseLock(String clientID, LockedDocument doc) throws LockExpired;
 	
 }
 

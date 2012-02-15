@@ -47,7 +47,7 @@ public class DocLocker implements AsyncCallback<LockedDocument> {
 		this.side = side;
 		this.index = index;
 
-		collaborator.collabService.lockDocument(key, this);
+		collaborator.collabService.lockDocument(collaborator.clientID, key, this);
 	}
 
 	@Override

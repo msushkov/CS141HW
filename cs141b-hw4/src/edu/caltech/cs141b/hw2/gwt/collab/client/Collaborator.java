@@ -1,6 +1,7 @@
 package edu.caltech.cs141b.hw2.gwt.collab.client;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import com.google.gwt.appengine.channel.client.Channel;
 import com.google.gwt.appengine.channel.client.ChannelFactory;
@@ -34,15 +35,20 @@ import com.google.gwt.user.client.ui.Widget;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.AbstractDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
+import edu.caltech.cs141b.hw2.gwt.collab.client.DocReleaser;
+import edu.caltech.cs141b.hw2.gwt.collab.client.DocLister;
+import edu.caltech.cs141b.hw2.gwt.collab.client.DocReader;
 
 /**
  * Main class for a single Collaborator widget.
  */
 public class Collaborator extends Composite implements ClickHandler {
 
+	private static final int CLIENT_ID_LEN = 16;
+	
 	final private static int maxTabTextLen = 13;
 	final private int maxConsoleEnt = 5;
-	final private int maxTabsOnOneSide = 4;
+	final private int maxTabsOnOneSide = 5;
 	final private int maxTitleLength = 100;
 	final private int maxContentsLength = 10000;
 	final private int maxListItems = 15;
@@ -50,9 +56,9 @@ public class Collaborator extends Composite implements ClickHandler {
 	final private String disabledCSS = "Disabled";
 
 	protected CollaboratorServiceAsync collabService;
-	protected TokenServiceAsync tokenService;
-
-	private String clientID;
+	
+	protected String channelID;
+	protected String clientID;
 
 	// Track document information.
 	protected ArrayList<AbstractDocument> documentsLeftList = new ArrayList<AbstractDocument>();
@@ -116,10 +122,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * 
 	 * @param collabService
 	 */
-	public Collaborator(CollaboratorServiceAsync collabService,
-			TokenServiceAsync tokenService) {
+	public Collaborator(CollaboratorServiceAsync collabService) {
 		this.collabService = collabService;
-		this.tokenService = tokenService;
 
 		// initialize the UI
 		initUI();
@@ -158,8 +162,15 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		initWidget(mainOuterPanel);
 		lister.getDocumentList();
-
-		tokenService.login(new AsyncCallback<String>() {
+		
+		Random r = new Random();
+		clientID = "";
+		
+		for (int i = 0; i < CLIENT_ID_LEN; i++) {
+			clientID += (char) (r.nextInt(95) + 32);
+		}
+		
+		collabService.login(clientID, new AsyncCallback<String>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -173,11 +184,10 @@ public class Collaborator extends Composite implements ClickHandler {
 			}
 
 		});
-
 	}
 
 	private void loginComplete(String id) {
-		this.clientID = id;
+		this.channelID = id;
 		System.out.println(id);
 		ChannelFactory.createChannel(id, new ChannelCreatedCallback() {
 
@@ -209,7 +219,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			}
 		});
 	}
-
+	
 	/**
 	 * Initialize the UI.
 	 */
@@ -254,7 +264,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		refreshButtonR.setStylePrimaryName("refreshButton");
 		createNew.setStylePrimaryName("createNewButton");
 		refreshList.setStylePrimaryName("refreshButton");
-
+		
 		// add button tooltips
 		refreshDoc.setTitle("Refresh the doc list.");
 		lockButtonL.setTitle("Start editing this document.");
@@ -269,7 +279,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		refreshButtonR.setTitle("Refresh this document.");
 		createNew.setTitle("Create a new document.");
 		refreshList.setTitle("Refresh the documents list.");
-
+		
 		refreshDoc.addStyleName("gwt-Button");
 		lockButtonL.addStyleName("gwt-Button");
 		saveButtonL.addStyleName("gwt-Button");
@@ -410,7 +420,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		// Tab bars
 		documentsL.setWidth("100%");
 		documentsR.setWidth("100%");
-
 	}
 
 	public static String shortenText(String title, int len) {
@@ -568,8 +577,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	public void addTab(final String title, String content, boolean left) {
 		// are we dealing with a new doc?
-		final boolean isNewDoc = title.equals("Enter the document title.")
-				&& content.equals("Enter the document contents.");
+		final boolean isNewDoc = title.equals("Enter the document title.") && 
+				content.equals("Enter the document contents.");
 
 		// holds the title and the contents
 		VerticalPanel vp = new VerticalPanel();
@@ -770,7 +779,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		addTab(ld.getTitle(), ld.getContents(), left);
 		setTabText(ld.getTitle(), docList.size() - 1, side);
 		openLatestTab(side);
-
+	
 		// when a new doc is opened, set the cursor to the title
 		TextBox title = titleList.get(titleList.size() - 1);
 		title.setCursorPos(title.getText().length());
@@ -996,11 +1005,13 @@ public class Collaborator extends Composite implements ClickHandler {
 		disableButton(showButtonR);
 	}
 
+	
+	
 	/**
 	 * Opens a new document on the tab of the given side and puts it in focus.
 	 * 
-	 * @param String
-	 *            side: Side to open new document in, "left" or "right".
+	 * @param String side:
+	 *            Side to open new document in, "left" or "right".
 	 */
 	public void openDocument(String side) {
 		int docIndx = documentList.getSelectedIndex();
@@ -1130,12 +1141,12 @@ public class Collaborator extends Composite implements ClickHandler {
 		enableButton(refresh);
 	}
 
+	
 	/**
-	 * Enables the given button and removes the disabledCSS string part of the
-	 * CSS class
-	 * 
-	 * @param Button
-	 *            b the button to be enabled
+	 * Enables the given button and removes the disabledCSS string part of the CSS class
+	 *  
+	 * @param Button b
+	 *            the button to be enabled
 	 */
 	protected void enableButton(Button b) {
 		/* Enable button */
@@ -1150,11 +1161,10 @@ public class Collaborator extends Composite implements ClickHandler {
 	}
 
 	/**
-	 * Disables the given button and adds the disabledCSS string to the current
-	 * CSS class
-	 * 
-	 * @param Button
-	 *            b the button to be disabled
+	 * Disables the given button and adds the disabledCSS string to the current CSS class
+	 *  
+	 * @param Button b
+	 *            the button to be disabled
 	 */
 	protected void disableButton(Button b) {
 		/* Disable button */

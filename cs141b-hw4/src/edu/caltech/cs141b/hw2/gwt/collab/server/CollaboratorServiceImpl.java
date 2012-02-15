@@ -8,6 +8,9 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.Transaction;
 
+import com.google.appengine.api.channel.ChannelMessage;
+import com.google.appengine.api.channel.ChannelService;
+import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -129,10 +132,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				Date lockedUntil = toSave.getLockedUntil();
 
 				// Get the IP Address
-				//String identity = getThreadLocalRequest().getRemoteAddr();
+				String identity = getThreadLocalRequest().getRemoteAddr();
 				// Check that the person trying to save has the lock and that
 				// the lock hasn't expired
-				if (lockedBy.equals("abc")
+				if (lockedBy.equals(identity)
 						&& lockedUntil.after(new Date(System
 								.currentTimeMillis()))) {
 					// If both are fulfilled, update and unlock the doc
@@ -169,10 +172,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * (edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument)
 	 */
 	@Override
-	public void releaseLock(LockedDocument doc) throws LockExpired {
+	public void releaseLock(String clientID, LockedDocument doc)
+			throws LockExpired {
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-
+		getChannelService().sendMessage(new ChannelMessage(clientID, "ehhh"));
 		Transaction t = pm.currentTransaction();
 		try {
 			// Starting transaction...
@@ -223,7 +227,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * (java.lang.String)
 	 */
 	@Override
-	public LockedDocument lockDocument(String documentKey)
+	public LockedDocument lockDocument(String clientID, String documentKey)
 			throws LockUnavailable {
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -279,5 +283,15 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			}
 			pm.close();
 		}
+	}
+
+	@Override
+	public String login(String clientID) {
+
+		return getChannelService().createChannel(clientID);
+	}
+
+	private ChannelService getChannelService() {
+		return ChannelServiceFactory.getChannelService();
 	}
 }

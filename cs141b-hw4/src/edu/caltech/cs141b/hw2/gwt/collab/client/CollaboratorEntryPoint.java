@@ -20,16 +20,13 @@ public class CollaboratorEntryPoint implements EntryPoint {
 	private final CollaboratorServiceAsync collabService =
 			GWT.create(CollaboratorService.class);
 
-	private final TokenServiceAsync tokenService =
-		GWT.create(TokenService.class);
-	
 
 	/**
 	 * This is the entry point method, meaning the first method called when
 	 * this module is initialized.
 	 */
 	public void onModuleLoad() {
-		collab = new Collaborator(collabService, tokenService);
+		collab = new Collaborator(collabService);
 		
 		// Make the loading display invisible and the application visible.
 		RootPanel.get("application").add(collab);
