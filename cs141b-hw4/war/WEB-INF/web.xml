@@ -26,16 +26,6 @@
     <url-pattern>/collab/token</url-pattern>
   </servlet-mapping>
   
-  <servlet>
-  <servlet-name>tokenServlet</servlet-name>
-    <servlet-class>edu.caltech.cs141b.hw2.gwt.collab.server.TokenServlet</servlet-class>
-  </servlet>  	
-  	
-   <servlet-mapping>
-   <servlet-name>tokenServlet</servlet-name>
-    <url-pattern>/token/*</url-pattern>
-  </servlet-mapping>
-  
   
   <!-- Default page to serve -->
   <welcome-file-list>

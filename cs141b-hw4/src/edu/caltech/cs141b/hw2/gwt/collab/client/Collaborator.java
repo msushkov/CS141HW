@@ -186,7 +186,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		});
 		
-		/*ChannelFactory.createChannel(clientID, new ChannelCreatedCallback() {
+		ChannelFactory.createChannel(clientID, new ChannelCreatedCallback() {
 
 			@Override
 			public void onChannelCreated(Channel channel) {
@@ -214,7 +214,7 @@ public class Collaborator extends Composite implements ClickHandler {
 					}
 				});
 			}
-		});*/
+		});
 	}
 
 	/**
