@@ -4,6 +4,6 @@
 	<classpathentry exported="true" kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/bryanjadot/Dropbox/Documents/CS141b/repo/cs141b-hw4/gwt-gae-channel-0.4-alpha.jar"/>
+	<classpathentry kind="lib" path="/home/gustafa/cs141/cs141b-hw4/gwt-gae-channel-0.4-alpha.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

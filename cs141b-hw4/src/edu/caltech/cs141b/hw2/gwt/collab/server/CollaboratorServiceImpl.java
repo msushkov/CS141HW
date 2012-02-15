@@ -9,13 +9,16 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.Transaction;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.gwt.user.server.rpc.SerializationPolicy;
 
 import edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.DocumentMetadata;
@@ -134,10 +137,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				Date lockedUntil = toSave.getLockedUntil();
 
 				// Get the IP Address
-				String identity = getThreadLocalRequest().getRemoteAddr();
+				//String identity = getThreadLocalRequest().getRemoteAddr();
 				// Check that the person trying to save has the lock and that
 				// the lock hasn't expired
-				if (lockedBy.equals(identity)
+				if (lockedBy.equals("abc")
 						&& lockedUntil.after(new Date(System
 								.currentTimeMillis()))) {
 					// If both are fulfilled, update and unlock the doc
