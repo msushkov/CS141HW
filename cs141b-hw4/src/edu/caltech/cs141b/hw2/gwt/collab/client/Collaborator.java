@@ -2,9 +2,6 @@ package edu.caltech.cs141b.hw2.gwt.collab.client;
 
 import java.util.ArrayList;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-
 import com.google.gwt.appengine.channel.client.Channel;
 import com.google.gwt.appengine.channel.client.ChannelFactory;
 import com.google.gwt.appengine.channel.client.SocketError;
@@ -20,12 +17,6 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
@@ -43,9 +34,6 @@ import com.google.gwt.user.client.ui.Widget;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.AbstractDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
-import edu.caltech.cs141b.hw2.gwt.collab.client.DocReleaser;
-import edu.caltech.cs141b.hw2.gwt.collab.client.DocLister;
-import edu.caltech.cs141b.hw2.gwt.collab.client.DocReader;
 
 /**
  * Main class for a single Collaborator widget.
@@ -63,7 +51,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	protected CollaboratorServiceAsync collabService;
 	protected TokenServiceAsync tokenService;
-	
+
 	private String clientID;
 
 	// Track document information.
@@ -128,10 +116,11 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * 
 	 * @param collabService
 	 */
-	public Collaborator(CollaboratorServiceAsync collabService, TokenServiceAsync tokenService) {
+	public Collaborator(CollaboratorServiceAsync collabService,
+			TokenServiceAsync tokenService) {
 		this.collabService = collabService;
 		this.tokenService = tokenService;
-		
+
 		// initialize the UI
 		initUI();
 
@@ -180,13 +169,17 @@ public class Collaborator extends Composite implements ClickHandler {
 			@Override
 			public void onSuccess(String result) {
 				System.out.println(result);
-				clientID = result;
-				
+				loginComplete(result);
+
 			}
 
 		});
-		
-		ChannelFactory.createChannel(clientID, new ChannelCreatedCallback() {
+
+	}
+
+	private void loginComplete(String id) {
+		this.clientID = id;
+		ChannelFactory.createChannel(id, new ChannelCreatedCallback() {
 
 			@Override
 			public void onChannelCreated(Channel channel) {
@@ -194,7 +187,7 @@ public class Collaborator extends Composite implements ClickHandler {
 				channel.open(new SocketListener() {
 					@Override
 					public void onOpen() {
-						System.out.println("open");	
+						System.out.println("open");
 					}
 
 					@Override
@@ -210,7 +203,7 @@ public class Collaborator extends Composite implements ClickHandler {
 					@Override
 					public void onError(SocketError error) {
 						System.out.println("error " + error.getDescription());
-						
+
 					}
 				});
 			}
@@ -935,7 +928,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			// if title and contents have not been changed, no need to save
 			if (doc.getTitle().equals(titleList.get(ind).getValue())
 					&& doc.getContents()
-					.equals(contentsList.get(ind).getText()))
+							.equals(contentsList.get(ind).getText()))
 				statusUpdate("No document changes; not saving.");
 
 			// otherwise if stuff was changed, save
@@ -1022,7 +1015,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			documentsRightList.add(null);
 			addTab(title, "", false);
 			DocReader
-			.readDoc(this, key, "right", documentsRightList.size() - 1);
+					.readDoc(this, key, "right", documentsRightList.size() - 1);
 		}
 
 		openLatestTab(side);
