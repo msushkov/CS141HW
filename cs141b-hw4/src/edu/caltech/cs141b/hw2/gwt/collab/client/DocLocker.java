@@ -41,7 +41,8 @@ public class DocLocker implements AsyncCallback<Void> {
 	 * @param index
 	 */
 	public void lockDocument(String key, String side, int index) {
-
+		// calls the server's method addToDocQueue: essentially
+		// asks the server to enqueue this request for the lock
 		collaborator.collabService.lockDocument(collaborator.clientID, key, this);
 	}
 

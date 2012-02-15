@@ -147,6 +147,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					toSave.update(doc);
 					toSave.unlock();
 
+					// the next client in line waiting on this 
+					// document can now get the lock
 					notifyNextObject(stringKey);
 				} else {
 					// Otherwise, throw an exception
@@ -172,11 +174,16 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	}
 
 	private void notifyNextObject(String docKey) {
+		// which client is next in line for this document?
 		String clientID = pollNextClient(docKey);
 
 		if (clientID != null) {
+			// send a message to the next-in-line client that
+			// he is now acquiring the lock
 			getChannelService().sendMessage(
 					new ChannelMessage(clientID, docKey));
+			
+			// TODO
 			// Lock the document for this client
 			// Start timer
 		}
@@ -242,10 +249,17 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()
 				.getAttribute(QUEUE_MAP);
 
-		if (queueMap == null) {
+		if (queueMap == null)
 			queueMap = new HashMap<String, List<String>>();
-		}
 
+		// SUSHKOV IS CONFUSED
+		
+		// why are we checking for docKey here, arent we storing 
+		// client id's as the keys?
+		
+		// or maybe you meant to store the docKeys as the keys, and the lists of
+		// clientID's as values? 
+				
 		if (!queueMap.containsKey(documentKey)) {
 			queueMap.put(clientID, Collections
 					.synchronizedList(new LinkedList<String>()));
@@ -259,6 +273,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		getThreadLocalRequest().setAttribute(QUEUE_MAP, queueMap);
 	}
 
+	/**
+	 * 
+	 * @param documentKey
+	 * @return a client ID of the next client waiting on this doc
+	 */
 	@SuppressWarnings("unchecked")
 	private String pollNextClient(String documentKey) {
 		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()
