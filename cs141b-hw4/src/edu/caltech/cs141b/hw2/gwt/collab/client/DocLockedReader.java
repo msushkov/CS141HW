@@ -10,9 +10,11 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 /**
  * Used in conjunction with <code>CollaboratorService.lockDocument()</code>.
  */
-public class DocLocker implements AsyncCallback<Void> {
+public class DocLockedReader implements AsyncCallback<LockedDocument> {
 
 	private Collaborator collaborator;
+	String side; // is the current doc on the left or the right?
+	private int index; // which tab is the current doc on?
 
 	/**
 	 * This function creates a new DocLocker and calls it. This function
@@ -24,36 +26,71 @@ public class DocLocker implements AsyncCallback<Void> {
 	 * @param ind
 	 * @return
 	 */
-	public static void lockDoc(Collaborator collab, String key, String side,
+	public static void getLockedDoc(Collaborator collab, String key, String side,
 			int ind) {
-		DocLocker dl = new DocLocker(collab);
-		dl.lockDocument(key, side, ind);
+		DocLockedReader dl = new DocLockedReader(collab);
+		dl.getLockDocument(key, side, ind);
 	}
 
-	public DocLocker(Collaborator collaborator) {
+	public DocLockedReader(Collaborator collaborator) {
 		this.collaborator = collaborator;
 	}
 
 	/**
-	 * Sends a request to be added to the locked document queue
+	 * Sends a request to fetch a locked doc
 	 * @param key
 	 * @param side
 	 * @param index
 	 */
-	public void lockDocument(String key, String side, int index) {
+	public void getLockDocument(String key, String side, int index) {
+		this.side = side;
+		this.index = index;
 
-		collaborator.collabService.lockDocument(collaborator.clientID, key, this);
+		collaborator.collabService.getLockedDocument(collaborator.clientID, key, this);
 	}
 
 	@Override
 	public void onFailure(Throwable caught) {
-		collaborator.statusUpdate("Error entering lock queue");
-		GWT.log("Error entering lock queue.", caught);
+		collaborator.statusUpdate("Error retrieving document");
+		GWT.log("Error retrieving document", caught);
+
+		// set and enable/disable correct buttons
+		lockFailed();
 	}
 
 	@Override
-	public void onSuccess(Void result) {
-		collaborator.statusUpdate("In document queue");
+	public void onSuccess(LockedDocument result) {
+		collaborator.statusUpdate("Document Retrieved");
+		
+		collaborator.setDoc(result, index, side);
+	}
+
+	/**
+	 * Called by when docLockerReader failed to fetch the document.
+	 * 
+	 */
+	protected void lockFailed() {
+		if (side.equals("left"))
+			collaborator.setGenericObjects(true);
+		else
+			collaborator.setGenericObjects(false);
+
+		TextBox box = collaborator.titleList.get(index);
+		TextArea area = collaborator.contentsList.get(index);
+
+		// the user cannot edit the title and the contents of this doc
+		box.setEnabled(false);
+		area.setEnabled(false);
+
+		// we need lock, removeTab, and refresh buttons
+		collaborator.hPanel.clear();
+		collaborator.hPanel.add(collaborator.lockButton);
+		collaborator.hPanel.add(collaborator.refresh);
+		collaborator.hPanel.add(collaborator.removeTabButton);
+
+		collaborator.lockButton.setEnabled(true);
+		collaborator.removeTabButton.setEnabled(true);
+		collaborator.refresh.setEnabled(true);
 	}
 
 	/**

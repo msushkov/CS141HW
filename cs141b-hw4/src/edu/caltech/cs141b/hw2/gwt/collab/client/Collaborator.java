@@ -170,6 +170,8 @@ public class Collaborator extends Composite implements ClickHandler {
 			clientID += (char) (r.nextInt(95) + 32);
 		}
 		
+		System.out.println(clientID);
+		
 		collabService.login(clientID, new AsyncCallback<String>() {
 
 			@Override
@@ -1175,5 +1177,10 @@ public class Collaborator extends Composite implements ClickHandler {
 			curClass += disabledCSS;
 			b.setStylePrimaryName(curClass);
 		}
+	}
+
+	public void setDoc(LockedDocument result, int index, String side2) {
+		// TODO Auto-generated method stub
+		
 	}
 }

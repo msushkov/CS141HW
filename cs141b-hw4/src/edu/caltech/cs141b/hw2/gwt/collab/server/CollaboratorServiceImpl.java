@@ -1,8 +1,12 @@
 package edu.caltech.cs141b.hw2.gwt.collab.server;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -28,6 +32,8 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 @SuppressWarnings("serial")
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		CollaboratorService {
+
+	private static final String QUEUE_MAP = "queue_map";
 
 	/*
 	 * (non-Javadoc)
@@ -79,7 +85,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		try {
-
 			// Create the key for this document
 			Key key = KeyFactory.stringToKey(documentKey);
 			// Use the key to retrieve the document
@@ -101,7 +106,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * (edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument)
 	 */
 	@Override
-	public UnlockedDocument saveDocument(LockedDocument doc) throws LockExpired {
+	public UnlockedDocument saveDocument(String clientID, LockedDocument doc) throws LockExpired {
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -132,7 +137,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				Date lockedUntil = toSave.getLockedUntil();
 
 				// Get the IP Address
-				String identity = getThreadLocalRequest().getRemoteAddr();
+				String identity = clientID;//getThreadLocalRequest().getRemoteAddr();
 				// Check that the person trying to save has the lock and that
 				// the lock hasn't expired
 				if (lockedBy.equals(identity)
@@ -141,6 +146,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					// If both are fulfilled, update and unlock the doc
 					toSave.update(doc);
 					toSave.unlock();
+
+					notifyNextObject(stringKey);
 				} else {
 					// Otherwise, throw an exception
 					throw new LockExpired();
@@ -164,6 +171,17 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	private void notifyNextObject(String docKey) {
+		String clientID = pollNextClient(docKey);
+
+		if (clientID != null) {
+			getChannelService().sendMessage(
+					new ChannelMessage(clientID, docKey));
+			// Lock the document for this client
+			// Start timer
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -176,7 +194,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			throws LockExpired {
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		getChannelService().sendMessage(new ChannelMessage(clientID, "ehhh"));
+
 		Transaction t = pm.currentTransaction();
 		try {
 			// Starting transaction...
@@ -193,7 +211,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			String lockedBy = toSave.getLockedBy();
 
 			// Get the IP Address
-			String identity = getThreadLocalRequest().getRemoteAddr();
+			String identity = clientID;//getThreadLocalRequest().getRemoteAddr();
 
 			// Make sure that the person unlocking is the person who locked the
 			// doc.
@@ -219,6 +237,58 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private void addToDocQueue(String clientID, String documentKey) {
+		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()
+				.getAttribute(QUEUE_MAP);
+
+		if (queueMap == null) {
+			queueMap = new HashMap<String, List<String>>();
+		}
+
+		if (!queueMap.containsKey(documentKey)) {
+			queueMap.put(clientID, Collections
+					.synchronizedList(new LinkedList<String>()));
+		}
+
+		List<String> queue = queueMap.get(clientID);
+
+		queue.add(clientID);
+
+		queueMap.put(clientID, queue);
+		getThreadLocalRequest().setAttribute(QUEUE_MAP, queueMap);
+	}
+
+	@SuppressWarnings("unchecked")
+	private String pollNextClient(String documentKey) {
+		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()
+				.getAttribute(QUEUE_MAP);
+
+		if (queueMap != null) {
+			List<String> queue = queueMap.get(documentKey);
+			if (queue != null && !queue.isEmpty()) {
+				return queue.remove(0);
+			}
+		}
+
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean removeClient(String clientID, String documentKey) {
+		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()
+				.getAttribute(QUEUE_MAP);
+
+		if (queueMap != null) {
+			List<String> queue = queueMap.get(documentKey);
+			if (queue != null) {
+				return queue.remove(clientID);
+			}
+		}
+
+		return false;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -227,8 +297,23 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * (java.lang.String)
 	 */
 	@Override
-	public LockedDocument lockDocument(String clientID, String documentKey)
+	public void lockDocument(String clientID, String documentKey) {
+		addToDocQueue(clientID, documentKey);
+	}
+
+	@Override
+	public String login(String clientID) {
+		return getChannelService().createChannel(clientID);
+	}
+
+	private ChannelService getChannelService() {
+		return ChannelServiceFactory.getChannelService();
+	}
+
+	@Override
+	public LockedDocument getLockedDocument(String clientID, String documentKey)
 			throws LockUnavailable {
+
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -243,33 +328,15 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// Get the document from the Datastore
 			Document toSave = pm.getObjectById(Document.class, key);
 
-			// If the doc is locked...
-			if (toSave.isLocked()) {
-				// But it should be unlocked...
-				// System.out.println(toSave.getLockedUntil());
-				if (toSave.getLockedUntil().before(
-						new Date(System.currentTimeMillis()))) {
-					// Unlock it
-					toSave.unlock();
-				} else {
-					// Otherwise notify the client that it lock is unavailable
-					throw new LockUnavailable("Document is locked for "
-							+ (toSave.getLockedUntil().getTime() - System
-									.currentTimeMillis()) / 1000L
-							+ " more seconds.");
-				}
+			String identity = clientID;//getThreadLocalRequest().getRemoteAddr();
+
+			// If the doc is locked and you own it...
+			if (!toSave.isLocked()
+					|| !toSave.getLockedBy().equals(identity)
+					|| toSave.getLockedUntil().before(
+							new Date(System.currentTimeMillis()))) {
+				throw new LockUnavailable("This lock is not yours");
 			}
-
-			// At this point, the doc should be unlocked
-			// Get the IP Address of the user
-			String identity = getThreadLocalRequest().getRemoteAddr();
-
-			// Lock the document for 30 seconds
-			toSave
-					.lock(new Date(System.currentTimeMillis() + 30000L),
-							identity);
-			// Write this to the Datastore
-			pm.makePersistent(toSave);
 
 			// ...Ending transaction
 			t.commit();
@@ -283,15 +350,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			}
 			pm.close();
 		}
+
 	}
 
 	@Override
-	public String login(String clientID) {
-
-		return getChannelService().createChannel(clientID);
-	}
-
-	private ChannelService getChannelService() {
-		return ChannelServiceFactory.getChannelService();
+	public void leaveLockQueue(String clientID, String documentKey) {
+		removeClient(clientID, documentKey);
 	}
 }
