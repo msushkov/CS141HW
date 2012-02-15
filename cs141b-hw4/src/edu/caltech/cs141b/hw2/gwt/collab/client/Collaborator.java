@@ -168,7 +168,6 @@ public class Collaborator extends Composite implements ClickHandler {
 
 			@Override
 			public void onSuccess(String result) {
-				System.out.println(result);
 				loginComplete(result);
 
 			}
@@ -179,6 +178,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	private void loginComplete(String id) {
 		this.clientID = id;
+		System.out.println(id);
 		ChannelFactory.createChannel(id, new ChannelCreatedCallback() {
 
 			@Override

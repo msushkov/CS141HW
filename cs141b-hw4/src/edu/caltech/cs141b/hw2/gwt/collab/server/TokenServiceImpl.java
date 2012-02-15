@@ -23,7 +23,7 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 @SuppressWarnings("serial")
 public class TokenServiceImpl extends RemoteServiceServlet implements
 		TokenService {
-	private static final int LOGIN_STRING_LEN = 32;
+	private static final int LOGIN_STRING_LEN = 16;
 	
 	@Override
 	public String login() {
@@ -34,9 +34,9 @@ public class TokenServiceImpl extends RemoteServiceServlet implements
 			randStr += (char) (r.nextInt(95) + 32);
 		}
 		
-		getChannelService().createChannel(randStr);
+		System.out.println(randStr);
+		return getChannelService().createChannel(randStr);
 		
-		return randStr;
 	}
 	
 	private ChannelService getChannelService() {
