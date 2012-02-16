@@ -420,6 +420,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		} else {
 			addToDocQueue(clientID, documentKey);
 		}
+		
+		
 	}
 
 	@Override

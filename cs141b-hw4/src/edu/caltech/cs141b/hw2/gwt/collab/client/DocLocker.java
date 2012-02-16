@@ -20,10 +20,9 @@ public class DocLocker implements AsyncCallback<Void> {
 	 * @param ind
 	 * @return
 	 */
-	public static void lockDoc(Collaborator collab, String key, String side,
-			int ind) {
+	public static void lockDoc(Collaborator collab, String key) {
 		DocLocker dl = new DocLocker(collab);
-		dl.lockDocument(key, side, ind);
+		dl.lockDocument(key);
 	}
 
 	public DocLocker(Collaborator collaborator) {
@@ -36,7 +35,7 @@ public class DocLocker implements AsyncCallback<Void> {
 	 * @param side
 	 * @param index
 	 */
-	public void lockDocument(String key, String side, int index) {
+	public void lockDocument(String key) {
 		// this calls the server's method addToDocQueue: essentially
 		// asks the server to enqueue this request for the lock
 		collaborator.collabService.lockDocument(collaborator.clientID, key, this);
