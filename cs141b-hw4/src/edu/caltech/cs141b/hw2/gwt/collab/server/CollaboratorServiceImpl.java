@@ -321,10 +321,10 @@ private void sendToken(final String clientID, final String docKey) {
 
 	Document toSave;
 	Date endTime;
-	Transaction t = pm.currentTransaction();
+	//Transaction t = pm.currentTransaction();
 	try {
 		// Starting transaction...
-		t.begin();
+		//t.begin();
 		// Create the key
 		Key key = KeyFactory.stringToKey(docKey);
 
@@ -335,12 +335,12 @@ private void sendToken(final String clientID, final String docKey) {
 
 		pm.makePersistent(toSave);
 
-		t.commit();
+		//t.commit();
 	} finally {
 		// Do some cleanup
-		if (t.isActive()) {
+		/*if (t.isActive()) {
 			t.rollback();
-		}
+		}*/
 		pm.close();
 	}
 
