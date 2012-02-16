@@ -220,6 +220,9 @@ public class Collaborator extends Composite implements ClickHandler {
 						// Setting side to left per default
 						String side = "left";
 						int tabId = NOT_IN_TAB;
+						
+						// Remove whitespace characters to help identify equality
+						key = key.trim();
 						for (int i = 0; i < documentsLeftList.size(); i++) {
 							if (documentsLeftList.get(i).getKey().equals(key)) {
 								tabId = i;
@@ -228,7 +231,8 @@ public class Collaborator extends Composite implements ClickHandler {
 						}
 						
 						
-						if (tabId != NOT_IN_TAB) {
+						// If still not found look at the right documents
+						if (tabId == NOT_IN_TAB) {
 							for (int i = 0; i < documentsRightList.size(); i++) {
 								if (documentsRightList.get(i).getKey().equals(key)) {
 									tabId = i;
@@ -1335,9 +1339,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		titleList.get(index).setValue(doc.getTitle());
 		contentsList.get(index).setValue(doc.getContents());
 
-		// title and contents cannot be edited
-		titleList.get(index).setEnabled(false);
-		contentsList.get(index).setEnabled(false);
+
 
 		// add lock, remove tab, and refresh buttons
 		hPanel.clear();
@@ -1346,11 +1348,19 @@ public class Collaborator extends Composite implements ClickHandler {
 			hPanel.add(lockButton);
 			enableButton(lockButton);
 			enableButton(refresh);
+			
+			// title and contents cannot be edited
+			titleList.get(index).setEnabled(false);
+			contentsList.get(index).setEnabled(false);
 
 		} else {
 			hPanel.add(saveDocButton);
 			enableButton(saveDocButton);
 			disableButton(refresh);
+			
+			// title and contents can now be edited
+			titleList.get(index).setEnabled(true);
+			contentsList.get(index).setEnabled(true);
 		}
 		
 		hPanel.add(refresh);
@@ -1403,8 +1413,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * @param index
 	 * @param side2
 	 */
-	public void setDoc(LockedDocument result, int index, String side2) {
-		// TODO Auto-generated method stub
-
-	}
+//	public void setDoc(LockedDocument result, int index, String side2) {
+//		// TODO Auto-generated method stub
+//
+//	}
 }
