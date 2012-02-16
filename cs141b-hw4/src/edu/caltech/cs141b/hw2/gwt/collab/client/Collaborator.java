@@ -48,9 +48,9 @@ public class Collaborator extends Composite implements ClickHandler {
 	private Collaborator hacksAreLol = this;
 	
 	private static final int CLIENT_ID_LEN = 16;
-	private int MAX_SLEEP_TIME_IN_SEC = 4; 
-	private int MAX_EAT_TIME_IN_SEC = 4; 
-	
+	private int MAX_SLEEP_TIME_IN_SEC = 4;
+	private int MAX_EAT_TIME_IN_SEC = 4;
+
 	final private static int maxTabTextLen = 13;
 	final private int maxConsoleEnt = 5;
 	final private int maxTabsOnOneSide = 5;
@@ -62,7 +62,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	final private String disabledCSS = "Disabled";
 
 	protected CollaboratorServiceAsync collabService;
-	
+
 	protected String channelID;
 	protected String clientID;
 
@@ -132,7 +132,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	public Collaborator(CollaboratorServiceAsync collabService) {
 		this.collabService = collabService;
-		
+
 		// initialize the UI
 		initUI();
 
@@ -170,16 +170,16 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		initWidget(mainOuterPanel);
 		lister.getDocumentList();
-		
+
 		Random r = new Random();
 		clientID = "";
-		
+
 		for (int i = 0; i < CLIENT_ID_LEN; i++) {
 			clientID += (char) (r.nextInt(95) + 32);
 		}
-		
+
 		System.out.println(clientID);
-		
+
 		collabService.login(clientID, new AsyncCallback<String>() {
 
 			@Override
@@ -196,7 +196,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		});
 	}
 
-	
 	private void loginComplete(String id) {
 		this.channelID = id;
 		System.out.println(id);
@@ -258,7 +257,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			}
 		});
 	}
-	
+
 	/**
 	 * Initialize the UI.
 	 */
@@ -304,7 +303,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		createNew.setStylePrimaryName("createNewButton");
 		refreshList.setStylePrimaryName("refreshButton");
 		simulateButton.setStylePrimaryName("simulateButton");
-		
+
 		// add button tooltips
 		refreshDoc.setTitle("Refresh the doc list.");
 		lockButtonL.setTitle("Start editing this document.");
@@ -319,7 +318,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		refreshButtonR.setTitle("Refresh this document.");
 		createNew.setTitle("Create a new document.");
 		refreshList.setTitle("Refresh the documents list.");
-		
+
 		refreshDoc.addStyleName("gwt-Button");
 		lockButtonL.addStyleName("gwt-Button");
 		saveButtonL.addStyleName("gwt-Button");
@@ -620,8 +619,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	public void addTab(final String title, String content, boolean left) {
 		// are we dealing with a new doc?
-		final boolean isNewDoc = title.equals("Enter the document title.") && 
-				content.equals("Enter the document contents.");
+		final boolean isNewDoc = title.equals("Enter the document title.")
+				&& content.equals("Enter the document contents.");
 
 		// holds the title and the contents
 		VerticalPanel vp = new VerticalPanel();
@@ -800,7 +799,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// if user selects a doc from the doc list
 		else if (event.getSource().equals(documentList))
 			docListHandler();
-		
+
 		// if user presses the simulate button
 		else if (event.getSource().equals(simulateButton))
 			simulateButtonHandler();
@@ -826,7 +825,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		addTab(ld.getTitle(), ld.getContents(), left);
 		setTabText(ld.getTitle(), docList.size() - 1, side);
 		openLatestTab(side);
-	
+
 		// when a new doc is opened, set the cursor to the title
 		TextBox title = titleList.get(titleList.size() - 1);
 		title.setCursorPos(title.getText().length());
@@ -892,13 +891,13 @@ public class Collaborator extends Composite implements ClickHandler {
 		AbstractDocument currDoc = docList.get(ind);
 
 		/*
-		// if this doc is locked, release the lock since we are closing this tab
-		// (dont want a user locking their own document)
-		if (currDoc.getKey() != null && currDoc instanceof LockedDocument)
-			releaser.releaseLock((LockedDocument) currDoc);
-		*/
-		
-		// remove this client from the server's waiting queue associated 
+		 * // if this doc is locked, release the lock since we are closing this
+		 * tab // (dont want a user locking their own document) if
+		 * (currDoc.getKey() != null && currDoc instanceof LockedDocument)
+		 * releaser.releaseLock((LockedDocument) currDoc);
+		 */
+
+		// remove this client from the server's waiting queue associated
 		// with this doc
 		closer.removeFromServerQueue(currDoc.getKey());
 
@@ -1057,12 +1056,12 @@ public class Collaborator extends Composite implements ClickHandler {
 		disableButton(showButtonL);
 		disableButton(showButtonR);
 	}
-	
+
 	/**
 	 * Opens a new document on the tab of the given side and puts it in focus.
 	 * 
-	 * @param String side:
-	 *            Side to open new document in, "left" or "right".
+	 * @param String
+	 *            side: Side to open new document in, "left" or "right".
 	 */
 	public void openDocument(String side) {
 		int docIndx = documentList.getSelectedIndex();
@@ -1121,29 +1120,24 @@ public class Collaborator extends Composite implements ClickHandler {
 	/**
 	 * Called when the user presses the simulate button.
 	 */
-	private void simulateButtonHandler()
-	{
+	private void simulateButtonHandler() {
 		// create a new 'simulate' doc that has all of the client id's.
-		// this doc will be stored on the server. 
+		// this doc will be stored on the server.
 		UnlockedDocument simulateDoc = new UnlockedDocument();
-		
+
 		// each client can view this doc
-		// but cannot edit it manually (user should not be able to type in the 
+		// but cannot edit it manually (user should not be able to type in the
 		// doc; the client should add to the doc automatically)
-		
+
 		// SLEEPING
-		
+
 		/*
-		Timer t = new Timer() {
-			
-			@Override
-			public void run() {
-				// do nothing				
-			}
-		};
-		t.schedule(SLEEP_TIME);
-		*/
-		
+		 * Timer t = new Timer() {
+		 * 
+		 * @Override public void run() { // do nothing } };
+		 * t.schedule(SLEEP_TIME);
+		 */
+
 		// sleep for the needed time
 		try {
 			this.wait((new Random()).nextInt(MAX_SLEEP_TIME_IN_SEC) * 1000);
@@ -1151,17 +1145,17 @@ public class Collaborator extends Composite implements ClickHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		// HUNGRY
-		
+
 		// request the lock
-		
+
 		// EATING
-		
+
 		// eat for a random time (sleep and then add this client's id
 		// to the 'simulate' doc
 	}
-	
+
 	/**
 	 * Returns true of key is in either of the lists, false otherwise.
 	 * 
@@ -1199,8 +1193,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * document is saved, it calls this function to simulate an initial reading
 	 * of a document.
 	 * 
-	 * Called by docsaver (onFailure and onSuccess) 
-	 * and docreader (onSuccess).
+	 * Called by docsaver (onFailure and onSuccess) and docreader (onSuccess).
 	 * 
 	 * @param doc
 	 *            the unlocked doc that should be displayed
@@ -1244,12 +1237,13 @@ public class Collaborator extends Composite implements ClickHandler {
 		
 		// enable lock, refreshDoc, and removeTab buttons
 	}
-	
+
 	/**
-	 * Enables the given button and removes the disabledCSS string part of the CSS class
-	 *  
-	 * @param Button b
-	 *            the button to be enabled
+	 * Enables the given button and removes the disabledCSS string part of the
+	 * CSS class
+	 * 
+	 * @param Button
+	 *            b the button to be enabled
 	 */
 	protected void enableButton(Button b) {
 		/* Enable button */
@@ -1264,10 +1258,11 @@ public class Collaborator extends Composite implements ClickHandler {
 	}
 
 	/**
-	 * Disables the given button and adds the disabledCSS string to the current CSS class
-	 *  
-	 * @param Button b
-	 *            the button to be disabled
+	 * Disables the given button and adds the disabledCSS string to the current
+	 * CSS class
+	 * 
+	 * @param Button
+	 *            b the button to be disabled
 	 */
 	protected void disableButton(Button b) {
 		/* Disable button */
@@ -1282,12 +1277,13 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	/**
 	 * Called by docLockedReader (onSuccess).
+	 * 
 	 * @param result
 	 * @param index
 	 * @param side2
 	 */
 	public void setDoc(LockedDocument result, int index, String side2) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
