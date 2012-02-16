@@ -17,7 +17,6 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -37,9 +36,6 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.AbstractDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.DocumentMetadata;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
-import edu.caltech.cs141b.hw2.gwt.collab.client.DocReleaser;
-import edu.caltech.cs141b.hw2.gwt.collab.client.DocLister;
-import edu.caltech.cs141b.hw2.gwt.collab.client.DocReader;
 
 /**
  * Main class for a single Collaborator widget.
@@ -51,6 +47,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	private static final int CLIENT_ID_LEN = 16;
 	private int MAX_SLEEP_TIME_IN_SEC = 4;
 	private int MAX_EAT_TIME_IN_SEC = 4;
+	private static final String POSS_LOGIN_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
 
 	final private static int maxTabTextLen = 13;
 	final private int maxConsoleEnt = 5;
@@ -176,13 +173,13 @@ public class Collaborator extends Composite implements ClickHandler {
 		disableButton(showButtonR);
 
 		initWidget(mainOuterPanel);
-		lister.getDocumentList();
 
 		Random r = new Random();
 		clientID = "";
 
 		for (int i = 0; i < CLIENT_ID_LEN; i++) {
-			clientID += (char) (r.nextInt(95) + 32);
+			clientID += POSS_LOGIN_CHARS.charAt(r.nextInt(POSS_LOGIN_CHARS
+					.length()));
 		}
 
 		System.out.println(clientID);
@@ -197,6 +194,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			@Override
 			public void onSuccess(String result) {
 				loginComplete(result);
+				lister.getDocumentList();
 
 			}
 
@@ -885,10 +883,15 @@ public class Collaborator extends Composite implements ClickHandler {
 		// if user selects a doc from the doc list
 		else if (event.getSource().equals(documentList))
 			docListHandler();
-
-		// if user presses the simulate button
+		
 		else if (event.getSource().equals(simulateButton))
 			simulateButtonHandler();
+
+		// if user presses the simulate button
+		/*
+		 * else if (event.getSource().equals(simulateButton))
+		 * simulateButtonHandler();
+		 */
 	}
 
 	/**
