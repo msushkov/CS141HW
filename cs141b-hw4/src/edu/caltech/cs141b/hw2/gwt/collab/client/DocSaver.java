@@ -101,7 +101,7 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 		collaborator.setDoc(result, index, side);
 
 		// Refresh list in case title was changed.
-		collaborator.lister.getDocumentList();
+		collaborator.lister.getDocumentList(false);
 
 	}
 }
