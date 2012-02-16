@@ -41,7 +41,8 @@ public class DocLocker implements AsyncCallback<Void> {
 	 * @param index
 	 */
 	public void lockDocument(String key, String side, int index) {
-
+		// this calls the server's method addToDocQueue: essentially
+		// asks the server to enqueue this request for the lock
 		collaborator.collabService.lockDocument(collaborator.clientID, key, this);
 	}
 
@@ -56,6 +57,7 @@ public class DocLocker implements AsyncCallback<Void> {
 		collaborator.statusUpdate("In document queue");
 	}
 
+	
 	/**
 	 * If we successfully acquired the locker - can now edit the doc.
 	 * 
@@ -63,6 +65,7 @@ public class DocLocker implements AsyncCallback<Void> {
 	 * @param side
 	 * @param index
 	 */
+	/*
 	protected void gotDoc(LockedDocument result, String side, int index) {
 		if (side.equals("left"))
 			collaborator.setGenericObjects(true);
@@ -93,4 +96,5 @@ public class DocLocker implements AsyncCallback<Void> {
 		collaborator.removeTabButton.setEnabled(true);
 		collaborator.refresh.setEnabled(false);
 	}
+	*/
 }

@@ -364,6 +364,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		getThreadLocalRequest().setAttribute(QUEUE_MAP, queueMap);
 	}
 
+	/**
+	 * 
+	 * @param documentKey
+	 * @return a client ID of the next client waiting on this doc
+	 */
 	@SuppressWarnings("unchecked")
 	private String pollNextClient(String documentKey) {
 		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()

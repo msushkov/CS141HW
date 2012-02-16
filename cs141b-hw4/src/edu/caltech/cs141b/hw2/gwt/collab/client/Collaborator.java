@@ -17,6 +17,7 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -45,6 +46,8 @@ import edu.caltech.cs141b.hw2.gwt.collab.client.DocReader;
 public class Collaborator extends Composite implements ClickHandler {
 
 	private static final int CLIENT_ID_LEN = 16;
+	private int MAX_SLEEP_TIME_IN_SEC = 4; 
+	private int MAX_EAT_TIME_IN_SEC = 4; 
 	
 	final private static int maxTabTextLen = 13;
 	final private int maxConsoleEnt = 5;
@@ -87,6 +90,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected Button removeTabR = new Button("Remove Tab");
 	protected Button refreshButtonL = new Button("Refresh Doc");
 	protected Button refreshButtonR = new Button("Refresh Doc");
+	protected Button simulateButton = new Button("Simulate");
 
 	// Panels
 	VerticalPanel leftPanel = new VerticalPanel();
@@ -98,6 +102,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected DocReader reader = new DocReader(this);
 	protected DocLister lister = new DocLister(this);
 	protected DocReleaser releaser = new DocReleaser(this);
+	protected DocCloser closer = new DocCloser(this);
 
 	// Generic objects used on key handlers.
 	protected TabPanel tabPanel = null;
@@ -124,7 +129,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	public Collaborator(CollaboratorServiceAsync collabService) {
 		this.collabService = collabService;
-
+		
 		// initialize the UI
 		initUI();
 
@@ -188,6 +193,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		});
 	}
 
+	
 	private void loginComplete(String id) {
 		this.channelID = id;
 		System.out.println(id);
@@ -266,6 +272,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		refreshButtonR.setStylePrimaryName("refreshButton");
 		createNew.setStylePrimaryName("createNewButton");
 		refreshList.setStylePrimaryName("refreshButton");
+		simulateButton.setStylePrimaryName("simulateButton");
 		
 		// add button tooltips
 		refreshDoc.setTitle("Refresh the doc list.");
@@ -295,6 +302,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		refreshButtonR.addStyleName("gwt-Button");
 		createNew.addStyleName("gwt-Button");
 		refreshList.addStyleName("gwt-Button");
+		simulateButton.addStyleName("gwt-Button");
 
 		// buttons under the doc list
 		HorizontalPanel docListButtonPanel = new HorizontalPanel();
@@ -303,6 +311,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		docListButtonPanel.add(createNew);
 		docListButtonPanel.add(showButtonL);
 		docListButtonPanel.add(showButtonR);
+		docListButtonPanel.add(simulateButton);
 		docListPanel.add(docListButtonPanel);
 		DecoratorPanel dp = new DecoratorPanel();
 		dp.setWidth("100%");
@@ -504,6 +513,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		removeTabL.addClickHandler(this);
 		refreshButtonL.addClickHandler(this);
 		refreshButtonR.addClickHandler(this);
+		simulateButton.addClickHandler(this);
 	}
 
 	/**
@@ -759,6 +769,10 @@ public class Collaborator extends Composite implements ClickHandler {
 		// if user selects a doc from the doc list
 		else if (event.getSource().equals(documentList))
 			docListHandler();
+		
+		// if user presses the simulate button
+		else if (event.getSource().equals(simulateButton))
+			simulateButtonHandler();
 	}
 
 	/**
@@ -833,10 +847,10 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	/**
 	 * Remove a tab from the correct side. Called after user presses either
-	 * right or left removeTab button.
+	 * right or left removeTab button. Also remove this client from the server's
+	 * wait queue for this document.
 	 * 
 	 * @param left
-	 *            true if we want to remove left tab, false if right.
 	 */
 	private void removeTabButtonHandler(boolean left) {
 		setGenericObjects(left);
@@ -846,10 +860,16 @@ public class Collaborator extends Composite implements ClickHandler {
 		// get the doc that we are removing from the tabpanel
 		AbstractDocument currDoc = docList.get(ind);
 
+		/*
 		// if this doc is locked, release the lock since we are closing this tab
 		// (dont want a user locking their own document)
 		if (currDoc.getKey() != null && currDoc instanceof LockedDocument)
 			releaser.releaseLock((LockedDocument) currDoc);
+		*/
+		
+		// remove this client from the server's waiting queue associated 
+		// with this doc
+		closer.removeFromServerQueue(currDoc.getKey());
 
 		tabPanel.remove(ind);
 		docList.remove(ind);
@@ -1006,8 +1026,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		disableButton(showButtonL);
 		disableButton(showButtonR);
 	}
-
-	
 	
 	/**
 	 * Opens a new document on the tab of the given side and puts it in focus.
@@ -1070,6 +1088,50 @@ public class Collaborator extends Composite implements ClickHandler {
 	}
 
 	/**
+	 * Called when the user presses the simulate button.
+	 */
+	private void simulateButtonHandler()
+	{
+		// create a new 'simulate' doc that has all of the client id's.
+		// this doc will be stored on the server. 
+		UnlockedDocument simulateDoc = new UnlockedDocument();
+		
+		// each client can view this doc
+		// but cannot edit it manually (user should not be able to type in the 
+		// doc; the client should add to the doc automatically)
+		
+		// SLEEPING
+		
+		/*
+		Timer t = new Timer() {
+			
+			@Override
+			public void run() {
+				// do nothing				
+			}
+		};
+		t.schedule(SLEEP_TIME);
+		*/
+		
+		// sleep for the needed time
+		try {
+			this.wait((new Random()).nextInt(MAX_SLEEP_TIME_IN_SEC) * 1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// HUNGRY
+		
+		// request the lock
+		
+		// EATING
+		
+		// eat for a random time (sleep and then add this client's id
+		// to the 'simulate' doc
+	}
+	
+	/**
 	 * Returns true of key is in either of the lists, false otherwise.
 	 * 
 	 * @param key
@@ -1106,7 +1168,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * document is saved, it calls this function to simulate an initial reading
 	 * of a document.
 	 * 
-	 * Called by docsaver and docreader.
+	 * Called by docsaver (onFailure and onSuccess) 
+	 * and docreader (onSuccess).
 	 * 
 	 * @param result
 	 *            the unlocked doc that should be displayed
@@ -1142,7 +1205,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		enableButton(removeTabButton);
 		enableButton(refresh);
 	}
-
 	
 	/**
 	 * Enables the given button and removes the disabledCSS string part of the CSS class
@@ -1179,6 +1241,12 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 	}
 
+	/**
+	 * Called by docLockedReader (onSuccess).
+	 * @param result
+	 * @param index
+	 * @param side2
+	 */
 	public void setDoc(LockedDocument result, int index, String side2) {
 		// TODO Auto-generated method stub
 		
