@@ -1129,6 +1129,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// which are taken care of in DocLocker
 		if (doc instanceof UnlockedDocument)
 			DocLocker.lockDoc(this, doc.getKey());
+		disableButton(lockButton);
 	}
 
 	/**
