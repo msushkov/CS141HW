@@ -45,6 +45,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	private Map<String, List<String>> queueMap;
 	private Map<String, String> tokenMap;
 	private Map<String, Timer> timerMap;
+	
+	
+	public static void cleanLocks() {
+		
+	}
 
 	public CollaboratorServiceImpl() {
 		queueMap = Collections
@@ -511,4 +516,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	public void leaveLockQueue(String clientID, String documentKey) {
 		removeClient(clientID, documentKey);
 	}
+	
+	
 }
