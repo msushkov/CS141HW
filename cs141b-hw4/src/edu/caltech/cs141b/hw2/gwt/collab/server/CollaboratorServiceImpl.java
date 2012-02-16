@@ -218,7 +218,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 	@SuppressWarnings("unchecked")
 	private void sendToken(final String clientID, final String docKey) {
-		// Fetch and create the neccessary maps
+		// Fetch and create the necessary maps
 		Map<String, String> tokenMap = (Map<String, String>) getThreadLocalRequest()
 				.getAttribute(TOKEN_MAP);
 
