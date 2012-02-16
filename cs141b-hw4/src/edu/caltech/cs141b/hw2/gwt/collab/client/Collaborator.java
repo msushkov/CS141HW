@@ -731,7 +731,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// the document contents
 		final TextArea areaBox = new TextArea();
-		areaBox.setWidth("100%");
+		areaBox.setWidth("99%");
 		areaBox.setHeight("100%");
 		areaBox.setStyleName("documentTextBox");
 

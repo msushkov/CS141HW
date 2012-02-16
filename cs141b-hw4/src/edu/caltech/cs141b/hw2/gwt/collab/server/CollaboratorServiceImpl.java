@@ -283,6 +283,12 @@ private void receiveToken(String clientID, String docKey) {
 
 	// Return the token
 	tokenMap.put(docKey, "server");
+	
+	// If there is no document waiting for the document remove from list of locked docs CRITICAL CODE?
+	if (!queueMap.containsKey(docKey) && lockedDocuments.contains(docKey)) {
+		lockedDocuments.remove(docKey);
+	}
+	
 
 	// getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
 
@@ -304,6 +310,11 @@ private void sendToken(final String clientID, final String docKey) {
 	// Now, set the correct clientID. We are "giving" them the token here.
 	tokenMap.put(docKey, clientID);
 
+	// Add to list of locked documents if not already in there
+	if (!lockedDocuments.contains(docKey)) {
+		lockedDocuments.add(docKey);
+	}
+	
 	// getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
 
 	// Lock the document
@@ -502,10 +513,7 @@ public void lockDocument(String clientID, String documentKey) {
 	// client has tried to access it yet
 
 
-	// Add to list of locked documents if not already in there
-	if (!lockedDocuments.contains(documentKey)) {
-		lockedDocuments.add(documentKey);
-	}
+
 
 	if (!tokenMap.containsKey(documentKey))
 		tokenMap.put(documentKey, "server");
