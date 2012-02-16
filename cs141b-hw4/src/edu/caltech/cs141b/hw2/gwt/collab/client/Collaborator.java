@@ -45,6 +45,8 @@ import edu.caltech.cs141b.hw2.gwt.collab.client.DocReader;
  */
 public class Collaborator extends Composite implements ClickHandler {
 
+	private Collaborator hacksAreLol = this;
+	
 	private static final int CLIENT_ID_LEN = 16;
 	private int MAX_SLEEP_TIME_IN_SEC = 4; 
 	private int MAX_EAT_TIME_IN_SEC = 4; 
@@ -55,6 +57,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	final private int maxTitleLength = 100;
 	final private int maxContentsLength = 10000;
 	final private int maxListItems = 15;
+	final private int NOT_IN_TAB = -1;
 
 	final private String disabledCSS = "Disabled";
 
@@ -209,8 +212,36 @@ public class Collaborator extends Composite implements ClickHandler {
 					}
 
 					@Override
-					public void onMessage(String message) {
-						System.out.println("message " + message);
+					public void onMessage(String key) {
+						// Setting side to left per default
+						String side = "left";
+						int tabId = NOT_IN_TAB;
+						for (int i = 0; i < documentsLeftList.size(); i++) {
+							if (documentsLeftList.get(i).getKey().equals(key)) {
+								tabId = i;
+								break;
+							}
+						}
+						
+						
+						if (tabId != NOT_IN_TAB) {
+							for (int i = 0; i < documentsRightList.size(); i++) {
+								if (documentsRightList.get(i).getKey().equals(key)) {
+									tabId = i;
+									side = "right";
+									break;
+								}
+							}
+	
+						}
+						if (tabId != NOT_IN_TAB) {
+							DocLockedReader.getLockedDoc(hacksAreLol, key, side, tabId);
+						} else {
+							statusUpdate("ZOMG YOU GOT A LOCK BUT YOU CLOSED THE DOC YE FOOL!");
+						}
+
+						
+						System.out.println("message " + key);
 					}
 
 					@Override
@@ -1171,24 +1202,24 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * Called by docsaver (onFailure and onSuccess) 
 	 * and docreader (onSuccess).
 	 * 
-	 * @param result
+	 * @param doc
 	 *            the unlocked doc that should be displayed
 	 */
-	protected void setDoc(UnlockedDocument result, int index, String side) {
+	protected void setDoc(AbstractDocument doc, int index, String side) {
 		// set the tab text to the doc title
-		setTabText(result.getTitle(), index, side);
+		setTabText(doc.getTitle(), index, side);
 
 		if (side.equals("left"))
 			setGenericObjects(true);
 		else
 			setGenericObjects(false);
 
-		docList.set(index, result);
+		docList.set(index, doc);
 
 		// set the title and contents to be the most updated stuff
 		// from the input fields
-		titleList.get(index).setValue(result.getTitle());
-		contentsList.get(index).setValue(result.getContents());
+		titleList.get(index).setValue(doc.getTitle());
+		contentsList.get(index).setValue(doc.getContents());
 
 		// title and contents cannot be edited
 		titleList.get(index).setEnabled(false);
@@ -1196,14 +1227,22 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// add lock, remove tab, and refresh buttons
 		hPanel.clear();
-		hPanel.add(lockButton);
+		
+		if (doc instanceof UnlockedDocument) {
+			hPanel.add(lockButton);
+			enableButton(lockButton);
+			enableButton(refresh);
+
+		} else {
+			hPanel.add(saveDocButton);
+			enableButton(saveDocButton);
+			disableButton(refresh);
+		}
+		
 		hPanel.add(refresh);
 		hPanel.add(removeTabButton);
-
+		
 		// enable lock, refreshDoc, and removeTab buttons
-		enableButton(lockButton);
-		enableButton(removeTabButton);
-		enableButton(refresh);
 	}
 	
 	/**
