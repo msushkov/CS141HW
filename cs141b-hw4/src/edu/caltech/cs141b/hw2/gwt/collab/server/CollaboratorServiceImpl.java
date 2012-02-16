@@ -34,6 +34,20 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		CollaboratorService {
 
 	private static final String QUEUE_MAP = "queue_map";
+	private static final String TOKEN_MAP = "token_map";
+	private static final String TIMER_MAP = "timer_map";
+	private static final int LOCK_TIME = 30;
+
+	public CollaboratorServiceImpl() {
+		getThreadLocalRequest().setAttribute(
+				QUEUE_MAP,
+				Collections
+						.synchronizedMap(new HashMap<String, List<String>>()));
+		getThreadLocalRequest().setAttribute(TOKEN_MAP,
+				Collections.synchronizedMap(new HashMap<String, String>()));
+		getThreadLocalRequest().setAttribute(TIMER_MAP,
+				Collections.synchronizedMap(new HashMap<String, Thread>()));
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -106,7 +120,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * (edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument)
 	 */
 	@Override
-	public UnlockedDocument saveDocument(String clientID, LockedDocument doc) throws LockExpired {
+	public UnlockedDocument saveDocument(String clientID, LockedDocument doc)
+			throws LockExpired {
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -136,8 +151,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				String lockedBy = toSave.getLockedBy();
 				Date lockedUntil = toSave.getLockedUntil();
 
-				// Get the IP Address
-				String identity = clientID;//getThreadLocalRequest().getRemoteAddr();
+				// Get the client's ID
+				String identity = clientID;// getThreadLocalRequest().getRemoteAddr();
+				
 				// Check that the person trying to save has the lock and that
 				// the lock hasn't expired
 				if (lockedBy.equals(identity)
@@ -147,7 +163,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					toSave.update(doc);
 					toSave.unlock();
 
-					notifyNextObject(stringKey);
+					receiveToken(clientID, stringKey);
 				} else {
 					// Otherwise, throw an exception
 					throw new LockExpired();
@@ -171,15 +187,104 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	private void notifyNextObject(String docKey) {
-		String clientID = pollNextClient(docKey);
+	/**
+	 * Called whenever a client returns a token for an item. This function will
+	 * update the token map and then send a token if possible.
+	 * 
+	 * @param clientID
+	 * @param docKey
+	 */
+	@SuppressWarnings("unchecked")
+	private void receiveToken(String clientID, String docKey) {
+		Map<String, String> tokenMap = (Map<String, String>) getThreadLocalRequest()
+				.getAttribute(TOKEN_MAP);
+		Map<String, Thread> timerMap = (Map<String, Thread>) getThreadLocalRequest()
+				.getAttribute(TIMER_MAP);
 
+		// Stop the lock timer.
+		timerMap.get(docKey).interrupt();
+
+		// Return the token
+		tokenMap.put(docKey, "server");
+
+		getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
+
+		// Now, try to send a token
+		clientID = pollNextClient(docKey);
 		if (clientID != null) {
-			getChannelService().sendMessage(
-					new ChannelMessage(clientID, docKey));
-			// Lock the document for this client
-			// Start timer
+			sendToken(clientID, docKey);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void sendToken(final String clientID, final String docKey) {
+		// Fetch and create the neccessary maps
+		Map<String, String> tokenMap = (Map<String, String>) getThreadLocalRequest()
+				.getAttribute(TOKEN_MAP);
+		Map<String, Thread> timerMap = (Map<String, Thread>) getThreadLocalRequest()
+				.getAttribute(TIMER_MAP);
+
+		// Now, set the correct clientID.  We are "giving" them the token
+		tokenMap.put(docKey, clientID);
+
+		getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
+
+		// Lock the document
+		// Get the PM
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+
+		Document toSave;
+
+		Transaction t = pm.currentTransaction();
+		try {
+			// Starting transaction...
+			t.begin();
+			// Create the key
+			Key key = KeyFactory.stringToKey(docKey);
+
+			// Get the document corresponding to the key
+			toSave = pm.getObjectById(Document.class, key);
+
+			toSave.lock(
+					new Date(System.currentTimeMillis() + LOCK_TIME * 1000),
+					clientID);
+
+			pm.makePersistent(toSave);
+
+			t.commit();
+		} finally {
+			// Do some cleanup
+			if (t.isActive()) {
+				t.rollback();
+			}
+			pm.close();
+		}
+
+		// Start the unlock timer
+		Thread timer = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(LOCK_TIME * 1000);
+				} catch (InterruptedException e) {
+					// This happens if the lock is returned before it expires.
+					// We don't want to call receiveToken and invalidate things
+					return;
+				}
+
+				receiveToken(clientID, docKey);
+
+			}
+
+		});
+		timer.start();
+		timerMap.put(docKey, timer);
+		getThreadLocalRequest().setAttribute(TIMER_MAP, timerMap);
+
+		// Finally, inform the client that the doc is locked and ready for them
+		getChannelService().sendMessage(new ChannelMessage(clientID, docKey));
+
 	}
 
 	/*
@@ -210,17 +315,20 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// there is a lock or if it's a new document
 			String lockedBy = toSave.getLockedBy();
 
-			// Get the IP Address
-			String identity = clientID;//getThreadLocalRequest().getRemoteAddr();
+			// Get the client's identity
+			String identity = clientID;// getThreadLocalRequest().getRemoteAddr();
 
 			// Make sure that the person unlocking is the person who locked the
 			// doc.
 			if (lockedBy.equals(identity)) {
 				// Unlock it
 				toSave.unlock();
-
+				
 				// And store it in the Datastore
 				pm.makePersistent(toSave);
+				
+				// Indicate that the token has been returned
+				receiveToken(clientID, doc.getKey());
 			} else {
 				// Otherwise, throw an exception
 				throw new LockExpired("You no longer have the lock");
@@ -242,20 +350,16 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()
 				.getAttribute(QUEUE_MAP);
 
-		if (queueMap == null) {
-			queueMap = new HashMap<String, List<String>>();
-		}
-
 		if (!queueMap.containsKey(documentKey)) {
-			queueMap.put(clientID, Collections
+			queueMap.put(documentKey, Collections
 					.synchronizedList(new LinkedList<String>()));
 		}
 
-		List<String> queue = queueMap.get(clientID);
+		List<String> queue = queueMap.get(documentKey);
 
 		queue.add(clientID);
 
-		queueMap.put(clientID, queue);
+		queueMap.put(documentKey, queue);
 		getThreadLocalRequest().setAttribute(QUEUE_MAP, queueMap);
 	}
 
@@ -264,11 +368,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()
 				.getAttribute(QUEUE_MAP);
 
-		if (queueMap != null) {
-			List<String> queue = queueMap.get(documentKey);
-			if (queue != null && !queue.isEmpty()) {
-				return queue.remove(0);
-			}
+		List<String> queue = queueMap.get(documentKey);
+		if (queue != null && !queue.isEmpty()) {
+			return queue.remove(0);
 		}
 
 		return null;
@@ -279,11 +381,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()
 				.getAttribute(QUEUE_MAP);
 
-		if (queueMap != null) {
-			List<String> queue = queueMap.get(documentKey);
-			if (queue != null) {
-				return queue.remove(clientID);
-			}
+		List<String> queue = queueMap.get(documentKey);
+		if (queue != null) {
+			return queue.remove(clientID);
 		}
 
 		return false;
@@ -296,9 +396,24 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#lockDocument
 	 * (java.lang.String)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void lockDocument(String clientID, String documentKey) {
-		addToDocQueue(clientID, documentKey);
+		Map<String, String> tokenMap = (Map<String, String>) getThreadLocalRequest()
+				.getAttribute(TOKEN_MAP);
+		// Handle the case where the token map doesn't have the docKey - no
+		// client has tried to access it yet
+
+		if (!tokenMap.containsKey(documentKey)) {
+			tokenMap.put(documentKey, "server");
+		}
+
+		// Check if we have the token. If we do, send the token out immediately
+		if (tokenMap.get(documentKey).equals("server")) {
+			sendToken(clientID, documentKey);
+		} else {
+			addToDocQueue(clientID, documentKey);
+		}
 	}
 
 	@Override
@@ -328,7 +443,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// Get the document from the Datastore
 			Document toSave = pm.getObjectById(Document.class, key);
 
-			String identity = clientID;//getThreadLocalRequest().getRemoteAddr();
+			String identity = clientID;// getThreadLocalRequest().getRemoteAddr();
 
 			// If the doc is locked and you own it...
 			if (!toSave.isLocked()
