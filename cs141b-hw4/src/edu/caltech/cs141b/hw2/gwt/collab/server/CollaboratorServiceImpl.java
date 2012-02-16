@@ -64,12 +64,12 @@ CollaboratorService {
 	public static void cleanLocks() {
 		// Clean up documents if there are document currently locked
 		if (!lockedDocuments.isEmpty()) {
+			ArrayList<String> toClear = new ArrayList<String>();
 
 			for (String docKey : lockedDocuments) {
 				System.out.println("Checking lock for " + docKey);
-				String previousClient = null;
 				PersistenceManager pm = PMF.get().getPersistenceManager();
-				Transaction t = pm.currentTransaction();
+				Transaction t = pm.currentTransaction();	
 				try {
 					// Starting transaction...
 					t.begin();
@@ -82,14 +82,10 @@ CollaboratorService {
 
 					// If the doc is locked and the lock expired
 					if (doc.isLocked() && doc.getLockedUntil().before(new Date(System.currentTimeMillis()))) {
-						System.out.println("Unlocking for " + docKey);
-						doc.unlock();
+						toClear.add(docKey);
 						if (queueMap.containsKey(docKey)) {
+							toClear.add(docKey);
 							System.out.println("In the queueMap " + docKey);
-
-							// Maybe use appstore instead?
-							previousClient = tokenMap.get(docKey);
-							server.receiveToken(previousClient, docKey);
 
 						}
 						// Check if there are clients waiting for the document
@@ -105,6 +101,21 @@ CollaboratorService {
 					pm.close();
 				}
 
+			}
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			Transaction t = pm.currentTransaction();
+
+			try {
+				t.begin();
+				for (String docKey : toClear) {
+					String previousClient = tokenMap.get(docKey);
+					server.receiveToken(previousClient, docKey);
+				}
+			} finally {
+				if (t.isActive()) {
+					t.rollback();
+				}
+				pm.close();
 			}
 		}
 
