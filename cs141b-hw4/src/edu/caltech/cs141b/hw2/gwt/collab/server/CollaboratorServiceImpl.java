@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Map.Entry;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -33,20 +36,21 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		CollaboratorService {
 
-	private static final String QUEUE_MAP = "queue_map";
-	private static final String TOKEN_MAP = "token_map";
-	private static final String TIMER_MAP = "timer_map";
+	/*
+	 * private static final String QUEUE_MAP = "queue_map"; private static final
+	 * String TOKEN_MAP = "token_map"; private static final String TIMER_MAP =
+	 * "timer_map";
+	 */
 	private static final int LOCK_TIME = 30;
+	private Map<String, List<String>> queueMap;
+	private Map<String, String> tokenMap;
+	private Map<String, Timer> timerMap;
 
 	public CollaboratorServiceImpl() {
-		getThreadLocalRequest().setAttribute(
-				QUEUE_MAP,
-				Collections
-						.synchronizedMap(new HashMap<String, List<String>>()));
-		getThreadLocalRequest().setAttribute(TOKEN_MAP,
-				Collections.synchronizedMap(new HashMap<String, String>()));
-		getThreadLocalRequest().setAttribute(TIMER_MAP,
-				Collections.synchronizedMap(new HashMap<String, Thread>()));
+		queueMap = Collections
+				.synchronizedMap(new HashMap<String, List<String>>());
+		tokenMap = Collections.synchronizedMap(new HashMap<String, String>());
+		timerMap = Collections.synchronizedMap(new HashMap<String, Timer>());
 	}
 
 	/*
@@ -177,6 +181,12 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			t.commit();
 
 			// Return the unlocked document
+
+			/*
+			 * System.out.println("Saved"); for (Entry<String, String> e :
+			 * tokenMap.entrySet()) { System.out.println(e.getKey() + ": " +
+			 * e.getValue()); }
+			 */
 			return toSave.getUnlockedDoc();
 		} finally {
 			// Do some cleanup
@@ -196,18 +206,20 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	@SuppressWarnings("unchecked")
 	private void receiveToken(String clientID, String docKey) {
-		Map<String, String> tokenMap = (Map<String, String>) getThreadLocalRequest()
-				.getAttribute(TOKEN_MAP);
-		Map<String, Thread> timerMap = (Map<String, Thread>) getThreadLocalRequest()
-				.getAttribute(TIMER_MAP);
+		/*
+		 * Map<String, String> tokenMap = (Map<String, String>)
+		 * getThreadLocalRequest() .getAttribute(TOKEN_MAP); Map<String, Thread>
+		 * timerMap = (Map<String, Thread>) getThreadLocalRequest()
+		 * .getAttribute(TIMER_MAP);
+		 */
 
 		// Stop the lock timer.
-		timerMap.get(docKey).interrupt();
+		// timerMap.get(docKey).cancel();
 
 		// Return the token
 		tokenMap.put(docKey, "server");
 
-		getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
+		// getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
 
 		// Now, try to send a token
 		clientID = pollNextClient(docKey);
@@ -219,20 +231,22 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@SuppressWarnings("unchecked")
 	private void sendToken(final String clientID, final String docKey) {
 		// Fetch and create the necessary maps
-		Map<String, String> tokenMap = (Map<String, String>) getThreadLocalRequest()
-				.getAttribute(TOKEN_MAP);
+		/*
+		 * Map<String, String> tokenMap = (Map<String, String>)
+		 * getThreadLocalRequest() .getAttribute(TOKEN_MAP);
+		 */
 
 		// Now, set the correct clientID. We are "giving" them the token here.
 		tokenMap.put(docKey, clientID);
 
-		getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
+		// getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
 
 		// Lock the document
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		Document toSave;
-
+		Date endTime;
 		Transaction t = pm.currentTransaction();
 		try {
 			// Starting transaction...
@@ -242,10 +256,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			// Get the document corresponding to the key
 			toSave = pm.getObjectById(Document.class, key);
-
-			toSave.lock(
-					new Date(System.currentTimeMillis() + LOCK_TIME * 1000),
-					clientID);
+			endTime = new Date(System.currentTimeMillis() + LOCK_TIME * 1000);
+			toSave.lock(endTime, clientID);
 
 			pm.makePersistent(toSave);
 
@@ -259,29 +271,35 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 
 		// Start the unlock timer
-		Map<String, Thread> timerMap = (Map<String, Thread>) getThreadLocalRequest()
-				.getAttribute(TIMER_MAP);
+		/*
+		 * Map<String, Thread> timerMap = (Map<String, Thread>)
+		 * getThreadLocalRequest() .getAttribute(TIMER_MAP);
+		 */
 
-		Thread timer = new Thread(new Runnable() {
+		/*
+		 * Timer timer = new Timer(); timer.schedule(new TimerTask() {
+		 * 
+		 * @Override public void run() { receiveToken(clientID, docKey); }
+		 * 
+		 * }, endTime);
+		 */
 
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(LOCK_TIME * 1000);
-				} catch (InterruptedException e) {
-					// This happens if the lock is returned before it expires.
-					// We don't want to call receiveToken and invalidate things
-					return;
-				}
-
-				receiveToken(clientID, docKey);
-
-			}
-
-		});
-		timer.start();
-		timerMap.put(docKey, timer);
-		getThreadLocalRequest().setAttribute(TIMER_MAP, timerMap);
+		/*
+		 * Thread timer = new Thread(new Runnable() {
+		 * 
+		 * @Override public void run() { try { Thread.sleep(LOCK_TIME * 1000); }
+		 * catch (InterruptedException e) { // This happens if the lock is
+		 * returned before it expires. // We don't want to call receiveToken and
+		 * invalidate things return; }
+		 * 
+		 * receiveToken(clientID, docKey);
+		 * 
+		 * }
+		 * 
+		 * }); timer.start();
+		 */
+		// timerMap.put(docKey, timer);
+		// getThreadLocalRequest().setAttribute(TIMER_MAP, timerMap);
 
 		// Finally, inform the client that the doc is locked and ready for them
 		getChannelService().sendMessage(new ChannelMessage(clientID, docKey));
@@ -348,8 +366,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 	@SuppressWarnings("unchecked")
 	private void addToDocQueue(String clientID, String documentKey) {
-		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()
-				.getAttribute(QUEUE_MAP);
+		/*
+		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
+		 * getThreadLocalRequest() .getAttribute(QUEUE_MAP);
+		 */
 
 		if (!queueMap.containsKey(documentKey)) {
 			queueMap.put(documentKey, Collections
@@ -361,7 +381,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		queue.add(clientID);
 
 		queueMap.put(documentKey, queue);
-		getThreadLocalRequest().setAttribute(QUEUE_MAP, queueMap);
+		// getThreadLocalRequest().setAttribute(QUEUE_MAP, queueMap);
 	}
 
 	/**
@@ -371,8 +391,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	@SuppressWarnings("unchecked")
 	private String pollNextClient(String documentKey) {
-		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()
-				.getAttribute(QUEUE_MAP);
+		/*
+		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
+		 * getThreadLocalRequest() .getAttribute(QUEUE_MAP);
+		 */
 
 		List<String> queue = queueMap.get(documentKey);
 		if (queue != null && !queue.isEmpty()) {
@@ -384,8 +406,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 	@SuppressWarnings("unchecked")
 	private boolean removeClient(String clientID, String documentKey) {
-		Map<String, List<String>> queueMap = (Map<String, List<String>>) getThreadLocalRequest()
-				.getAttribute(QUEUE_MAP);
+		/*
+		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
+		 * getThreadLocalRequest() .getAttribute(QUEUE_MAP);
+		 */
 
 		List<String> queue = queueMap.get(documentKey);
 		if (queue != null) {
@@ -405,8 +429,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@SuppressWarnings("unchecked")
 	@Override
 	public void lockDocument(String clientID, String documentKey) {
-		Map<String, String> tokenMap = (Map<String, String>) getThreadLocalRequest()
-				.getAttribute(TOKEN_MAP);
+		/*
+		 * Map<String, String> tokenMap = (Map<String, String>)
+		 * getThreadLocalRequest() .getAttribute(TOKEN_MAP);
+		 */
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
 
@@ -420,8 +446,15 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		} else {
 			addToDocQueue(clientID, documentKey);
 		}
-		
-		
+
+		/*
+		 * for (Entry<String, List<String>> e : queueMap.entrySet()) {
+		 * System.out.println(e.getKey()); for (String s : e.getValue()) {
+		 * System.out.println(s); } }
+		 * 
+		 * for (Entry<String, String> e : tokenMap.entrySet()) {
+		 * System.out.println(e.getKey() + ": " + e.getValue()); }
+		 */
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public class DocLister implements AsyncCallback<List<DocumentMetadata>> {
 	 * Sends the request to obtain the document list.
 	 */
 	public void getDocumentList() {
-		// collaborator.statusUpdate("Fetching document list.");
+		collaborator.statusUpdate("Fetching document list.");
 
 		// disable the refresh button while we are getting the doc list
 		collaborator.refreshDoc.setEnabled(false);

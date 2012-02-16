@@ -17,7 +17,6 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -36,9 +35,6 @@ import com.google.gwt.user.client.ui.Widget;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.AbstractDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
-import edu.caltech.cs141b.hw2.gwt.collab.client.DocReleaser;
-import edu.caltech.cs141b.hw2.gwt.collab.client.DocLister;
-import edu.caltech.cs141b.hw2.gwt.collab.client.DocReader;
 
 /**
  * Main class for a single Collaborator widget.
@@ -48,6 +44,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	private static final int CLIENT_ID_LEN = 16;
 	private int MAX_SLEEP_TIME_IN_SEC = 4;
 	private int MAX_EAT_TIME_IN_SEC = 4;
+	private static final String POSS_LOGIN_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
 
 	final private static int maxTabTextLen = 13;
 	final private int maxConsoleEnt = 5;
@@ -166,13 +163,13 @@ public class Collaborator extends Composite implements ClickHandler {
 		disableButton(showButtonR);
 
 		initWidget(mainOuterPanel);
-		lister.getDocumentList();
 
 		Random r = new Random();
 		clientID = "";
 
 		for (int i = 0; i < CLIENT_ID_LEN; i++) {
-			clientID += (char) (r.nextInt(95) + 32);
+			clientID += POSS_LOGIN_CHARS.charAt(r.nextInt(POSS_LOGIN_CHARS
+					.length()));
 		}
 
 		System.out.println(clientID);
@@ -187,6 +184,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			@Override
 			public void onSuccess(String result) {
 				loginComplete(result);
+				lister.getDocumentList();
 
 			}
 
@@ -770,8 +768,10 @@ public class Collaborator extends Composite implements ClickHandler {
 			docListHandler();
 
 		// if user presses the simulate button
-		else if (event.getSource().equals(simulateButton))
-			simulateButtonHandler();
+		/*
+		 * else if (event.getSource().equals(simulateButton))
+		 * simulateButtonHandler();
+		 */
 	}
 
 	/**
@@ -1004,7 +1004,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// this call can result in either success or failure, both of
 		// which are taken care of in DocLocker
 		if (doc instanceof UnlockedDocument)
-			DocLocker.lockDoc(this, doc.getKey(), side, ind);
+			DocLocker.lockDoc(this, doc.getKey());
 	}
 
 	/**
@@ -1089,41 +1089,31 @@ public class Collaborator extends Composite implements ClickHandler {
 	/**
 	 * Called when the user presses the simulate button.
 	 */
-	private void simulateButtonHandler() {
-		// create a new 'simulate' doc that has all of the client id's.
-		// this doc will be stored on the server.
-		UnlockedDocument simulateDoc = new UnlockedDocument();
-
-		// each client can view this doc
-		// but cannot edit it manually (user should not be able to type in the
-		// doc; the client should add to the doc automatically)
-
-		// SLEEPING
-
-		/*
-		 * Timer t = new Timer() {
-		 * 
-		 * @Override public void run() { // do nothing } };
-		 * t.schedule(SLEEP_TIME);
-		 */
-
-		// sleep for the needed time
-		try {
-			this.wait((new Random()).nextInt(MAX_SLEEP_TIME_IN_SEC) * 1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// HUNGRY
-
-		// request the lock
-
-		// EATING
-
-		// eat for a random time (sleep and then add this client's id
-		// to the 'simulate' doc
-	}
+	/*
+	 * private void simulateButtonHandler() { // create a new 'simulate' doc
+	 * that has all of the client id's. // this doc will be stored on the
+	 * server. UnlockedDocument simulateDoc = new UnlockedDocument();
+	 * 
+	 * // each client can view this doc // but cannot edit it manually (user
+	 * should not be able to type in the // doc; the client should add to the
+	 * doc automatically)
+	 * 
+	 * // SLEEPING
+	 * 
+	 * // sleep for the needed time try { this.wait((new
+	 * Random()).nextInt(MAX_SLEEP_TIME_IN_SEC) * 1000); } catch
+	 * (InterruptedException e) { // TODO Auto-generated catch block
+	 * e.printStackTrace(); }
+	 * 
+	 * // HUNGRY
+	 * 
+	 * // request the lock
+	 * 
+	 * // EATING
+	 * 
+	 * // eat for a random time (sleep and then add this client's id // to the
+	 * 'simulate' doc }
+	 */
 
 	/**
 	 * Returns true of key is in either of the lists, false otherwise.

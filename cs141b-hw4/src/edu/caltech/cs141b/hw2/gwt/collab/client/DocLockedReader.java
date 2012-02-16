@@ -61,7 +61,6 @@ public class DocLockedReader implements AsyncCallback<LockedDocument> {
 	@Override
 	public void onSuccess(LockedDocument result) {
 		collaborator.statusUpdate("Document Retrieved");
-		
 		collaborator.setDoc(result, index, side);
 	}
 

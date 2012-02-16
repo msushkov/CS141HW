@@ -14,6 +14,7 @@ public class DocLocker implements AsyncCallback<Void> {
 	 * This function creates a new DocLocker and calls it. This function
 	 * basically allows for multiple requests to be sent at the same time with
 	 * different internal state associated with them.
+	 * 
 	 * @param collaborator
 	 * @param key
 	 * @param side
@@ -31,6 +32,7 @@ public class DocLocker implements AsyncCallback<Void> {
 
 	/**
 	 * Sends a request to be added to the locked document queue
+	 * 
 	 * @param key
 	 * @param side
 	 * @param index
@@ -38,7 +40,8 @@ public class DocLocker implements AsyncCallback<Void> {
 	public void lockDocument(String key) {
 		// this calls the server's method addToDocQueue: essentially
 		// asks the server to enqueue this request for the lock
-		collaborator.collabService.lockDocument(collaborator.clientID, key, this);
+		collaborator.collabService.lockDocument(collaborator.clientID, key,
+				this);
 	}
 
 	@Override
@@ -52,7 +55,6 @@ public class DocLocker implements AsyncCallback<Void> {
 		collaborator.statusUpdate("In document queue");
 	}
 
-	
 	/**
 	 * If we successfully acquired the locker - can now edit the doc.
 	 * 
@@ -61,35 +63,30 @@ public class DocLocker implements AsyncCallback<Void> {
 	 * @param index
 	 */
 	/*
-	protected void gotDoc(LockedDocument result, String side, int index) {
-		if (side.equals("left"))
-			collaborator.setGenericObjects(true);
-		else
-			collaborator.setGenericObjects(false);
-
-		TextBox box = collaborator.titleList.get(index);
-		TextArea area = collaborator.contentsList.get(index);
-
-		collaborator.docList.set(index, result);
-
-		// set the title and contents of this doc to be the current thing on the
-		// page
-		box.setValue(result.getTitle());
-		area.setText(result.getContents());
-
-		// the user can now edit the title and the contents of this doc
-		box.setEnabled(true);
-		area.setEnabled(true);
-
-		// we need save, removeTab, and refresh buttons
-		collaborator.hPanel.clear();
-		collaborator.hPanel.add(collaborator.saveDocButton);
-		collaborator.hPanel.add(collaborator.refresh);
-		collaborator.hPanel.add(collaborator.removeTabButton);
-
-		collaborator.saveDocButton.setEnabled(true);
-		collaborator.removeTabButton.setEnabled(true);
-		collaborator.refresh.setEnabled(false);
-	}
-	*/
+	 * protected void gotDoc(LockedDocument result, String side, int index) { if
+	 * (side.equals("left")) collaborator.setGenericObjects(true); else
+	 * collaborator.setGenericObjects(false);
+	 * 
+	 * TextBox box = collaborator.titleList.get(index); TextArea area =
+	 * collaborator.contentsList.get(index);
+	 * 
+	 * collaborator.docList.set(index, result);
+	 * 
+	 * // set the title and contents of this doc to be the current thing on the
+	 * // page box.setValue(result.getTitle());
+	 * area.setText(result.getContents());
+	 * 
+	 * // the user can now edit the title and the contents of this doc
+	 * box.setEnabled(true); area.setEnabled(true);
+	 * 
+	 * // we need save, removeTab, and refresh buttons
+	 * collaborator.hPanel.clear();
+	 * collaborator.hPanel.add(collaborator.saveDocButton);
+	 * collaborator.hPanel.add(collaborator.refresh);
+	 * collaborator.hPanel.add(collaborator.removeTabButton);
+	 * 
+	 * collaborator.saveDocButton.setEnabled(true);
+	 * collaborator.removeTabButton.setEnabled(true);
+	 * collaborator.refresh.setEnabled(false); }
+	 */
 }
