@@ -65,7 +65,6 @@ public static void cleanLocks() {
 
 		for (String docKey : lockedDocuments) {
 			System.out.println("Checking lock for " + docKey);
-			boolean sendNextClient = false;
 			String previousClient = null;
 			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
@@ -88,7 +87,8 @@ public static void cleanLocks() {
 
 						// Maybe use appstore instead?
 						previousClient = tokenMap.get(docKey);
-						sendNextClient = true;
+						server.receiveToken(previousClient, docKey);
+
 					}
 					// Check if there are clients waiting for the document
 
@@ -102,11 +102,6 @@ public static void cleanLocks() {
 					t.rollback();
 				}
 				pm.close();
-				if (sendNextClient) {
-					if (previousClient != null) {
-						server.receiveToken(previousClient, docKey);
-					}
-				}
 			}
 
 		}
