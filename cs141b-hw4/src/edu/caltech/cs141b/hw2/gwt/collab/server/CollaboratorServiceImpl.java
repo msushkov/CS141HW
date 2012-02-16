@@ -410,18 +410,14 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
 
-		if (!tokenMap.containsKey(documentKey)) {
+		if (!tokenMap.containsKey(documentKey))
 			tokenMap.put(documentKey, "server");
-		}
 
 		// Check if we have the token. If we do, send the token out immediately
-		if (tokenMap.get(documentKey).equals("server")) {
+		if (tokenMap.get(documentKey).equals("server"))
 			sendToken(clientID, documentKey);
-		} else {
+		else
 			addToDocQueue(clientID, documentKey);
-		}
-		
-		
 	}
 
 	@Override
