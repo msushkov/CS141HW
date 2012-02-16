@@ -153,7 +153,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 				// Get the client's ID
 				String identity = clientID;// getThreadLocalRequest().getRemoteAddr();
-				
+
 				// Check that the person trying to save has the lock and that
 				// the lock hasn't expired
 				if (lockedBy.equals(identity)
@@ -221,10 +221,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Fetch and create the neccessary maps
 		Map<String, String> tokenMap = (Map<String, String>) getThreadLocalRequest()
 				.getAttribute(TOKEN_MAP);
-		Map<String, Thread> timerMap = (Map<String, Thread>) getThreadLocalRequest()
-				.getAttribute(TIMER_MAP);
 
-		// Now, set the correct clientID.  We are "giving" them the token
+		// Now, set the correct clientID. We are "giving" them the token here.
 		tokenMap.put(docKey, clientID);
 
 		getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
@@ -261,6 +259,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 
 		// Start the unlock timer
+		Map<String, Thread> timerMap = (Map<String, Thread>) getThreadLocalRequest()
+				.getAttribute(TIMER_MAP);
+
 		Thread timer = new Thread(new Runnable() {
 
 			@Override
@@ -323,10 +324,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			if (lockedBy.equals(identity)) {
 				// Unlock it
 				toSave.unlock();
-				
+
 				// And store it in the Datastore
 				pm.makePersistent(toSave);
-				
+
 				// Indicate that the token has been returned
 				receiveToken(clientID, doc.getKey());
 			} else {
