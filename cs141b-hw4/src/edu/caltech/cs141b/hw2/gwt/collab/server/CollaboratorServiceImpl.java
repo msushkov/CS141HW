@@ -67,7 +67,6 @@ CollaboratorService {
 
 			for (String docKey : lockedDocuments) {
 				System.out.println("Checking lock for " + docKey);
-				boolean sendNextClient = false;
 				String previousClient = null;
 				PersistenceManager pm = PMF.get().getPersistenceManager();
 				Transaction t = pm.currentTransaction();
@@ -90,25 +89,20 @@ CollaboratorService {
 
 							// Maybe use appstore instead?
 							previousClient = tokenMap.get(docKey);
-							sendNextClient = true;
+							server.receiveToken(previousClient, docKey);
+
 						}
 						// Check if there are clients waiting for the document
 
 					}
 					// ...Ending transaction
 					t.commit();
-
 				} finally {
 					// Do some cleanup
 					if (t.isActive()) {
 						t.rollback();
 					}
 					pm.close();
-					if (sendNextClient) {
-						if (previousClient != null) {
-							server.receiveToken(previousClient, docKey);
-						}
-					}
 				}
 
 			}
