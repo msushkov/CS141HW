@@ -1,6 +1,7 @@
 package edu.caltech.cs141b.hw2.gwt.collab.client;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import com.google.gwt.appengine.channel.client.Channel;
@@ -33,6 +34,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import edu.caltech.cs141b.hw2.gwt.collab.shared.AbstractDocument;
+import edu.caltech.cs141b.hw2.gwt.collab.shared.DocumentMetadata;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 
@@ -55,7 +57,11 @@ public class Collaborator extends Composite implements ClickHandler {
 	final private int maxContentsLength = 10000;
 	final private int maxListItems = 15;
 	final private int NOT_IN_TAB = -1;
-
+	
+	final private String defaultDocTitle = "Enter the document title.";
+	final private String defaultDocContents = "Enter the document contents.";	
+	final protected String simulateDocTitle = "Simulation Document.";
+	final protected String simulateDocContents = "Client IDs:";
 	final private String disabledCSS = "Disabled";
 
 	protected CollaboratorServiceAsync collabService;
@@ -116,6 +122,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected HorizontalPanel hPanel = null;
 	protected String side = null;
 
+	protected LockedDocument simulateDoc;
+	
 	// Status tracking.
 	private VerticalPanel statusArea = new VerticalPanel();
 
@@ -187,8 +195,9 @@ public class Collaborator extends Composite implements ClickHandler {
 			@Override
 			public void onSuccess(String result) {
 				loginComplete(result);
-				lister.getDocumentList();
-
+				
+				// this call is now made in loginComplete()
+				//lister.getDocumentList();
 			}
 
 		});
@@ -213,6 +222,9 @@ public class Collaborator extends Composite implements ClickHandler {
 						// Setting side to left per default
 						String side = "left";
 						int tabId = NOT_IN_TAB;
+						
+						// Remove whitespace characters to help identify equality
+						key = key.trim();
 						for (int i = 0; i < documentsLeftList.size(); i++) {
 							if (documentsLeftList.get(i).getKey().equals(key)) {
 								tabId = i;
@@ -221,7 +233,8 @@ public class Collaborator extends Composite implements ClickHandler {
 						}
 						
 						
-						if (tabId != NOT_IN_TAB) {
+						// If still not found look at the right documents
+						if (tabId == NOT_IN_TAB) {
 							for (int i = 0; i < documentsRightList.size(); i++) {
 								if (documentsRightList.get(i).getKey().equals(key)) {
 									tabId = i;
@@ -254,8 +267,90 @@ public class Collaborator extends Composite implements ClickHandler {
 				});
 			}
 		});
+	
+		// refresh doc list before we check for presence of simulation document
+		lister.getDocumentList(true);
+		
+		// onSuccess of lister will call addSimulateDoc() in 
+		// the case that we are creating a simulation doc (simulation is true)
+	}
+	
+	/**
+	 * Add a 'simulate' doc right when the app starts. If this doc isnt in the
+	 * doc list, create a new one, and if it already is (created by another client),
+	 * then do nothing.
+	 */
+	protected void addSimulateDoc()
+	{	
+		boolean isSimDocInDocList = false;
+		
+		// WE KEEP THIS DOC IN THE DOCLIST EVEN AFTER A CLIENT EXITS
+		
+		// if document with this title isnt already in the doc list, 
+		// create new unlocked 'shared' document: this will be used 
+		// in the simulation. if this doc exists already, dont do anything
+		for (int i = 0; i < documentList.getItemCount(); i++)
+		{						
+			// if the title of this doc is the same as the simulate doc title,
+			// break out of the loop
+			if (documentList.getItemText(i).equals(simulateDocTitle))
+			{				
+				isSimDocInDocList = true;
+				break;
+			}
+		}
+
+		// if simulate doc doesnt exist 
+		if (!isSimDocInDocList)
+		{
+			String side = null;
+			boolean left = false;
+			
+			// create a new locked doc and save it
+			if (documentsL.getTabBar().getTabCount() < maxTabsOnOneSide)
+			{
+				side = "left";
+				left = true;
+			}
+			else if (documentsR.getTabBar().getTabCount() < maxTabsOnOneSide)
+			{
+				side = "right";
+				left = false;
+			}
+			
+			setGenericObjects(left);
+			
+			createNewSimulateDoc(left);
+			
+			// save the document like normal
+			int ind = tabPanel.getTabBar().getSelectedTab();
+			DocSaver.saveDoc(this, simulateDoc, side, ind);
+		}
+		
+		// at this point our app has started and we have a simulate doc
+		// that will be shared by all the open clients
+		statusUpdate("Created new simulation doc: " + simulateDoc);
+		
 	}
 
+	/**
+	 * Called by onSuccess of DocLockedReader when shared simulateDoc can 
+	 * be edited by this client.
+	 */
+	protected void editSimulateDoc(LockedDocument doc, int index, String side)
+	{		
+		statusUpdate("EDITING");
+		
+		// eat for a random time (sleep and then add this client's id
+		// to the 'simulate' doc)
+		
+		// append this client's id to the current contents
+		doc.setContents(doc.getContents() + "\n Client: " + clientID);
+		
+		// save this doc
+		DocSaver.saveDoc(this, doc, side, index);	
+	}
+	
 	/**
 	 * Initialize the UI.
 	 */
@@ -617,8 +712,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	public void addTab(final String title, String content, boolean left) {
 		// are we dealing with a new doc?
-		final boolean isNewDoc = title.equals("Enter the document title.")
-				&& content.equals("Enter the document contents.");
+		final boolean isNewDoc = title.equals(defaultDocTitle)
+				&& content.equals(defaultDocContents);
 
 		// holds the title and the contents
 		VerticalPanel vp = new VerticalPanel();
@@ -636,7 +731,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// the document contents
 		final TextArea areaBox = new TextArea();
-		areaBox.setWidth("100%");
+		areaBox.setWidth("99%");
 		areaBox.setHeight("100%");
 		areaBox.setStyleName("documentTextBox");
 
@@ -747,7 +842,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	public void onClick(ClickEvent event) {
 		// pressed 'refresh document list' button
 		if (event.getSource().equals(refreshList))
-			lister.getDocumentList();
+			lister.getDocumentList(false);
 
 		// pressed 'new doc' button
 		else if (event.getSource().equals(createNew)) {
@@ -797,6 +892,9 @@ public class Collaborator extends Composite implements ClickHandler {
 		// if user selects a doc from the doc list
 		else if (event.getSource().equals(documentList))
 			docListHandler();
+		
+		else if (event.getSource().equals(simulateButton))
+			simulateButtonHandler();
 
 		// if user presses the simulate button
 		/*
@@ -809,8 +907,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * Behaves similarly to locking a document, except without a key/lock obj.
 	 */
 	private void createNewDocument(String side) {
-		LockedDocument ld = new LockedDocument(null, null, null,
-				"Enter the document title.", "Enter the document contents.");
+		LockedDocument ld = new LockedDocument(null, null, null, 
+				defaultDocTitle, defaultDocContents);
 
 		boolean left = false;
 
@@ -1036,6 +1134,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// which are taken care of in DocLocker
 		if (doc instanceof UnlockedDocument)
 			DocLocker.lockDoc(this, doc.getKey());
+		disableButton(lockButton);
 	}
 
 	/**
@@ -1120,31 +1219,77 @@ public class Collaborator extends Composite implements ClickHandler {
 	/**
 	 * Called when the user presses the simulate button.
 	 */
-	/*
-	 * private void simulateButtonHandler() { // create a new 'simulate' doc
-	 * that has all of the client id's. // this doc will be stored on the
-	 * server. UnlockedDocument simulateDoc = new UnlockedDocument();
-	 * 
-	 * // each client can view this doc // but cannot edit it manually (user
-	 * should not be able to type in the // doc; the client should add to the
-	 * doc automatically)
-	 * 
-	 * // SLEEPING
-	 * 
-	 * // sleep for the needed time try { this.wait((new
-	 * Random()).nextInt(MAX_SLEEP_TIME_IN_SEC) * 1000); } catch
-	 * (InterruptedException e) { // TODO Auto-generated catch block
-	 * e.printStackTrace(); }
-	 * 
-	 * // HUNGRY
-	 * 
-	 * // request the lock
-	 * 
-	 * // EATING
-	 * 
-	 * // eat for a random time (sleep and then add this client's id // to the
-	 * 'simulate' doc }
+	private void simulateButtonHandler() {
+		// we have a 'simulate' doc in our docList now
+
+		// TODO
+		
+		// SLEEPING
+
+		/*
+		 * Timer t = new Timer() {
+		 * 
+		 * @Override public void run() { // do nothing } };
+		 * t.schedule(SLEEP_TIME);
+		 */
+
+		// sleep for the needed time
+		/*
+		try {
+			this.wait((new Random()).nextInt(MAX_SLEEP_TIME_IN_SEC) * 1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
+
+		// HUNGRY
+
+		// BUG: simulateDoc is null
+		
+		statusUpdate("KEY: " + simulateDoc);
+		
+		// request the lock for the doc with the simulateDoc key
+		DocLocker.lockDoc(this, simulateDoc.getKey());
+
+		// EATING implemented in editSimulateDoc() since that gets called
+		// after the doc's lock is acuired
+	}
+	
+	/**
+	 * Creates a new simulation document, much like a nromal new doc.
+	 * @param left
 	 */
+	private void createNewSimulateDoc(boolean left)
+	{
+		simulateDoc = new LockedDocument(null, null, null, 
+				simulateDocTitle, simulateDocContents);
+
+		setGenericObjects(left);
+
+		docList.add(simulateDoc);
+		addTab(simulateDoc.getTitle(), simulateDoc.getContents(), left);
+		setTabText(simulateDoc.getTitle(), docList.size() - 1, side);
+		openLatestTab(side);
+
+		// when a new doc is opened, set the cursor to the title
+		TextBox title = titleList.get(titleList.size() - 1);
+		title.setCursorPos(title.getText().length());
+		title.setFocus(true);
+		title.selectAll();
+
+		// add save, refresh, and removeTab buttons
+		hPanel.clear();
+		hPanel.add(saveDocButton);
+		hPanel.add(refresh);
+		hPanel.add(removeTabButton);
+
+		enableButton(saveDocButton);
+		disableButton(refresh);
+		enableButton(removeTabButton);
+		disableButton(showButtonL);
+		disableButton(showButtonR);
+	}
 
 	/**
 	 * Returns true of key is in either of the lists, false otherwise.
@@ -1204,9 +1349,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		titleList.get(index).setValue(doc.getTitle());
 		contentsList.get(index).setValue(doc.getContents());
 
-		// title and contents cannot be edited
-		titleList.get(index).setEnabled(false);
-		contentsList.get(index).setEnabled(false);
+
 
 		// add lock, remove tab, and refresh buttons
 		hPanel.clear();
@@ -1215,11 +1358,19 @@ public class Collaborator extends Composite implements ClickHandler {
 			hPanel.add(lockButton);
 			enableButton(lockButton);
 			enableButton(refresh);
+			
+			// title and contents cannot be edited
+			titleList.get(index).setEnabled(false);
+			contentsList.get(index).setEnabled(false);
 
 		} else {
 			hPanel.add(saveDocButton);
 			enableButton(saveDocButton);
 			disableButton(refresh);
+			
+			// title and contents can now be edited
+			titleList.get(index).setEnabled(true);
+			contentsList.get(index).setEnabled(true);
 		}
 		
 		hPanel.add(refresh);
@@ -1272,8 +1423,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * @param index
 	 * @param side2
 	 */
-	public void setDoc(LockedDocument result, int index, String side2) {
-		// TODO Auto-generated method stub
-
-	}
+//	public void setDoc(LockedDocument result, int index, String side2) {
+//		// TODO Auto-generated method stub
+//
+//	}
 }
