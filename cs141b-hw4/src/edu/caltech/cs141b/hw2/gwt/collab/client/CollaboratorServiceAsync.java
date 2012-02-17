@@ -13,7 +13,6 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  */
 public interface CollaboratorServiceAsync {
 
-	
 	void login(String clientID, AsyncCallback<String> callback);
 	
 	void getDocumentList(AsyncCallback<List<DocumentMetadata>> callback);
@@ -33,6 +32,9 @@ public interface CollaboratorServiceAsync {
 			AsyncCallback<LockedDocument> callback);
 
 	void leaveLockQueue(String clientID, String documentKey,
+			AsyncCallback<Void> callback);
+	
+	void cleanLock(String documentKey,
 			AsyncCallback<Void> callback);
 
 }

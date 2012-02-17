@@ -90,4 +90,6 @@ public interface CollaboratorService extends RemoteService {
 	 */
 	void leaveLockQueue(String clientID, String documentKey);
 
+	void cleanLock(String documentKey);
+
 }

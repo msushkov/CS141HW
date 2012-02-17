@@ -71,6 +71,17 @@ public class Collaborator extends Composite implements ClickHandler {
 	private int eatTimeMin = 4000;
 	private int eatTimeMax = 6000;
 	private int simulationWwaitTimeUntilLockReq = 1000;
+	private int lockTime = 35 * 1000;
+
+	private void clearLock(final String docKey) {
+		Timer cleanLocksTimer = new Timer() {
+			public void run() {
+				releaser.cleanLock(docKey);
+			}
+		};
+		cleanLocksTimer.schedule(lockTime);
+	}
+
 	
 	// Keeps track of the shared simulation document.
 	protected LockedDocument simulateDoc;
@@ -148,7 +159,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	VerticalPanel rightPanel = new VerticalPanel();
 	HorizontalPanel leftHPanel = new HorizontalPanel();
 	HorizontalPanel rightHPanel = new HorizontalPanel();
-	
+
 	// buttons under the doc list
 	HorizontalPanel docListButtonPanel = new HorizontalPanel();
 
@@ -289,10 +300,14 @@ public class Collaborator extends Composite implements ClickHandler {
 							}
 
 						}
+						
 
 						if (tabId != NOT_IN_TAB) {
 							statusUpdate("LOCKED READER");
 							DocLockedReader.getLockedDoc(hacksAreLol, key, side, tabId);
+							
+							// Add a timer to report back to server after the time has expired.
+							clearLock(key);
 						} else {
 							statusUpdate("ZOMG YOU GOT A LOCK BUT YOU CLOSED THE DOC YE FOOL!");
 						}
@@ -864,7 +879,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// if user presses the simulate button
 		else if (event.getSource().equals(simulateButton))
 			simulateButtonHandler();
-		
+
 		// if user presses the stop simulate button
 		else if (event.getSource().equals(stopSimulateButton))
 			stopSimulateButtonHandler();
@@ -924,7 +939,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			last = documentsR.getTabBar().getTabCount() - 1;
 			documentsR.getTabBar().selectTab(last);
 		}
-		
+
 		// Record the tab number if the simulation is running
 		if (simulation) {
 			simulationTab = last;
@@ -1218,7 +1233,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// correct lock doc button for our simulate doc
 		delayProblemTimer.schedule(simulationWwaitTimeUntilLockReq);
 	}
-		
+
 	/**
 	 * Called at the end of the hungry phase - after the client waits for 
 	 * simulationWwaitTimeUntilLockReq time, request the lock for the simulation doc.
@@ -1294,7 +1309,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	private void stopSimulateButtonHandler() {
 		// Terminate simulation
 		simulation = false;
-		
+
 		// Replace stop simulate button with the simulate button
 		docListButtonPanel.remove(stopSimulateButton);
 		docListButtonPanel.add(simulateButton);
@@ -1302,18 +1317,18 @@ public class Collaborator extends Composite implements ClickHandler {
 		// TODO
 		// refresh the page? so that things go back to normal after simulation is done
 	}
-	
+
 	/**
 	 * Called when the user presses the simulate button.
 	 */
 	private void simulateButtonHandler() {
 		// Start the simulation
 		simulation = true;
-		
+
 		// Replace simulate button with stop simulate button
 		docListButtonPanel.remove(simulateButton);
 		docListButtonPanel.add(stopSimulateButton);
-		
+
 		// the user cannot do anything while the simulation runs
 		lockDownUI();
 
@@ -1324,7 +1339,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	
 	// END SIMULATION METHODS
 	// ===================================================================
-	
+
+
 	/**
 	 * Returns true of key is in either of the lists, false otherwise.
 	 * 

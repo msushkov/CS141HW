@@ -31,7 +31,7 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  */
 @SuppressWarnings("serial")
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
-		CollaboratorService {
+CollaboratorService {
 
 	/*
 	 * private static final String QUEUE_MAP = "queue_map"; private static final
@@ -52,6 +52,46 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		tokenMap = Collections.synchronizedMap(new HashMap<String, String>());
 	}
 
+	// Cleans lock for an individual document
+	public void cleanLock(String docKey) {
+		int notInList = -1;
+		int docIndex = lockedDocuments.indexOf(docKey);
+		if (docIndex != notInList) {
+			System.out.println("Checking individual lock for " + docKey);
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			Transaction t = pm.currentTransaction();
+			try {
+				// Starting transaction...
+				t.begin();
+
+				// Create the key
+				Key key = KeyFactory.stringToKey(docKey);
+
+				// Get the document from the Datastore
+				Document doc = pm.getObjectById(Document.class, key);
+
+				// If the doc is locked and the lock expired
+				if (doc.isLocked()
+						&& doc.getLockedUntil().before(
+								new Date(System.currentTimeMillis()))) {
+					String previousClient = tokenMap.get(docKey);
+					server.receiveToken(previousClient, docKey);
+					System.out.println("Lock cleaned for document with key " + docKey);
+				}
+
+			} finally {
+				// Do some cleanup
+				if (t.isActive()) {
+					t.rollback();
+				}
+				pm.close();
+			}
+
+		}
+	}
+
+
+	// Cleans locks for all currently locked documents
 	public static void cleanLocks() {
 		// Clean up documents if there are document currently locked
 		if (!lockedDocuments.isEmpty()) {
@@ -453,6 +493,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	@Override
 	public void lockDocument(String clientID, String documentKey) {
+
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
 
