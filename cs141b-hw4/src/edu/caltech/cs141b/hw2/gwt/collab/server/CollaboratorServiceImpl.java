@@ -185,17 +185,17 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 		Transaction t = pm.currentTransaction();
 		try {
-			
-
 			// If the doc has no key, it's a new document, so create a new
 			// document
+
+			// Starting transaction...
+			t.begin();
+
 			if (stringKey == null) {
 				// First unlock it
 				toSave = new Document(doc.unlock());
 			} else {
-				// Starting transaction...
-				t.begin();
-				
+
 				// Create the key
 				Key key = KeyFactory.stringToKey(stringKey);
 
@@ -218,20 +218,21 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					// If both are fulfilled, update and unlock the doc
 					toSave.update(doc);
 					toSave.unlock();
-					
+
 				} else {
 					// Otherwise, throw an exception
 					throw new LockExpired();
 				}
-				
-				// Now write the results to Datastore
-				pm.makePersistent(toSave);
-				
-				// ...Ending transaction
-				t.commit();
-				
-				receiveToken(clientID, stringKey);
 			}
+
+			// Now write the results to Datastore
+			pm.makePersistent(toSave);
+
+			// ...Ending transaction
+			t.commit();
+
+			// Now, take the token back
+			receiveToken(clientID, stringKey);
 
 			// Return the unlocked document
 			return toSave.getUnlockedDoc();
