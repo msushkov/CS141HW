@@ -453,10 +453,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	@Override
 	public void lockDocument(String clientID, String documentKey) {
-		/*
-		 * Map<String, String> tokenMap = (Map<String, String>)
-		 * getThreadLocalRequest() .getAttribute(TOKEN_MAP);
-		 */
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
 
@@ -468,15 +464,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			sendToken(clientID, documentKey);
 		else
 			addToDocQueue(clientID, documentKey);
-
-		/*
-		 * for (Entry<String, List<String>> e : queueMap.entrySet()) {
-		 * System.out.println(e.getKey()); for (String s : e.getValue()) {
-		 * System.out.println(s); } }
-		 * 
-		 * for (Entry<String, String> e : tokenMap.entrySet()) {
-		 * System.out.println(e.getKey() + ": " + e.getValue()); }
-		 */
 	}
 
 	@Override
