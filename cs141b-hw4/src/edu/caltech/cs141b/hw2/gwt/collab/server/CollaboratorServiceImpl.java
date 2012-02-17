@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -42,7 +41,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	private static final int LOCK_TIME = 30;
 	private static Map<String, List<String>> queueMap;
 	private static Map<String, String> tokenMap;
-	private Map<String, Timer> timerMap;
 
 	private static ArrayList<String> lockedDocuments = new ArrayList<String>();
 
@@ -52,7 +50,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		queueMap = Collections
 				.synchronizedMap(new HashMap<String, List<String>>());
 		tokenMap = Collections.synchronizedMap(new HashMap<String, String>());
-		timerMap = Collections.synchronizedMap(new HashMap<String, Timer>());
 	}
 
 	public static void cleanLocks() {
@@ -96,22 +93,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					}
 					pm.close();
 				}
-
 			}
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			Transaction t = pm.currentTransaction();
 
-			try {
-				t.begin();
-				for (String docKey : toClear) {
-					String previousClient = tokenMap.get(docKey);
-					server.receiveToken(previousClient, docKey);
-				}
-			} finally {
-				if (t.isActive()) {
-					t.rollback();
-				}
-				pm.close();
+			for (String docKey : toClear) {
+				String previousClient = tokenMap.get(docKey);
+				server.receiveToken(previousClient, docKey);
 			}
 		}
 
@@ -199,15 +185,17 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 		Transaction t = pm.currentTransaction();
 		try {
+			// If the doc has no key, it's a new document, so create a new
+			// document
+
 			// Starting transaction...
 			t.begin();
 
-			// If the doc has no key, it's a new document, so create a new
-			// document
 			if (stringKey == null) {
 				// First unlock it
 				toSave = new Document(doc.unlock());
 			} else {
+
 				// Create the key
 				Key key = KeyFactory.stringToKey(stringKey);
 
@@ -231,19 +219,20 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					toSave.update(doc);
 					toSave.unlock();
 
-					// Now write the results to Datastore
-					pm.makePersistent(toSave);
-					t.commit();
-					receiveToken(clientID, stringKey);
 				} else {
 					// Otherwise, throw an exception
 					throw new LockExpired();
 				}
-				// ...Ending transaction
-				// t.commit();
-				toSave = pm.getObjectById(Document.class, key);
-				System.out.println("Locked at end?" + toSave.isLocked());
 			}
+
+			// Now write the results to Datastore
+			pm.makePersistent(toSave);
+
+			// ...Ending transaction
+			t.commit();
+
+			// Now, take the token back
+			receiveToken(clientID, stringKey);
 
 			// Return the unlocked document
 			return toSave.getUnlockedDoc();
@@ -263,7 +252,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * @param clientID
 	 * @param docKey
 	 */
-	@SuppressWarnings("unchecked")
 	private void receiveToken(String clientID, String docKey) {
 		/*
 		 * Map<String, String> tokenMap = (Map<String, String>)
@@ -271,9 +259,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		 * timerMap = (Map<String, Thread>) getThreadLocalRequest()
 		 * .getAttribute(TIMER_MAP);
 		 */
-
-		// Stop the lock timer.
-		// timerMap.get(docKey).cancel();
 
 		// Return the token
 		tokenMap.put(docKey, "server");
@@ -293,7 +278,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void sendToken(final String clientID, final String docKey) {
 		// Fetch and create the necessary maps
 		/*
@@ -336,9 +320,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			t.commit();
 		} finally {
 			// Do some cleanup
-			/*
-			 * if (t.isActive()) { t.rollback(); }
-			 */
+			if (t.isActive()) {
+				t.rollback();
+			}
+
 			pm.close();
 		}
 
@@ -387,15 +372,16 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				// And store it in the Datastore
 				pm.makePersistent(toSave);
 
-				// ...Ending transaction
-				t.commit();
-
-				// Indicate that the token has been returned
-				receiveToken(clientID, doc.getKey());
 			} else {
 				// Otherwise, throw an exception
 				throw new LockExpired("You no longer have the lock");
 			}
+
+			// ...Ending transaction
+			t.commit();
+
+			// Indicate that the token has been returned
+			receiveToken(clientID, doc.getKey());
 
 		} finally {
 			// Do some cleanup
@@ -406,7 +392,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void addToDocQueue(String clientID, String documentKey) {
 		/*
 		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
@@ -431,7 +416,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * @param documentKey
 	 * @return a client ID of the next client waiting on this doc
 	 */
-	@SuppressWarnings("unchecked")
 	private String pollNextClient(String documentKey) {
 		/*
 		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
@@ -446,7 +430,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean removeClient(String clientID, String documentKey) {
 		/*
 		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
@@ -468,13 +451,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#lockDocument
 	 * (java.lang.String)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void lockDocument(String clientID, String documentKey) {
-		/*
-		 * Map<String, String> tokenMap = (Map<String, String>)
-		 * getThreadLocalRequest() .getAttribute(TOKEN_MAP);
-		 */
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
 
@@ -486,15 +464,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			sendToken(clientID, documentKey);
 		else
 			addToDocQueue(clientID, documentKey);
-
-		/*
-		 * for (Entry<String, List<String>> e : queueMap.entrySet()) {
-		 * System.out.println(e.getKey()); for (String s : e.getValue()) {
-		 * System.out.println(s); } }
-		 * 
-		 * for (Entry<String, String> e : tokenMap.entrySet()) {
-		 * System.out.println(e.getKey() + ": " + e.getValue()); }
-		 */
 	}
 
 	@Override
