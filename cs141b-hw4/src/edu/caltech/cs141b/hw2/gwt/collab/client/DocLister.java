@@ -72,13 +72,6 @@ public class DocLister implements AsyncCallback<List<DocumentMetadata>> {
 
 		// we can press the refresh button again
 		collaborator.refreshDoc.setEnabled(true);
-		
-		// if we are adding a simulation document
-		if (this.simulation)
-		{
-			collaborator.statusUpdate("SIMULATION");
-			collaborator.addSimulateDoc();
-		}
 	}
 
 }
