@@ -317,10 +317,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 		Document toSave;
 		Date endTime;
-		// Transaction t = pm.currentTransaction();
+
+		Transaction t = pm.currentTransaction();
 		try {
 			// Starting transaction...
-			// t.begin();
+			t.begin();
 			// Create the key
 			Key key = KeyFactory.stringToKey(docKey);
 
@@ -332,7 +333,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			pm.makePersistent(toSave);
 
-			// t.commit();
+			t.commit();
 		} finally {
 			// Do some cleanup
 			/*
