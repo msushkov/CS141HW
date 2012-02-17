@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -39,10 +38,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * String TOKEN_MAP = "token_map"; private static final String TIMER_MAP =
 	 * "timer_map";
 	 */
-	private static final int LOCK_TIME = 300;
+	private static final int LOCK_TIME = 30;
 	private static Map<String, List<String>> queueMap;
 	private static Map<String, String> tokenMap;
-	private Map<String, Timer> timerMap;
 
 	private static ArrayList<String> lockedDocuments = new ArrayList<String>();
 
@@ -52,7 +50,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		queueMap = Collections
 				.synchronizedMap(new HashMap<String, List<String>>());
 		tokenMap = Collections.synchronizedMap(new HashMap<String, String>());
-		timerMap = Collections.synchronizedMap(new HashMap<String, Timer>());
 	}
 
 	public static void cleanLocks() {
@@ -98,20 +95,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				}
 
 			}
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			Transaction t = pm.currentTransaction();
 
-			try {
-				t.begin();
-				for (String docKey : toClear) {
-					String previousClient = tokenMap.get(docKey);
-					server.receiveToken(previousClient, docKey);
-				}
-			} finally {
-				if (t.isActive()) {
-					t.rollback();
-				}
-				pm.close();
+			for (String docKey : toClear) {
+				String previousClient = tokenMap.get(docKey);
+				server.receiveToken(previousClient, docKey);
 			}
 		}
 
@@ -263,7 +250,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * @param clientID
 	 * @param docKey
 	 */
-	@SuppressWarnings("unchecked")
 	private void receiveToken(String clientID, String docKey) {
 		/*
 		 * Map<String, String> tokenMap = (Map<String, String>)
@@ -293,7 +279,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void sendToken(final String clientID, final String docKey) {
 		// Fetch and create the necessary maps
 		/*
@@ -406,7 +391,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void addToDocQueue(String clientID, String documentKey) {
 		/*
 		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
@@ -431,7 +415,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * @param documentKey
 	 * @return a client ID of the next client waiting on this doc
 	 */
-	@SuppressWarnings("unchecked")
 	private String pollNextClient(String documentKey) {
 		/*
 		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
@@ -446,7 +429,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean removeClient(String clientID, String documentKey) {
 		/*
 		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
@@ -468,7 +450,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#lockDocument
 	 * (java.lang.String)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void lockDocument(String clientID, String documentKey) {
 		/*
