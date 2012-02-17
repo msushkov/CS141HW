@@ -47,5 +47,9 @@ public class DocReleaser implements AsyncCallback<Void> {
 		// Do nothing...
 	}
 	
+	public void cleanLock(String docKey) {
+		collaborator.collabService.cleanLock(docKey, this);
+	}
+	
 }
 

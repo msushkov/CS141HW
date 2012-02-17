@@ -74,13 +74,24 @@ public class Collaborator extends Composite implements ClickHandler {
 	private int thinkTimeMax = 5000;
 	private int eatTimeMin = 4000;
 	private int eatTimeMax = 6000;
+	private int lockTime = 35 * 1000;
+
+	private void clearLock(final String docKey) {
+		Timer cleanLocksTimer = new Timer() {
+			public void run() {
+				releaser.cleanLock(docKey);
+			}
+		};
+		cleanLocksTimer.schedule(lockTime);
+	}
+
 	
 	private Timer thinkingTimer = new Timer() {
 		public void run() {
 			simulateHungry();
 		}
 	};
-	
+
 	private Timer eatingTimer = new Timer() {
 		public void run() {
 			editSimulateDoc();
@@ -135,7 +146,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	VerticalPanel rightPanel = new VerticalPanel();
 	HorizontalPanel leftHPanel = new HorizontalPanel();
 	HorizontalPanel rightHPanel = new HorizontalPanel();
-	
+
 	// buttons under the doc list
 	HorizontalPanel docListButtonPanel = new HorizontalPanel();
 
@@ -278,10 +289,14 @@ public class Collaborator extends Composite implements ClickHandler {
 							}
 
 						}
+						
 
 						if (tabId != NOT_IN_TAB) {
 							statusUpdate("LOCKED READER");
 							DocLockedReader.getLockedDoc(hacksAreLol, key, side, tabId);
+							
+							// Add a timer to report back to server after the time has expired.
+							clearLock(key);
 						} else {
 							statusUpdate("ZOMG YOU GOT A LOCK BUT YOU CLOSED THE DOC YE FOOL!");
 						}
@@ -853,7 +868,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// if user presses the simulate button
 		else if (event.getSource().equals(simulateButton))
 			simulateButtonHandler();
-		
+
 		// if user presses the stop simulate button
 		else if (event.getSource().equals(stopSimulateButton))
 			stopSimulateButtonHandler();
@@ -913,7 +928,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			last = documentsR.getTabBar().getTabCount() - 1;
 			documentsR.getTabBar().selectTab(last);
 		}
-		
+
 		// Record the tab number if the simulation is running
 		if (simulation) {
 			simulationTab = last;
@@ -1193,24 +1208,21 @@ public class Collaborator extends Composite implements ClickHandler {
 		showDocumentButtonHandler(simulateLeft);
 
 		delayProblemTimer.schedule(1000);
-		
+
 	}
-	
+
 	private void simulateHungryLock() {
 		lockDocumentButtonHandler(simulateLeft);
 	}
 
-	private void simulateThinking() {
-		// TODO simulating thinking
-	}
 
 	public void simulateEating(LockedDocument doc, int index, String side) {
 		simulateDoc = doc;
 		simulationTab = index;
 		simulationSide = side;
-		
+
 		int eatTime = eatTimeMin + com.google.gwt.user.client.Random.nextInt(eatTimeMax - eatTimeMin);
-		
+
 		// Wait random time to eat
 
 		eatingTimer.schedule(eatTime);
@@ -1221,29 +1233,29 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * Called when the user presses the stop simulate button.
 	 */
 	private void stopSimulateButtonHandler() {
-		
+
 		// Terminate simulation
 		simulation = false;
-		
+
 		// Replace stop simulate button with the simulate button
 		docListButtonPanel.remove(stopSimulateButton);
 		docListButtonPanel.add(simulateButton);
 
-		
+
 	}
-	
-	
+
+
 	/**
 	 * Called when the user presses the simulate button.
 	 */
 	private void simulateButtonHandler() {
 		simulation = true;
-		
+
 		// Replace simulate button with stop simulate button
 		docListButtonPanel.remove(simulateButton);
 		docListButtonPanel.add(stopSimulateButton);
 
-		
+
 		lockDownUI();
 
 
@@ -1304,22 +1316,22 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// save this doc
 		DocSaver.saveDoc(this, simulateDoc, simulationSide, simulationTab);
-		
-		
+
+
 		// Simulation still running? If so start thinking again.
 		if (simulation) {
 			int thinkTime = thinkTimeMin + com.google.gwt.user.client.Random.nextInt(thinkTimeMax - thinkTimeMin);
 			thinkingTimer.schedule(thinkTime);
 		}
 	}
-	
-	
+
+
 	protected void saveSimulateDoc(LockedDocument doc, int index, String side)
 	{		
 		// eat for a random time (sleep and then add this client's id	
 	}
-	
-	
+
+
 
 	/**
 	 * Returns true of key is in either of the lists, false otherwise.

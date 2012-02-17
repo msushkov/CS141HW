@@ -34,6 +34,9 @@ public interface CollaboratorServiceAsync {
 
 	void leaveLockQueue(String clientID, String documentKey,
 			AsyncCallback<Void> callback);
+	
+	void cleanLock(String documentKey,
+			AsyncCallback<Void> callback);
 
 }
 
