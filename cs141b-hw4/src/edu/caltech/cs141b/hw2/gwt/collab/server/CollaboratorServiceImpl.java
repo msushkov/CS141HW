@@ -93,7 +93,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					}
 					pm.close();
 				}
-
 			}
 
 			for (String docKey : toClear) {
@@ -186,8 +185,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 		Transaction t = pm.currentTransaction();
 		try {
-			// Starting transaction...
-			t.begin();
+			
 
 			// If the doc has no key, it's a new document, so create a new
 			// document
@@ -195,6 +193,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				// First unlock it
 				toSave = new Document(doc.unlock());
 			} else {
+				// Starting transaction...
+				t.begin();
+				
 				// Create the key
 				Key key = KeyFactory.stringToKey(stringKey);
 
@@ -217,19 +218,19 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					// If both are fulfilled, update and unlock the doc
 					toSave.update(doc);
 					toSave.unlock();
-
-					// Now write the results to Datastore
-					pm.makePersistent(toSave);
-					t.commit();
-					receiveToken(clientID, stringKey);
+					
 				} else {
 					// Otherwise, throw an exception
 					throw new LockExpired();
 				}
+				
+				// Now write the results to Datastore
+				pm.makePersistent(toSave);
+				
 				// ...Ending transaction
-				// t.commit();
-				toSave = pm.getObjectById(Document.class, key);
-				System.out.println("Locked at end?" + toSave.isLocked());
+				t.commit();
+				
+				receiveToken(clientID, stringKey);
 			}
 
 			// Return the unlocked document
