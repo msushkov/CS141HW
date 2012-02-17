@@ -39,7 +39,7 @@ CollaboratorService {
 	 * String TOKEN_MAP = "token_map"; private static final String TIMER_MAP =
 	 * "timer_map";
 	 */
-	private static final int LOCK_TIME = 30;
+	private static final int LOCK_TIME = 300;
 	private static Map<String, List<String>> queueMap;
 	private static Map<String, String> tokenMap;
 	private Map<String, Timer> timerMap;
@@ -225,19 +225,24 @@ public UnlockedDocument saveDocument(String clientID, LockedDocument doc)
 				toSave.update(doc);
 				toSave.unlock();
 
+				// Now write the results to Datastore
+				pm.makePersistent(toSave);
+				t.commit();
 				receiveToken(clientID, stringKey);
 			} else {
 				// Otherwise, throw an exception
 				throw new LockExpired();
 			}
+			// ...Ending transaction
+			//t.commit();
+			toSave = pm.getObjectById(Document.class, key);
+			System.out.println("Locked at end?" + toSave.isLocked());
 		}
 
-		// Now write the results to Datastore
-		pm.makePersistent(toSave);
+		
 
-		// ...Ending transaction
-		t.commit();
-
+		
+		
 		// Return the unlocked document
 
 		/*
@@ -273,7 +278,7 @@ private void receiveToken(String clientID, String docKey) {
 
 	// Stop the lock timer.
 	// timerMap.get(docKey).cancel();
-
+	
 	// Return the token
 	tokenMap.put(docKey, "server");
 	
@@ -293,7 +298,7 @@ private void receiveToken(String clientID, String docKey) {
 }
 
 @SuppressWarnings("unchecked")
-private void sendToken(final String clientID, final String docKey) {
+private void sendToken(String clientID, String docKey) {
 	// Fetch and create the necessary maps
 	/*
 	 * Map<String, String> tokenMap = (Map<String, String>)
@@ -326,6 +331,7 @@ private void sendToken(final String clientID, final String docKey) {
 		// Get the document corresponding to the key
 		toSave = pm.getObjectById(Document.class, key);
 		endTime = new Date(System.currentTimeMillis() + LOCK_TIME * 1000);
+		System.out.println("Giving lock to " + clientID);
 		toSave.lock(endTime, clientID);
 
 		pm.makePersistent(toSave);
@@ -415,6 +421,9 @@ public void releaseLock(String clientID, LockedDocument doc)
 			// And store it in the Datastore
 			pm.makePersistent(toSave);
 
+			// ...Ending transaction
+			t.commit();
+			
 			// Indicate that the token has been returned
 			receiveToken(clientID, doc.getKey());
 		} else {
@@ -422,8 +431,8 @@ public void releaseLock(String clientID, LockedDocument doc)
 			throw new LockExpired("You no longer have the lock");
 		}
 
-		// ...Ending transaction
-		t.commit();
+		
+		
 	} finally {
 		// Do some cleanup
 		if (t.isActive()) {
@@ -556,6 +565,8 @@ public LockedDocument getLockedDocument(String clientID, String documentKey)
 
 		String identity = clientID;// getThreadLocalRequest().getRemoteAddr();
 
+		System.out.println("The doc lock is " + toSave.isLocked());
+		
 		// If the doc is locked and you own it...
 		if (!toSave.isLocked()
 				|| !toSave.getLockedBy().equals(identity)
