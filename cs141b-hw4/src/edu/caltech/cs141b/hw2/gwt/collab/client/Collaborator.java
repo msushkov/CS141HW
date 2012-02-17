@@ -245,6 +245,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	
 						}
 						if (tabId != NOT_IN_TAB) {
+							statusUpdate("LOCKED READER");
 							DocLockedReader.getLockedDoc(hacksAreLol, key, side, tabId);
 						} else {
 							statusUpdate("ZOMG YOU GOT A LOCK BUT YOU CLOSED THE DOC YE FOOL!");
