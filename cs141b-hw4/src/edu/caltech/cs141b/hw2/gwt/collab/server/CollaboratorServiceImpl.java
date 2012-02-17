@@ -39,7 +39,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * String TOKEN_MAP = "token_map"; private static final String TIMER_MAP =
 	 * "timer_map";
 	 */
-	private static final int LOCK_TIME = 300;
+	private static final int LOCK_TIME = 30;
 	private static Map<String, List<String>> queueMap;
 	private static Map<String, String> tokenMap;
 	private Map<String, Timer> timerMap;

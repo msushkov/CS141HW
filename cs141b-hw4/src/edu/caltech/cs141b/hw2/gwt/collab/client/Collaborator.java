@@ -42,10 +42,11 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 public class Collaborator extends Composite implements ClickHandler {
 
 	private Collaborator hacksAreLol = this;
-	
+
 	private static final int CLIENT_ID_LEN = 16;
 	private int MAX_SLEEP_TIME_IN_SEC = 4;
 	private int MAX_EAT_TIME_IN_SEC = 4;
+	private static final int numSimulationSteps = 10;
 	private static final String POSS_LOGIN_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
 
 	final private static int maxTabTextLen = 13;
@@ -55,11 +56,11 @@ public class Collaborator extends Composite implements ClickHandler {
 	final private int maxContentsLength = 10000;
 	final private int maxListItems = 15;
 	final private int NOT_IN_TAB = -1;
-	
+
 	final private String defaultDocTitle = "Enter the document title.";
 	final private String defaultDocContents = "Enter the document contents.";	
 	final protected String simulateDocTitle = "Simulation Document.";
-	final protected String simulateDocContents = "Client IDs:";
+	final protected String simulateDocContents = "Client IDs:\n";
 	final private String disabledCSS = "Disabled";
 
 	protected CollaboratorServiceAsync collabService;
@@ -121,7 +122,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected String side = null;
 
 	protected LockedDocument simulateDoc;
-	
+
 	// Status tracking.
 	private VerticalPanel statusArea = new VerticalPanel();
 
@@ -193,7 +194,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			@Override
 			public void onSuccess(String result) {
 				loginComplete(result);
-				
+
 				// this call is now made in loginComplete()
 				//lister.getDocumentList();
 			}
@@ -220,9 +221,7 @@ public class Collaborator extends Composite implements ClickHandler {
 						// Setting side to left per default
 						String side = "left";
 						int tabId = NOT_IN_TAB;
-						
-						statusUpdate("MESSAGE RECD");
-						
+
 						// Remove whitespace characters to help identify equality
 						key = key.trim();
 						for (int i = 0; i < documentsLeftList.size(); i++) {
@@ -231,8 +230,7 @@ public class Collaborator extends Composite implements ClickHandler {
 								break;
 							}
 						}
-						
-						
+
 						// If still not found look at the right documents
 						if (tabId == NOT_IN_TAB) {
 							for (int i = 0; i < documentsRightList.size(); i++) {
@@ -242,8 +240,9 @@ public class Collaborator extends Composite implements ClickHandler {
 									break;
 								}
 							}
-	
+
 						}
+
 						if (tabId != NOT_IN_TAB) {
 							statusUpdate("LOCKED READER");
 							DocLockedReader.getLockedDoc(hacksAreLol, key, side, tabId);
@@ -251,7 +250,6 @@ public class Collaborator extends Composite implements ClickHandler {
 							statusUpdate("ZOMG YOU GOT A LOCK BUT YOU CLOSED THE DOC YE FOOL!");
 						}
 
-						
 						System.out.println("message " + key);
 					}
 
@@ -268,9 +266,9 @@ public class Collaborator extends Composite implements ClickHandler {
 				});
 			}
 		});
-	
+
 	}
-	
+
 	/**
 	 * Initialize the UI.
 	 */
@@ -812,7 +810,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// if user selects a doc from the doc list
 		else if (event.getSource().equals(documentList))
 			docListHandler();
-		
+
 		// if user presses the simulate button
 		else if (event.getSource().equals(simulateButton))
 			simulateButtonHandler();
@@ -1002,7 +1000,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			// if title and contents have not been changed, no need to save
 			if (doc.getTitle().equals(titleList.get(ind).getValue())
 					&& doc.getContents()
-							.equals(contentsList.get(ind).getText()))
+					.equals(contentsList.get(ind).getText()))
 				statusUpdate("No document changes; not saving.");
 
 			// otherwise if stuff was changed, save
@@ -1134,57 +1132,60 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * Called when the user presses the simulate button.
 	 */
 	private void simulateButtonHandler() {
-		// take the first item in our docList and designate it 
-		// to be the shared doc. if the list is empty, print error msg
-		if (documentList.getItemCount() > 0)
+		int i = 0;
+		while (i < numSimulationSteps)
 		{
-			// TODO
-			
-			// SLEEPING
+			// take the first item in our docList and designate it 
+			// to be the shared doc. if the list is empty, print error msg
+			if (documentList.getItemCount() > 0)
+			{
+				// TODO
 
-			/*
-			 * Timer t = new Timer() {
-			 * 
-			 * @Override public void run() { // do nothing } };
-			 * t.schedule(SLEEP_TIME);
-			 */
+				// SLEEPING
 
-			// sleep for the needed time
-			/*
+				/*
+				 * Timer t = new Timer() {
+				 * 
+				 * @Override public void run() { // do nothing } };
+				 * t.schedule(SLEEP_TIME);
+				 */
+
+				// sleep for the needed time
+				/*
 			try {
 				this.wait((new Random()).nextInt(MAX_SLEEP_TIME_IN_SEC) * 1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			*/
+				 */
 
-			// HUNGRY
-			
-			boolean left = false;
-			
-			// open the first document in a tab
-			documentList.setSelectedIndex(0);
-			if (documentsL.getTabBar().getTabCount() < maxTabsOnOneSide)
-				left = true;
-			else if (documentsR.getTabBar().getTabCount() < maxTabsOnOneSide)
-				left = false;
+				// HUNGRY
+
+				boolean left = false;
+
+				// open the first document in a tab
+				documentList.setItemText(0, simulateDocTitle);
+				documentList.setSelectedIndex(0);
+
+				if (documentsL.getTabBar().getTabCount() < maxTabsOnOneSide)
+					left = true;
+				else if (documentsR.getTabBar().getTabCount() < maxTabsOnOneSide)
+					left = false;
+				else
+					statusUpdate("Tabs panels are full...");
+
+				showDocumentButtonHandler(left);
+
+				// request the lock for the first doc in the list
+				lockDocumentButtonHandler(left);
+
+				// EATING implemented in editSimulateDoc() since that gets called
+				// after the doc's lock is acquired
+			}
 			else
-				statusUpdate("Tabs panels are full...");
-			
-			showDocumentButtonHandler(left);
-			
-			statusUpdate("HELLO");
-			
-			// request the lock for the first doc in the list
-			//DocLocker.lockDoc(this, documentList.getValue(0));
-			lockDocumentButtonHandler(left);
-			
-			// EATING implemented in editSimulateDoc() since that gets called
-			// after the doc's lock is acquired
+				statusUpdate("ERROR: Create a doc first!");
 		}
-		else
-			statusUpdate("ERROR: Create a doc first!");
 	}	
 
 	/**
@@ -1193,16 +1194,12 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	protected void editSimulateDoc(LockedDocument doc, int index, String side)
 	{		
-		statusUpdate("EDITING");
-		
 		// eat for a random time (sleep and then add this client's id
 		// to the 'simulate' doc)
-		
-		// append this client's id to the current contents
-		statusUpdate("CONTENTS: " + doc.getContents());
-		
+
+		// append the client id to the doc
 		doc.setContents(doc.getContents() + "\n Client: " + clientID);
-		
+
 		// save this doc
 		DocSaver.saveDoc(this, doc, side, index);	
 	}
@@ -1238,7 +1235,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		return contains;
 	}
-	
+
 
 	/**
 	 * Generalized so that it can be called elsewhere. In particular, after a
@@ -1268,12 +1265,12 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// add lock, remove tab, and refresh buttons
 		hPanel.clear();
-		
+
 		if (doc instanceof UnlockedDocument) {
 			hPanel.add(lockButton);
 			enableButton(lockButton);
 			enableButton(refresh);
-			
+
 			// title and contents cannot be edited
 			titleList.get(index).setEnabled(false);
 			contentsList.get(index).setEnabled(false);
@@ -1282,18 +1279,18 @@ public class Collaborator extends Composite implements ClickHandler {
 			hPanel.add(saveDocButton);
 			enableButton(saveDocButton);
 			disableButton(refresh);
-			
+
 			// title and contents can now be edited
 			titleList.get(index).setEnabled(true);
 			contentsList.get(index).setEnabled(true);
 		}
-		
+
 		hPanel.add(refresh);
 		hPanel.add(removeTabButton);
-		
+
 		// enable lock, refreshDoc, and removeTab buttons
 	}
-	
+
 
 	/**
 	 * Enables the given button and removes the disabledCSS string part of the
@@ -1313,7 +1310,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			b.setStylePrimaryName(curClass);
 		}
 	}
-	
+
 
 	/**
 	 * Disables the given button and adds the disabledCSS string to the current
@@ -1333,7 +1330,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 	}
 
-	
+
 	/**
 	 * Called by docLockedReader (onSuccess).
 	 * 
@@ -1341,8 +1338,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * @param index
 	 * @param side2
 	 */
-//	public void setDoc(LockedDocument result, int index, String side2) {
-//		// TODO Auto-generated method stub
-//
-//	}
+	//	public void setDoc(LockedDocument result, int index, String side2) {
+	//		// TODO Auto-generated method stub
+	//
+	//	}
 }
