@@ -281,6 +281,10 @@ textarea {
     background:transparent url(Simulate.png) no-repeat center top;
 }
 
+.stopSimulateButton {
+    background:transparent url(StopSimulate.png) no-repeat center top;
+}
+
 .createNewButtonDisabled {
     background:transparent url(NewDoc-grey.png) no-repeat center top;
 }

@@ -17,6 +17,7 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -63,6 +64,36 @@ public class Collaborator extends Composite implements ClickHandler {
 	final protected String simulateDocContents = "Client IDs:\n";
 	final private String disabledCSS = "Disabled";
 
+	// Boolean indicating whether a simulation is taking place
+	private boolean simulation = false;
+	private int simulationTab = 0;
+	private String simulationSide;
+	private boolean simulateLeft = true;
+	private LockedDocument simulationDoc = null;
+	private int thinkTimeMin = 2000;
+	private int thinkTimeMax = 5000;
+	private int eatTimeMin = 4000;
+	private int eatTimeMax = 6000;
+	
+	private Timer thinkingTimer = new Timer() {
+		public void run() {
+			simulateHungry();
+		}
+	};
+	
+	private Timer eatingTimer = new Timer() {
+		public void run() {
+			editSimulateDoc();
+		}
+	};
+
+	private Timer delayProblemTimer = new Timer() {
+		public void run() {
+			simulateHungryLock();
+		}
+	};
+
+
 	protected CollaboratorServiceAsync collabService;
 
 	protected String channelID;
@@ -96,12 +127,17 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected Button refreshButtonL = new Button("Refresh Doc");
 	protected Button refreshButtonR = new Button("Refresh Doc");
 	protected Button simulateButton = new Button("Simulate");
+	protected Button stopSimulateButton = new Button("Stop simulation");
+
 
 	// Panels
 	VerticalPanel leftPanel = new VerticalPanel();
 	VerticalPanel rightPanel = new VerticalPanel();
 	HorizontalPanel leftHPanel = new HorizontalPanel();
 	HorizontalPanel rightHPanel = new HorizontalPanel();
+	
+	// buttons under the doc list
+	HorizontalPanel docListButtonPanel = new HorizontalPanel();
 
 	// Callback objects.
 	protected DocReader reader = new DocReader(this);
@@ -314,6 +350,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		createNew.setStylePrimaryName("createNewButton");
 		refreshList.setStylePrimaryName("refreshButton");
 		simulateButton.setStylePrimaryName("simulateButton");
+		stopSimulateButton.setStylePrimaryName("stopSimulateButton");
 
 		// add button tooltips
 		refreshDoc.setTitle("Refresh the doc list.");
@@ -344,9 +381,10 @@ public class Collaborator extends Composite implements ClickHandler {
 		createNew.addStyleName("gwt-Button");
 		refreshList.addStyleName("gwt-Button");
 		simulateButton.addStyleName("gwt-Button");
+		stopSimulateButton.addStyleName("gwt-Button");
+
 
 		// buttons under the doc list
-		HorizontalPanel docListButtonPanel = new HorizontalPanel();
 		docListButtonPanel.setSpacing(10);
 		docListButtonPanel.add(refreshList);
 		docListButtonPanel.add(createNew);
@@ -555,6 +593,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		refreshButtonL.addClickHandler(this);
 		refreshButtonR.addClickHandler(this);
 		simulateButton.addClickHandler(this);
+		stopSimulateButton.addClickHandler(this);
 	}
 
 	/**
@@ -814,6 +853,10 @@ public class Collaborator extends Composite implements ClickHandler {
 		// if user presses the simulate button
 		else if (event.getSource().equals(simulateButton))
 			simulateButtonHandler();
+		
+		// if user presses the stop simulate button
+		else if (event.getSource().equals(stopSimulateButton))
+			stopSimulateButtonHandler();
 	}
 
 	/**
@@ -862,12 +905,18 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * @param side
 	 */
 	public void openLatestTab(String side) {
+		int last;
 		if (side.equals("left")) {
-			int last = documentsL.getTabBar().getTabCount() - 1;
+			last = documentsL.getTabBar().getTabCount() - 1;
 			documentsL.getTabBar().selectTab(last);
 		} else {
-			int last = documentsR.getTabBar().getTabCount() - 1;
+			last = documentsR.getTabBar().getTabCount() - 1;
 			documentsR.getTabBar().selectTab(last);
+		}
+		
+		// Record the tab number if the simulation is running
+		if (simulation) {
+			simulationTab = last;
 		}
 	}
 
@@ -1128,81 +1177,149 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 	}
 
+
+	private void simulateHungry() {
+		documentList.setItemText(0, simulateDocTitle);
+		documentList.setSelectedIndex(0);
+
+
+		if (documentsL.getTabBar().getTabCount() < maxTabsOnOneSide)
+			simulateLeft = true;
+		else if (documentsR.getTabBar().getTabCount() < maxTabsOnOneSide)
+			simulateLeft = false;
+		else
+			statusUpdate("Tabs panels are full...");
+
+		showDocumentButtonHandler(simulateLeft);
+
+		delayProblemTimer.schedule(1000);
+		
+	}
+	
+	private void simulateHungryLock() {
+		lockDocumentButtonHandler(simulateLeft);
+	}
+
+	private void simulateThinking() {
+		// TODO simulating thinking
+	}
+
+	public void simulateEating(LockedDocument doc, int index, String side) {
+		simulateDoc = doc;
+		simulationTab = index;
+		simulationSide = side;
+		
+		int eatTime = eatTimeMin + com.google.gwt.user.client.Random.nextInt(eatTimeMax - eatTimeMin);
+		
+		// Wait random time to eat
+
+		eatingTimer.schedule(eatTime);
+	}
+
+
+	/**
+	 * Called when the user presses the stop simulate button.
+	 */
+	private void stopSimulateButtonHandler() {
+		
+		// Terminate simulation
+		simulation = false;
+		
+		// Replace stop simulate button with the simulate button
+		docListButtonPanel.remove(stopSimulateButton);
+		docListButtonPanel.add(simulateButton);
+
+		
+	}
+	
+	
 	/**
 	 * Called when the user presses the simulate button.
 	 */
 	private void simulateButtonHandler() {
-		int i = 0;
-		while (i < numSimulationSteps)
-		{
-			// take the first item in our docList and designate it 
-			// to be the shared doc. if the list is empty, print error msg
-			if (documentList.getItemCount() > 0)
-			{
-				// TODO
+		simulation = true;
+		
+		// Replace simulate button with stop simulate button
+		docListButtonPanel.remove(simulateButton);
+		docListButtonPanel.add(stopSimulateButton);
 
-				// SLEEPING
+		
+		lockDownUI();
 
-				/*
-				 * Timer t = new Timer() {
-				 * 
-				 * @Override public void run() { // do nothing } };
-				 * t.schedule(SLEEP_TIME);
-				 */
 
-				// sleep for the needed time
-				/*
-			try {
-				this.wait((new Random()).nextInt(MAX_SLEEP_TIME_IN_SEC) * 1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-				 */
+		// Generate an int between and thinkTimeMin up to but not including thinkTimeMax
+		int thinkTime = thinkTimeMin + com.google.gwt.user.client.Random.nextInt(thinkTimeMax - thinkTimeMin);
+		thinkingTimer.schedule(thinkTime);
 
-				// HUNGRY
-
-				boolean left = false;
-
-				// open the first document in a tab
-				documentList.setItemText(0, simulateDocTitle);
-				documentList.setSelectedIndex(0);
-
-				if (documentsL.getTabBar().getTabCount() < maxTabsOnOneSide)
-					left = true;
-				else if (documentsR.getTabBar().getTabCount() < maxTabsOnOneSide)
-					left = false;
-				else
-					statusUpdate("Tabs panels are full...");
-
-				showDocumentButtonHandler(left);
-
-				// request the lock for the first doc in the list
-				lockDocumentButtonHandler(left);
-
-				// EATING implemented in editSimulateDoc() since that gets called
-				// after the doc's lock is acquired
-			}
-			else
-				statusUpdate("ERROR: Create a doc first!");
-		}
 	}	
+	//		int i = 0;
+	//		while (i < numSimulationSteps)
+	//		{
+	//			// take the first item in our docList and designate it 
+	//			// to be the shared doc. if the list is empty, print error msg
+	//			if (documentList.getItemCount() > 0)
+	//			{
+	//				// TODO
+	//
+	//				// SLEEPING
+	//
+	//				/*
+	//				 * Timer t = new Timer() {
+	//				 * 
+	//				 * @Override public void run() { // do nothing } };
+	//				 * t.schedule(SLEEP_TIME);
+	//				 */
+	//
+	//				// sleep for the needed time
+	//				/*
+	//			try {
+	//				this.wait((new Random()).nextInt(MAX_SLEEP_TIME_IN_SEC) * 1000);
+	//			} catch (InterruptedException e) {
+	//				// TODO Auto-generated catch block
+	//				e.printStackTrace();
+	//			}
+	//				 */
+	//
+
+	//
+	//				// EATING implemented in editSimulateDoc() since that gets called
+	//				// after the doc's lock is acquired
+	//			}
+	//			else
+	//				statusUpdate("ERROR: Create a doc first!");
+	//		}
+	//	}	
 
 	/**
 	 * Called by onSuccess of DocLockedReader when shared simulateDoc can 
 	 * be edited by this client.
 	 */
-	protected void editSimulateDoc(LockedDocument doc, int index, String side)
+	protected void editSimulateDoc()
 	{		
 		// eat for a random time (sleep and then add this client's id
 		// to the 'simulate' doc)
 
 		// append the client id to the doc
-		doc.setContents(doc.getContents() + "\n Client: " + clientID);
+		simulateDoc.setContents(simulateDoc.getContents() + "\n Client: " + clientID);
 
 		// save this doc
-		DocSaver.saveDoc(this, doc, side, index);	
+		DocSaver.saveDoc(this, simulateDoc, simulationSide, simulationTab);
+		
+		
+		// Simulation still running? If so start thinking again.
+		if (simulation) {
+			int thinkTime = thinkTimeMin + com.google.gwt.user.client.Random.nextInt(thinkTimeMax - thinkTimeMin);
+			thinkingTimer.schedule(thinkTime);
+		}
 	}
+	
+	
+	protected void saveSimulateDoc(LockedDocument doc, int index, String side)
+	{		
+		// eat for a random time (sleep and then add this client's id	
+	}
+	
+	
 
 	/**
 	 * Returns true of key is in either of the lists, false otherwise.
@@ -1331,15 +1448,9 @@ public class Collaborator extends Composite implements ClickHandler {
 	}
 
 
-	/**
-	 * Called by docLockedReader (onSuccess).
-	 * 
-	 * @param result
-	 * @param index
-	 * @param side2
-	 */
-	//	public void setDoc(LockedDocument result, int index, String side2) {
-	//		// TODO Auto-generated method stub
-	//
-	//	}
+	protected void lockDownUI() {
+		// TODO
+		// locks down the current interface for the user
+	}
+
 }
