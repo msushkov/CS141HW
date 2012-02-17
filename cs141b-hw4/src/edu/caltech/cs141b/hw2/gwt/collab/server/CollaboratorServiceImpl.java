@@ -260,9 +260,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		 * .getAttribute(TIMER_MAP);
 		 */
 
-		// Stop the lock timer.
-		// timerMap.get(docKey).cancel();
-
 		// Return the token
 		tokenMap.put(docKey, "server");
 
@@ -323,9 +320,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			t.commit();
 		} finally {
 			// Do some cleanup
-			/*
-			 * if (t.isActive()) { t.rollback(); }
-			 */
+			if (t.isActive()) {
+				t.rollback();
+			}
+
 			pm.close();
 		}
 
@@ -374,15 +372,16 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				// And store it in the Datastore
 				pm.makePersistent(toSave);
 
-				// ...Ending transaction
-				t.commit();
-
-				// Indicate that the token has been returned
-				receiveToken(clientID, doc.getKey());
 			} else {
 				// Otherwise, throw an exception
 				throw new LockExpired("You no longer have the lock");
 			}
+
+			// ...Ending transaction
+			t.commit();
+
+			// Indicate that the token has been returned
+			receiveToken(clientID, doc.getKey());
 
 		} finally {
 			// Do some cleanup
