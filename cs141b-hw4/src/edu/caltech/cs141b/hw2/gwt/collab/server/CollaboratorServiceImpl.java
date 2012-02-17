@@ -8,8 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Map.Entry;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -34,24 +32,21 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  */
 @SuppressWarnings("serial")
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
-CollaboratorService {
+		CollaboratorService {
 
 	/*
 	 * private static final String QUEUE_MAP = "queue_map"; private static final
 	 * String TOKEN_MAP = "token_map"; private static final String TIMER_MAP =
 	 * "timer_map";
 	 */
-	private static final int LOCK_TIME = 30;
+	private static final int LOCK_TIME = 300;
 	private static Map<String, List<String>> queueMap;
 	private static Map<String, String> tokenMap;
 	private Map<String, Timer> timerMap;
 
-
 	private static ArrayList<String> lockedDocuments = new ArrayList<String>();
 
-
 	private static CollaboratorServiceImpl server = new CollaboratorServiceImpl();
-
 
 	public CollaboratorServiceImpl() {
 		queueMap = Collections
@@ -60,14 +55,13 @@ CollaboratorService {
 		timerMap = Collections.synchronizedMap(new HashMap<String, Timer>());
 	}
 
-
 	public static void cleanLocks() {
 		// Clean up documents if there are document currently locked
 		if (!lockedDocuments.isEmpty()) {
+			ArrayList<String> toClear = new ArrayList<String>();
 
 			for (String docKey : lockedDocuments) {
 				System.out.println("Checking lock for " + docKey);
-				String previousClient = null;
 				PersistenceManager pm = PMF.get().getPersistenceManager();
 				Transaction t = pm.currentTransaction();
 				try {
@@ -81,15 +75,13 @@ CollaboratorService {
 					Document doc = pm.getObjectById(Document.class, key);
 
 					// If the doc is locked and the lock expired
-					if (doc.isLocked() && doc.getLockedUntil().before(new Date(System.currentTimeMillis()))) {
-						System.out.println("Unlocking for " + docKey);
-						doc.unlock();
+					if (doc.isLocked()
+							&& doc.getLockedUntil().before(
+									new Date(System.currentTimeMillis()))) {
+						toClear.add(docKey);
 						if (queueMap.containsKey(docKey)) {
+							toClear.add(docKey);
 							System.out.println("In the queueMap " + docKey);
-
-							// Maybe use appstore instead?
-							previousClient = tokenMap.get(docKey);
-							server.receiveToken(previousClient, docKey);
 
 						}
 						// Check if there are clients waiting for the document
@@ -106,11 +98,24 @@ CollaboratorService {
 				}
 
 			}
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			Transaction t = pm.currentTransaction();
+
+			try {
+				t.begin();
+				for (String docKey : toClear) {
+					String previousClient = tokenMap.get(docKey);
+					server.receiveToken(previousClient, docKey);
+				}
+			} finally {
+				if (t.isActive()) {
+					t.rollback();
+				}
+				pm.close();
+			}
 		}
 
 	}
-
-
 
 	/*
 	 * (non-Javadoc)
@@ -226,26 +231,21 @@ CollaboratorService {
 					toSave.update(doc);
 					toSave.unlock();
 
+					// Now write the results to Datastore
+					pm.makePersistent(toSave);
+					t.commit();
 					receiveToken(clientID, stringKey);
 				} else {
 					// Otherwise, throw an exception
 					throw new LockExpired();
 				}
+				// ...Ending transaction
+				// t.commit();
+				toSave = pm.getObjectById(Document.class, key);
+				System.out.println("Locked at end?" + toSave.isLocked());
 			}
 
-			// Now write the results to Datastore
-			pm.makePersistent(toSave);
-
-			// ...Ending transaction
-			t.commit();
-
 			// Return the unlocked document
-
-			/*
-			 * System.out.println("Saved"); for (Entry<String, String> e :
-			 * tokenMap.entrySet()) { System.out.println(e.getKey() + ": " +
-			 * e.getValue()); }
-			 */
 			return toSave.getUnlockedDoc();
 		} finally {
 			// Do some cleanup
@@ -278,11 +278,11 @@ CollaboratorService {
 		// Return the token
 		tokenMap.put(docKey, "server");
 
-		// If there is no document waiting for the document remove from list of locked docs CRITICAL CODE?
+		// If there is no document waiting for the document remove from list of
+		// locked docs CRITICAL CODE?
 		if (!queueMap.containsKey(docKey) && lockedDocuments.contains(docKey)) {
 			lockedDocuments.remove(docKey);
 		}
-
 
 		// getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
 
@@ -317,6 +317,7 @@ CollaboratorService {
 
 		Document toSave;
 		Date endTime;
+
 		Transaction t = pm.currentTransaction();
 		try {
 			// Starting transaction...
@@ -327,6 +328,7 @@ CollaboratorService {
 			// Get the document corresponding to the key
 			toSave = pm.getObjectById(Document.class, key);
 			endTime = new Date(System.currentTimeMillis() + LOCK_TIME * 1000);
+			System.out.println("Giving lock to " + clientID);
 			toSave.lock(endTime, clientID);
 
 			pm.makePersistent(toSave);
@@ -334,42 +336,11 @@ CollaboratorService {
 			t.commit();
 		} finally {
 			// Do some cleanup
-			if (t.isActive()) {
-				t.rollback();
-			}
+			/*
+			 * if (t.isActive()) { t.rollback(); }
+			 */
 			pm.close();
 		}
-
-		// Start the unlock timer
-		/*
-		 * Map<String, Thread> timerMap = (Map<String, Thread>)
-		 * getThreadLocalRequest() .getAttribute(TIMER_MAP);
-		 */
-
-		/*
-		 * Timer timer = new Timer(); timer.schedule(new TimerTask() {
-		 * 
-		 * @Override public void run() { receiveToken(clientID, docKey); }
-		 * 
-		 * }, endTime);
-		 */
-
-		/*
-		 * Thread timer = new Thread(new Runnable() {
-		 * 
-		 * @Override public void run() { try { Thread.sleep(LOCK_TIME * 1000); }
-		 * catch (InterruptedException e) { // This happens if the lock is
-		 * returned before it expires. // We don't want to call receiveToken and
-		 * invalidate things return; }
-		 * 
-		 * receiveToken(clientID, docKey);
-		 * 
-		 * }
-		 * 
-		 * }); timer.start();
-		 */
-		// timerMap.put(docKey, timer);
-		// getThreadLocalRequest().setAttribute(TIMER_MAP, timerMap);
 
 		// Finally, inform the client that the doc is locked and ready for them
 		getChannelService().sendMessage(new ChannelMessage(clientID, docKey));
@@ -416,6 +387,9 @@ CollaboratorService {
 				// And store it in the Datastore
 				pm.makePersistent(toSave);
 
+				// ...Ending transaction
+				t.commit();
+
 				// Indicate that the token has been returned
 				receiveToken(clientID, doc.getKey());
 			} else {
@@ -423,8 +397,6 @@ CollaboratorService {
 				throw new LockExpired("You no longer have the lock");
 			}
 
-			// ...Ending transaction
-			t.commit();
 		} finally {
 			// Do some cleanup
 			if (t.isActive()) {
@@ -506,9 +478,6 @@ CollaboratorService {
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
 
-
-
-
 		if (!tokenMap.containsKey(documentKey))
 			tokenMap.put(documentKey, "server");
 
@@ -584,6 +553,5 @@ CollaboratorService {
 	public void leaveLockQueue(String clientID, String documentKey) {
 		removeClient(clientID, documentKey);
 	}
-
 
 }

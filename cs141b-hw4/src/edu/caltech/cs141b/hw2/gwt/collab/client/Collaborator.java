@@ -1,7 +1,6 @@
 package edu.caltech.cs141b.hw2.gwt.collab.client;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import com.google.gwt.appengine.channel.client.Channel;
@@ -34,7 +33,6 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import edu.caltech.cs141b.hw2.gwt.collab.shared.AbstractDocument;
-import edu.caltech.cs141b.hw2.gwt.collab.shared.DocumentMetadata;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument;
 import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
 
@@ -300,7 +298,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		docListPanel.add(docListPanelTitle);
 		documentList.setWidth("100%");
 		docListPanel.add(documentList);
-		docListPanel.setWidth("320px");
+		docListPanel.setWidth("350px");
 
 		// button styles
 		refreshDoc.setStylePrimaryName("refreshButton");
