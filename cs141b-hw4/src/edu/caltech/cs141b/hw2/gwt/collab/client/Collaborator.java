@@ -45,9 +45,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	private Collaborator hacksAreLol = this;
 
 	private static final int CLIENT_ID_LEN = 16;
-	private int MAX_SLEEP_TIME_IN_SEC = 4;
-	private int MAX_EAT_TIME_IN_SEC = 4;
-	private static final int numSimulationSteps = 10;
 	private static final String POSS_LOGIN_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
 
 	final private static int maxTabTextLen = 13;
@@ -68,32 +65,49 @@ public class Collaborator extends Composite implements ClickHandler {
 	private boolean simulation = false;
 	private int simulationTab = 0;
 	private String simulationSide;
-	private boolean simulateLeft = true;
-	private LockedDocument simulationDoc = null;
+	private boolean simulateLeft = true; // is the simulate doc on L or R tabpanel?
 	private int thinkTimeMin = 2000;
 	private int thinkTimeMax = 5000;
 	private int eatTimeMin = 4000;
 	private int eatTimeMax = 6000;
+	private int simulationWwaitTimeUntilLockReq = 1000;
 	
+	// Keeps track of the shared simulation document.
+	protected LockedDocument simulateDoc;
+	
+	/**
+	 * Calls simulateHungry() when the timer fires.
+	 */
 	private Timer thinkingTimer = new Timer() {
+		// after the timer goes off, go to the hungry state
 		public void run() {
 			simulateHungry();
 		}
 	};
 	
+	/**
+	 * Calls editSimulateDoc() when the timer fires.
+	 */
 	private Timer eatingTimer = new Timer() {
+		// when the timer goes off, we have waited some time, so can now 
+		// edit the doc
 		public void run() {
 			editSimulateDoc();
 		}
 	};
 
+	/**
+	 * Calls simulateHungryLock() when the timer fires.
+	 */
 	private Timer delayProblemTimer = new Timer() {
+		// when the timer goes off, we have waited the needed time before
+		// requesting the lock, so now go ahead and request it
 		public void run() {
 			simulateHungryLock();
 		}
 	};
 
-
+	// The connection to the server.
 	protected CollaboratorServiceAsync collabService;
 
 	protected String channelID;
@@ -129,7 +143,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected Button simulateButton = new Button("Simulate");
 	protected Button stopSimulateButton = new Button("Stop simulation");
 
-
 	// Panels
 	VerticalPanel leftPanel = new VerticalPanel();
 	VerticalPanel rightPanel = new VerticalPanel();
@@ -156,8 +169,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected Button refresh = null;
 	protected HorizontalPanel hPanel = null;
 	protected String side = null;
-
-	protected LockedDocument simulateDoc;
 
 	// Status tracking.
 	private VerticalPanel statusArea = new VerticalPanel();
@@ -1177,12 +1188,20 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 	}
 
+	// ===================================================================
+	// SIMULATION METHODS
 
+	/**
+	 * Called after the client is done thinking. 
+	 */
 	private void simulateHungry() {
+		// set the first doc in the doc list to have the simulate doc title
 		documentList.setItemText(0, simulateDocTitle);
+		
+		// select the first doc in the doc list
 		documentList.setSelectedIndex(0);
 
-
+		// figure out which side to open the simulate doc on
 		if (documentsL.getTabBar().getTabCount() < maxTabsOnOneSide)
 			simulateLeft = true;
 		else if (documentsR.getTabBar().getTabCount() < maxTabsOnOneSide)
@@ -1190,137 +1209,122 @@ public class Collaborator extends Composite implements ClickHandler {
 		else
 			statusUpdate("Tabs panels are full...");
 
+		// act as if the user pressed the show right or left button
+		// since we want to display the simulate doc to the user
 		showDocumentButtonHandler(simulateLeft);
 
-		delayProblemTimer.schedule(1000);
+		// wait for a set time (simulationWwaitTimeUntilLockReq) and then
+		// call simulateHungryLock() which acts as if the user pressed the
+		// correct lock doc button for our simulate doc
+		delayProblemTimer.schedule(simulationWwaitTimeUntilLockReq);
+	}
 		
+	/**
+	 * Called at the end of the hungry phase - after the client waits for 
+	 * simulationWwaitTimeUntilLockReq time, request the lock for the simulation doc.
+	 * simulateLeft will tell us if the simulate doc is on the left or the right.
+	 */
+	private void simulateHungryLock() {
+		// request the lock for the simulation doc
+		lockDocumentButtonHandler(simulateLeft);
+		
+		// at this point this client has requested the lock for the simulate doc.
+		// when the lock is acquired the DocLockedReader class calls the simulateEating()
+		// method to simulate the eating phase.
 	}
 	
-	private void simulateHungryLock() {
-		lockDocumentButtonHandler(simulateLeft);
-	}
-
-	private void simulateThinking() {
-		// TODO simulating thinking
-	}
-
+	/** 
+	 * Called by DocLockedReader's onSuccess() method. This code runs after 
+	 * this client has acquired the lock for the simulate doc.
+	 * @param doc The actual simulate document
+	 * @param index Where on the tabPanel this doc is
+	 * @param side Which side is this doc on?
+	 */
 	public void simulateEating(LockedDocument doc, int index, String side) {
 		simulateDoc = doc;
 		simulationTab = index;
 		simulationSide = side;
 		
-		int eatTime = eatTimeMin + com.google.gwt.user.client.Random.nextInt(eatTimeMax - eatTimeMin);
+		// Wait random time before editing the doc
+		int eatTime = eatTimeMin + 
+				com.google.gwt.user.client.Random.nextInt(eatTimeMax - eatTimeMin);
 		
-		// Wait random time to eat
-
+		// simulates the actual "eating" - wait for a random time and then call
+		// editSimulateDoc()
 		eatingTimer.schedule(eatTime);
 	}
+	
+	/**
+	 * Called when the eatingTimer goes off - we have waited the appropriate time 
+	 * and can now edit the simulation doc.
+	 */
+	protected void editSimulateDoc()
+	{		
+		// edit the simulation doc - append the client id to its contents
+		simulateDoc.setContents(simulateDoc.getContents() + "\n Client: " + clientID);
 
+		// save this simulation doc so taht other clients can see its updates
+		DocSaver.saveDoc(this, simulateDoc, simulationSide, simulationTab);
+				
+		// Simulation still running? If so start thinking again.
+		if (simulation) {
+			int thinkTime = thinkTimeMin + com.google.gwt.user.client.Random.nextInt(thinkTimeMax - thinkTimeMin);
+			
+			// after we wait for thinkTime, simulateHungry() is called, and the
+			// entire simulation process repeats
+			thinkingTimer.schedule(thinkTime);
+		}
+	}
+	
+	/**
+	 * Waits for a random thinking time and then becomes hungry.
+	 */
+	private void simulateThinking() {
+		// Generate an int between and thinkTimeMin up to but not including thinkTimeMax
+		int thinkTime = thinkTimeMin + 
+				com.google.gwt.user.client.Random.nextInt(thinkTimeMax - thinkTimeMin);
+
+		// wait for the thinking time and then call simulateHungry()
+		thinkingTimer.schedule(thinkTime);
+	}
 
 	/**
 	 * Called when the user presses the stop simulate button.
 	 */
 	private void stopSimulateButtonHandler() {
-		
 		// Terminate simulation
 		simulation = false;
 		
 		// Replace stop simulate button with the simulate button
 		docListButtonPanel.remove(stopSimulateButton);
 		docListButtonPanel.add(simulateButton);
-
 		
+		// TODO
+		// refresh the page? so that things go back to normal after simulation is done
 	}
-	
 	
 	/**
 	 * Called when the user presses the simulate button.
 	 */
 	private void simulateButtonHandler() {
+		// Start the simulation
 		simulation = true;
 		
 		// Replace simulate button with stop simulate button
 		docListButtonPanel.remove(simulateButton);
 		docListButtonPanel.add(stopSimulateButton);
-
 		
+		// the user cannot do anything while the simulation runs
 		lockDownUI();
 
-
-		// Generate an int between and thinkTimeMin up to but not including thinkTimeMax
-		int thinkTime = thinkTimeMin + com.google.gwt.user.client.Random.nextInt(thinkTimeMax - thinkTimeMin);
-		thinkingTimer.schedule(thinkTime);
-
+		// start thinking (wait for a random time and then become hungry 
+		// aka request lock)
+		simulateThinking();
 	}	
-	//		int i = 0;
-	//		while (i < numSimulationSteps)
-	//		{
-	//			// take the first item in our docList and designate it 
-	//			// to be the shared doc. if the list is empty, print error msg
-	//			if (documentList.getItemCount() > 0)
-	//			{
-	//				// TODO
-	//
-	//				// SLEEPING
-	//
-	//				/*
-	//				 * Timer t = new Timer() {
-	//				 * 
-	//				 * @Override public void run() { // do nothing } };
-	//				 * t.schedule(SLEEP_TIME);
-	//				 */
-	//
-	//				// sleep for the needed time
-	//				/*
-	//			try {
-	//				this.wait((new Random()).nextInt(MAX_SLEEP_TIME_IN_SEC) * 1000);
-	//			} catch (InterruptedException e) {
-	//				// TODO Auto-generated catch block
-	//				e.printStackTrace();
-	//			}
-	//				 */
-	//
-
-	//
-	//				// EATING implemented in editSimulateDoc() since that gets called
-	//				// after the doc's lock is acquired
-	//			}
-	//			else
-	//				statusUpdate("ERROR: Create a doc first!");
-	//		}
-	//	}	
-
-	/**
-	 * Called by onSuccess of DocLockedReader when shared simulateDoc can 
-	 * be edited by this client.
-	 */
-	protected void editSimulateDoc()
-	{		
-		// eat for a random time (sleep and then add this client's id
-		// to the 'simulate' doc)
-
-		// append the client id to the doc
-		simulateDoc.setContents(simulateDoc.getContents() + "\n Client: " + clientID);
-
-		// save this doc
-		DocSaver.saveDoc(this, simulateDoc, simulationSide, simulationTab);
-		
-		
-		// Simulation still running? If so start thinking again.
-		if (simulation) {
-			int thinkTime = thinkTimeMin + com.google.gwt.user.client.Random.nextInt(thinkTimeMax - thinkTimeMin);
-			thinkingTimer.schedule(thinkTime);
-		}
-	}
 	
+	// END SIMULATION METHODS
+	// ===================================================================
 	
-	protected void saveSimulateDoc(LockedDocument doc, int index, String side)
-	{		
-		// eat for a random time (sleep and then add this client's id	
-	}
-	
-	
-
 	/**
 	 * Returns true of key is in either of the lists, false otherwise.
 	 * 
@@ -1352,7 +1356,6 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		return contains;
 	}
-
 
 	/**
 	 * Generalized so that it can be called elsewhere. In particular, after a
@@ -1408,7 +1411,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		// enable lock, refreshDoc, and removeTab buttons
 	}
 
-
 	/**
 	 * Enables the given button and removes the disabledCSS string part of the
 	 * CSS class
@@ -1428,7 +1430,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 	}
 
-
 	/**
 	 * Disables the given button and adds the disabledCSS string to the current
 	 * CSS class
@@ -1447,10 +1448,28 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 	}
 
-
+	/**
+	 * Lock the UI after the user presses the simulate button so that
+	 * no actions could be done.
+	 */
 	protected void lockDownUI() {
 		// TODO
 		// locks down the current interface for the user
+		
+		// disable all buttons under the doc list
+		for (Widget w : docListButtonPanel)
+			disableButton((Button) w);
+				
+		// disable all buttons in rightHPanel and leftHPanel
+		for (Widget w : rightHPanel)
+			disableButton((Button) w);
+				
+		for (Widget w : rightHPanel)
+			disableButton((Button) w);
+				
+		// TODO
+		// disable editing of any currently-open documents?
+		
 	}
 
 }

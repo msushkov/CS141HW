@@ -62,16 +62,17 @@ public class DocLockedReader implements AsyncCallback<LockedDocument> {
 	public void onSuccess(LockedDocument result) {
 		collaborator.statusUpdate("Document Retrieved");
 		
+		// if the document for which we acquired the lock is the simulate
+		// doc (can only tell this based on its title), then go into the
+		// "eating" part of the simulation
 		if (result.getTitle().equals(collaborator.simulateDocTitle))
 			collaborator.simulateEating(result, index, side);
 		else
-			System.out.println("setting locked doc " + result.getTitle());
 			collaborator.setDoc(result, index, side);
 	}
 
 	/**
-	 * Called by when docLockerReader failed to fetch the document.
-	 * 
+	 * Called when docLockerReader fails to fetch the document.
 	 */
 	protected void lockFailed() {
 		if (side.equals("left"))
