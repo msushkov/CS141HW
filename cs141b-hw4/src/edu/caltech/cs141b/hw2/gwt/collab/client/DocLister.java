@@ -13,7 +13,6 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.DocumentMetadata;
 public class DocLister implements AsyncCallback<List<DocumentMetadata>> {
 
 	private Collaborator collaborator;
-	private boolean simulation;
 
 	/**
 	 * Constructs a new DocLister.  DocLister doesn't need a static constructor method. No internal state

@@ -31,39 +31,50 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  */
 @SuppressWarnings("serial")
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
-CollaboratorService {
+		CollaboratorService {
 
-	/*
-	 * private static final String QUEUE_MAP = "queue_map"; private static final
-	 * String TOKEN_MAP = "token_map"; private static final String TIMER_MAP =
-	 * "timer_map";
-	 */
+	// This is the time in seconds that clients can lock a document
 	private static final int LOCK_TIME = 30;
+
+	// This object maps doc keys to queues of client IDs, which are the clients
+	// waiting for the document.
 	private static Map<String, List<String>> queueMap;
+	// This will map document keys to who owns the document. Either "server" or
+	// the clientID.
 	private static Map<String, String> tokenMap;
 
 	private static ArrayList<String> lockedDocuments = new ArrayList<String>();
 
+	// This is a bit of a hack that takes advantage of the fact all the fields
+	// are static. We need this static field to allow ClearLockServlet to access
+	// some of the non static functions of this class.
 	private static CollaboratorServiceImpl server = new CollaboratorServiceImpl();
 
+	/**
+	 * The constructor for this server. I'm not sure how GAE splits up work on
+	 * its servers, so I made sure all the maps were thread safe. Also, the cron
+	 * job might lead to concurrent modification.
+	 */
 	public CollaboratorServiceImpl() {
 		queueMap = Collections
 				.synchronizedMap(new HashMap<String, List<String>>());
 		tokenMap = Collections.synchronizedMap(new HashMap<String, String>());
 	}
 
-	// Cleans lock for an individual document
+	/**
+	 * Cleans lock for an individual document
+	 * 
+	 * @param docKey
+	 *            - The dockey for the document we want to clean the locks of
+	 */
 	public void cleanLock(String docKey) {
 		int notInList = -1;
 		int docIndex = lockedDocuments.indexOf(docKey);
-		if (docIndex != notInList) {
-			System.out.println("Checking individual lock for " + docKey);
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			Transaction t = pm.currentTransaction();
-			try {
-				// Starting transaction...
-				t.begin();
 
+		if (docIndex != notInList) {
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+
+			try {
 				// Create the key
 				Key key = KeyFactory.stringToKey(docKey);
 
@@ -76,29 +87,25 @@ CollaboratorService {
 								new Date(System.currentTimeMillis()))) {
 					String previousClient = tokenMap.get(docKey);
 					server.receiveToken(previousClient, docKey);
-					System.out.println("Lock cleaned for document with key " + docKey);
 				}
 
 			} finally {
 				// Do some cleanup
-				if (t.isActive()) {
-					t.rollback();
-				}
 				pm.close();
 			}
 
 		}
 	}
 
-
-	// Cleans locks for all currently locked documents
+	/**
+	 * Cleans locks for all currently locked documents
+	 */
 	public static void cleanLocks() {
 		// Clean up documents if there are document currently locked
 		if (!lockedDocuments.isEmpty()) {
 			ArrayList<String> toClear = new ArrayList<String>();
 
 			for (String docKey : lockedDocuments) {
-				System.out.println("Checking lock for " + docKey);
 				PersistenceManager pm = PMF.get().getPersistenceManager();
 				Transaction t = pm.currentTransaction();
 				try {
@@ -118,11 +125,8 @@ CollaboratorService {
 						toClear.add(docKey);
 						if (queueMap.containsKey(docKey)) {
 							toClear.add(docKey);
-							System.out.println("In the queueMap " + docKey);
 
 						}
-						// Check if there are clients waiting for the document
-
 					}
 					// ...Ending transaction
 					t.commit();
@@ -135,6 +139,7 @@ CollaboratorService {
 				}
 			}
 
+			// Check if there are clients waiting for the document
 			for (String docKey : toClear) {
 				String previousClient = tokenMap.get(docKey);
 				server.receiveToken(previousClient, docKey);
@@ -248,7 +253,7 @@ CollaboratorService {
 				Date lockedUntil = toSave.getLockedUntil();
 
 				// Get the client's ID
-				String identity = clientID;// getThreadLocalRequest().getRemoteAddr();
+				String identity = clientID;
 
 				// Check that the person trying to save has the lock and that
 				// the lock hasn't expired
@@ -290,41 +295,36 @@ CollaboratorService {
 	 * update the token map and then send a token if possible.
 	 * 
 	 * @param clientID
+	 *            The ID of the client sending the message
 	 * @param docKey
+	 *            The key of the document whose token we are receiving
 	 */
 	private void receiveToken(String clientID, String docKey) {
-		/*
-		 * Map<String, String> tokenMap = (Map<String, String>)
-		 * getThreadLocalRequest() .getAttribute(TOKEN_MAP); Map<String, Thread>
-		 * timerMap = (Map<String, Thread>) getThreadLocalRequest()
-		 * .getAttribute(TIMER_MAP);
-		 */
-
 		// Return the token
 		tokenMap.put(docKey, "server");
 
 		// If there is no document waiting for the document remove from list of
-		// locked docs CRITICAL CODE?
+		// locked docs
 		if (!queueMap.containsKey(docKey) && lockedDocuments.contains(docKey)) {
 			lockedDocuments.remove(docKey);
 		}
 
-		// getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
-
-		// Now, try to send a token
+		// Now, try to send a token if we can
 		clientID = pollNextClient(docKey);
 		if (clientID != null) {
 			sendToken(clientID, docKey);
 		}
 	}
 
+	/**
+	 * Send a token for the docKey out to the specified client
+	 * 
+	 * @param clientID
+	 *            The ID of the client sending the message
+	 * @param docKey
+	 *            The key of the document whose token we are receiving
+	 */
 	private void sendToken(final String clientID, final String docKey) {
-		// Fetch and create the necessary maps
-		/*
-		 * Map<String, String> tokenMap = (Map<String, String>)
-		 * getThreadLocalRequest() .getAttribute(TOKEN_MAP);
-		 */
-
 		// Now, set the correct clientID. We are "giving" them the token here.
 		tokenMap.put(docKey, clientID);
 
@@ -333,9 +333,7 @@ CollaboratorService {
 			lockedDocuments.add(docKey);
 		}
 
-		// getThreadLocalRequest().setAttribute(TOKEN_MAP, tokenMap);
-
-		// Lock the document
+		// Now, let's lock the document
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -352,7 +350,6 @@ CollaboratorService {
 			// Get the document corresponding to the key
 			toSave = pm.getObjectById(Document.class, key);
 			endTime = new Date(System.currentTimeMillis() + LOCK_TIME * 1000);
-			System.out.println("Giving lock to " + clientID);
 			toSave.lock(endTime, clientID);
 
 			pm.makePersistent(toSave);
@@ -401,7 +398,7 @@ CollaboratorService {
 			String lockedBy = toSave.getLockedBy();
 
 			// Get the client's identity
-			String identity = clientID;// getThreadLocalRequest().getRemoteAddr();
+			String identity = clientID;
 
 			// Make sure that the person unlocking is the person who locked the
 			// doc.
@@ -432,12 +429,15 @@ CollaboratorService {
 		}
 	}
 
+	/**
+	 * Adds the client ID to the correct document queue
+	 * 
+	 * @param clientID
+	 *            The ID of the client who is in the queue
+	 * @param docKey
+	 *            The key of the document that the client is waiting for
+	 */
 	private void addToDocQueue(String clientID, String documentKey) {
-		/*
-		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
-		 * getThreadLocalRequest() .getAttribute(QUEUE_MAP);
-		 */
-
 		if (!queueMap.containsKey(documentKey)) {
 			queueMap.put(documentKey, Collections
 					.synchronizedList(new LinkedList<String>()));
@@ -448,20 +448,16 @@ CollaboratorService {
 		queue.add(clientID);
 
 		queueMap.put(documentKey, queue);
-		// getThreadLocalRequest().setAttribute(QUEUE_MAP, queueMap);
 	}
 
 	/**
+	 * Polls the next client waiting for the specified document
 	 * 
 	 * @param documentKey
-	 * @return a client ID of the next client waiting on this doc
+	 *            The document we want to find the next client for
+	 * @return A client ID of the next client waiting on this doc
 	 */
 	private String pollNextClient(String documentKey) {
-		/*
-		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
-		 * getThreadLocalRequest() .getAttribute(QUEUE_MAP);
-		 */
-
 		List<String> queue = queueMap.get(documentKey);
 		if (queue != null && !queue.isEmpty()) {
 			return queue.remove(0);
@@ -470,12 +466,16 @@ CollaboratorService {
 		return null;
 	}
 
+	/**
+	 * Removes a client from the specified doc queue
+	 * 
+	 * @param clientID
+	 *            The client we are trying to remove
+	 * @param documentKey
+	 *            The document we are trying to dequeue the client
+	 * @return Whether the client was removed successfully
+	 */
 	private boolean removeClient(String clientID, String documentKey) {
-		/*
-		 * Map<String, List<String>> queueMap = (Map<String, List<String>>)
-		 * getThreadLocalRequest() .getAttribute(QUEUE_MAP);
-		 */
-
 		List<String> queue = queueMap.get(documentKey);
 		if (queue != null) {
 			return queue.remove(clientID);
@@ -507,15 +507,33 @@ CollaboratorService {
 			addToDocQueue(clientID, documentKey);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#login(java
+	 * .lang.String)
+	 */
 	@Override
 	public String login(String clientID) {
 		return getChannelService().createChannel(clientID);
 	}
 
+	/**
+	 * Returns a channel service that can be used to do channel operations
+	 * 
+	 * @return A channel service that can be used to do channel operations
+	 */
 	private ChannelService getChannelService() {
 		return ChannelServiceFactory.getChannelService();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeedu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#
+	 * getLockedDocument(java.lang.String, java.lang.String)
+	 */
 	@Override
 	public LockedDocument getLockedDocument(String clientID, String documentKey)
 			throws LockUnavailable {
@@ -534,7 +552,7 @@ CollaboratorService {
 			// Get the document from the Datastore
 			Document toSave = pm.getObjectById(Document.class, key);
 
-			String identity = clientID;// getThreadLocalRequest().getRemoteAddr();
+			String identity = clientID;
 
 			// If the doc is locked and you own it...
 			if (!toSave.isLocked()
@@ -559,6 +577,13 @@ CollaboratorService {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#leaveLockQueue
+	 * (java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void leaveLockQueue(String clientID, String documentKey) {
 		removeClient(clientID, documentKey);
