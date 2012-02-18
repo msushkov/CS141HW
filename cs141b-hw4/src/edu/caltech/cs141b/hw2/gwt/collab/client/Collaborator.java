@@ -1331,9 +1331,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		simulation = false;
 		simulationStopping = true;
 
-		// Replace stop simulate button with the simulate button
-		docListButtonPanel.remove(stopSimulateButton);
-		docListButtonPanel.add(simulateButton);
+		disableButton(stopSimulateButton);
 
 		// since simulation is set to false, once the stuff we started finishes then
 		// the page will reload (code is in editSimulateDoc())		
@@ -1351,6 +1349,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		docListButtonPanel.remove(simulateButton);
 		docListButtonPanel.add(stopSimulateButton);
 
+		lockDownUI(); 
+		
 		// start thinking (wait for a random time and then become hungry 
 		// aka request lock)
 		simulateThinking();
