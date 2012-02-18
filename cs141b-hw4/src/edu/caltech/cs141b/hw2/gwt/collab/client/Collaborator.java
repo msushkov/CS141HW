@@ -1,6 +1,9 @@
 package edu.caltech.cs141b.hw2.gwt.collab.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import com.google.gwt.appengine.channel.client.Channel;
@@ -80,8 +83,13 @@ public class Collaborator extends Composite implements ClickHandler {
 			}
 		};
 		cleanLocksTimer.schedule(lockTime);
+		timerMap.put(docKey, cleanLocksTimer);
 	}
 
+	
+	private  Map<String, Timer> timerMap = new HashMap<String, Timer>();
+
+	
 	
 	// Keeps track of the shared simulation document.
 	protected LockedDocument simulateDoc;
@@ -1386,6 +1394,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected void setDoc(AbstractDocument doc, int index, String side) {
 		// set the tab text to the doc title
 		setTabText(doc.getTitle(), index, side);
+		
+		
 
 		if (side.equals("left"))
 			setGenericObjects(true);
@@ -1410,6 +1420,14 @@ public class Collaborator extends Composite implements ClickHandler {
 			// title and contents cannot be edited
 			titleList.get(index).setEnabled(false);
 			contentsList.get(index).setEnabled(false);
+			String key = doc.getKey();
+			
+			
+			// Cancel and remove the timer if there was one before the save was pressed.
+			if (timerMap.containsKey(key)) {
+				timerMap.get(key).cancel();
+				timerMap.remove(key);
+			}
 
 		} else {
 			hPanel.add(saveDocButton);
