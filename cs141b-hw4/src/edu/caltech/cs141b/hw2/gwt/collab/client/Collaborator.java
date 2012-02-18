@@ -995,13 +995,18 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// remove this client from the server's waiting queue associated
 		// with this doc
-		closer.removeFromServerQueue(currDoc.getKey());
+		if (currDoc instanceof LockedDocument) {
+			closer.removeFromServerQueue(currDoc.getKey());
+			releaser.releaseLock((LockedDocument) currDoc);
+		}
+
 
 		tabPanel.remove(ind);
 		docList.remove(ind);
 		contentsList.remove(ind);
 		titleList.remove(ind);
 
+		
 		// if we have another open tab before the deleted one
 		if (ind > 0) {
 			hPanel.clear();
