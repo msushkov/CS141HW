@@ -3,6 +3,6 @@
   <cron>
     <url>/clearlock</url>
     <description>Look for expired locks</description>
-    <schedule>every 40 seconds</schedule>
+    <schedule>every 1 minutes</schedule>
   </cron>
 </cronentries>

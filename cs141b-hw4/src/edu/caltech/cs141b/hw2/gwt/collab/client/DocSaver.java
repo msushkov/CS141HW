@@ -56,10 +56,11 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 	 */
 	public void saveDocument(LockedDocument lockedDoc, String side, int ind) {
 		this.lockedDocument = lockedDoc;
-		collaborator.collabService.saveDocument(collaborator.clientID,
-				lockedDoc, this);
 		this.side = side;
 		this.index = ind;
+		
+		collaborator.collabService.saveDocument(collaborator.clientID,
+				lockedDoc, this);
 
 		if (side.equals("left"))
 			collaborator.setGenericObjects(true);
@@ -73,7 +74,7 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 		area.setEnabled(false);
 
 		// disable the save doc button for this side (until this doc is saved)
-		collaborator.saveDocButton.setEnabled(false);
+		collaborator.disableButton(collaborator.saveDocButton);
 	}
 
 	@Override

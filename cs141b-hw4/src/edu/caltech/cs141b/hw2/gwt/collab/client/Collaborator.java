@@ -1,6 +1,9 @@
 package edu.caltech.cs141b.hw2.gwt.collab.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import com.google.gwt.appengine.channel.client.Channel;
@@ -18,6 +21,7 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -63,6 +67,9 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	// Boolean indicating whether a simulation is taking place
 	private boolean simulation = false;
+	
+	// Simulation data.
+	private boolean simulationStopping = false;
 	private int simulationTab = 0;
 	private String simulationSide;
 	private boolean simulateLeft = true; // is the simulate doc on L or R tabpanel?
@@ -80,8 +87,13 @@ public class Collaborator extends Composite implements ClickHandler {
 			}
 		};
 		cleanLocksTimer.schedule(lockTime);
+		timerMap.put(docKey, cleanLocksTimer);
 	}
 
+	
+	private  Map<String, Timer> timerMap = new HashMap<String, Timer>();
+
+	
 	
 	// Keeps track of the shared simulation document.
 	protected LockedDocument simulateDoc;
@@ -262,7 +274,10 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	private void loginComplete(String id) {
 		this.channelID = id;
+		
 		System.out.println(id);
+		
+		// defines how we receives messages from the server
 		ChannelFactory.createChannel(id, new ChannelCreatedCallback() {
 
 			@Override
@@ -328,7 +343,9 @@ public class Collaborator extends Composite implements ClickHandler {
 				});
 			}
 		});
-
+		
+		// refresh document list on login
+		lister.getDocumentList();
 	}
 
 	/**
@@ -976,13 +993,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		// get the doc that we are removing from the tabpanel
 		AbstractDocument currDoc = docList.get(ind);
 
-		/*
-		 * // if this doc is locked, release the lock since we are closing this
-		 * tab // (dont want a user locking their own document) if
-		 * (currDoc.getKey() != null && currDoc instanceof LockedDocument)
-		 * releaser.releaseLock((LockedDocument) currDoc);
-		 */
-
 		// remove this client from the server's waiting queue associated
 		// with this doc
 		closer.removeFromServerQueue(currDoc.getKey());
@@ -1122,6 +1132,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// which are taken care of in DocLocker
 		if (doc instanceof UnlockedDocument)
 			DocLocker.lockDoc(this, doc.getKey());
+		
 		disableButton(lockButton);
 	}
 
@@ -1227,6 +1238,9 @@ public class Collaborator extends Composite implements ClickHandler {
 		// act as if the user pressed the show right or left button
 		// since we want to display the simulate doc to the user
 		showDocumentButtonHandler(simulateLeft);
+		
+		// disable the UI since simulation is still going
+		lockDownUI();
 
 		// wait for a set time (simulationWwaitTimeUntilLockReq) and then
 		// call simulateHungryLock() which acts as if the user pressed the
@@ -1242,6 +1256,9 @@ public class Collaborator extends Composite implements ClickHandler {
 	private void simulateHungryLock() {
 		// request the lock for the simulation doc
 		lockDocumentButtonHandler(simulateLeft);
+		
+		// disable the UI since simulation is still going
+		lockDownUI();
 		
 		// at this point this client has requested the lock for the simulate doc.
 		// when the lock is acquired the DocLockedReader class calls the simulateEating()
@@ -1280,7 +1297,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// save this simulation doc so taht other clients can see its updates
 		DocSaver.saveDoc(this, simulateDoc, simulationSide, simulationTab);
-				
+		
 		// Simulation still running? If so start thinking again.
 		if (simulation) {
 			int thinkTime = thinkTimeMin + com.google.gwt.user.client.Random.nextInt(thinkTimeMax - thinkTimeMin);
@@ -1289,6 +1306,9 @@ public class Collaborator extends Composite implements ClickHandler {
 			// entire simulation process repeats
 			thinkingTimer.schedule(thinkTime);
 		}
+		// the simulation is done
+		else
+			Window.Location.reload(); // refresh the client page
 	}
 	
 	/**
@@ -1309,14 +1329,16 @@ public class Collaborator extends Composite implements ClickHandler {
 	private void stopSimulateButtonHandler() {
 		// Terminate simulation
 		simulation = false;
+		simulationStopping = true;
 
 		// Replace stop simulate button with the simulate button
 		docListButtonPanel.remove(stopSimulateButton);
 		docListButtonPanel.add(simulateButton);
-		
-		// TODO
-		// refresh the page? so that things go back to normal after simulation is done
+
+		// since simulation is set to false, once the stuff we started finishes then
+		// the page will reload (code is in editSimulateDoc())		
 	}
+	
 
 	/**
 	 * Called when the user presses the simulate button.
@@ -1329,9 +1351,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		docListButtonPanel.remove(simulateButton);
 		docListButtonPanel.add(stopSimulateButton);
 
-		// the user cannot do anything while the simulation runs
-		lockDownUI();
-
 		// start thinking (wait for a random time and then become hungry 
 		// aka request lock)
 		simulateThinking();
@@ -1339,7 +1358,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	
 	// END SIMULATION METHODS
 	// ===================================================================
-
 
 	/**
 	 * Returns true of key is in either of the lists, false otherwise.
@@ -1373,6 +1391,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		return contains;
 	}
 
+	
 	/**
 	 * Generalized so that it can be called elsewhere. In particular, after a
 	 * document is saved, it calls this function to simulate an initial reading
@@ -1386,6 +1405,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	protected void setDoc(AbstractDocument doc, int index, String side) {
 		// set the tab text to the doc title
 		setTabText(doc.getTitle(), index, side);
+		
+		
 
 		if (side.equals("left"))
 			setGenericObjects(true);
@@ -1404,29 +1425,61 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		if (doc instanceof UnlockedDocument) {
 			hPanel.add(lockButton);
-			enableButton(lockButton);
-			enableButton(refresh);
+			
+			// if simulation is still running or is finishing up, then disable buttons
+			if (simulation || simulationStopping)
+			{
+				disableButton(lockButton);
+				disableButton(refresh);
+			}
+			else
+			{				
+				enableButton(lockButton);
+				enableButton(refresh);
+			}	
 
 			// title and contents cannot be edited
 			titleList.get(index).setEnabled(false);
 			contentsList.get(index).setEnabled(false);
+			String key = doc.getKey();
+			
+			
+			// Cancel and remove the timer if there was one before the save was pressed.
+			if (timerMap.containsKey(key)) {
+				timerMap.get(key).cancel();
+				timerMap.remove(key);
+			}
 
-		} else {
+		} 
+		// we have a locked doc
+		else {
 			hPanel.add(saveDocButton);
-			enableButton(saveDocButton);
-			disableButton(refresh);
+			
+			// if simulation is still running or is finishing up, then disable buttons
+			if (simulation || simulationStopping)
+				disableButton(saveDocButton);
+			else
+				enableButton(saveDocButton);
 
 			// title and contents can now be edited
 			titleList.get(index).setEnabled(true);
 			contentsList.get(index).setEnabled(true);
+			
+			disableButton(refresh);
 		}
 
 		hPanel.add(refresh);
+		
+		// if simulation is still running or is finishing up, then disable buttons
+		if (simulation || simulationStopping)
+			disableButton(removeTabButton);
+		else 
+			enableButton(removeTabButton);
+		
 		hPanel.add(removeTabButton);
-
-		// enable lock, refreshDoc, and removeTab buttons
 	}
 
+	
 	/**
 	 * Enables the given button and removes the disabledCSS string part of the
 	 * CSS class
@@ -1446,6 +1499,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 	}
 
+	
 	/**
 	 * Disables the given button and adds the disabledCSS string to the current
 	 * CSS class
@@ -1464,18 +1518,20 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 	}
 
+	
 	/**
 	 * Lock the UI after the user presses the simulate button so that
 	 * no actions could be done.
 	 */
 	protected void lockDownUI() {
-		// TODO
-		// locks down the current interface for the user
-		
-		// disable all buttons under the doc list
+		// disable all buttons under the doc list, except the stop simulate button
 		for (Widget w : docListButtonPanel)
-			disableButton((Button) w);
-				
+		{
+			Button button = (Button) w;
+			if (button != stopSimulateButton)
+				disableButton(button);
+		}
+		
 		// disable all buttons in rightHPanel and leftHPanel
 		for (Widget w : rightHPanel)
 			disableButton((Button) w);
