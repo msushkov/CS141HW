@@ -27,6 +27,17 @@
   </servlet-mapping>
   
   
+  <!-- Restrict access to our cron url to admins and cron jobs only -->
+  <security-constraint>
+    <web-resource-collection>
+        <url-pattern>/clearlock</url-pattern>
+    </web-resource-collection>
+	<auth-constraint>
+        <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
+  
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>collab.html</welcome-file>
