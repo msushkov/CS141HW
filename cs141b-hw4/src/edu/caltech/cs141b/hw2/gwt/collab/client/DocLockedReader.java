@@ -62,10 +62,10 @@ public class DocLockedReader implements AsyncCallback<LockedDocument> {
 	public void onSuccess(LockedDocument result) {
 		collaborator.statusUpdate("Document Retrieved");
 		
-		// if the document for which we acquired the lock is the simulate
-		// doc (can only tell this based on its title), then go into the
-		// "eating" part of the simulation
-		if (result.getTitle().equals(collaborator.simulateDocTitle))
+		// if we are in simulation mode (or stopping), then go into the
+		// "eating" part of the simulation (if we are stopping then at least
+		// finish eating)
+		if (collaborator.simulation || collaborator.simulationStopping)
 			collaborator.simulateEating(result, index, side);
 		else
 			collaborator.setDoc(result, index, side);
@@ -121,9 +121,18 @@ public class DocLockedReader implements AsyncCallback<LockedDocument> {
 		box.setValue(result.getTitle());
 		area.setText(result.getContents());
 
-		// the user can now edit the title and the contents of this doc
-		box.setEnabled(true);
-		area.setEnabled(true);
+		// if not in simulation mode, the user can now edit the 
+		// title and the contents of this doc
+		if (!collaborator.simulation && !collaborator.simulationStopping)
+		{
+			box.setEnabled(true);
+			area.setEnabled(true);
+		}
+		else
+		{
+			box.setEnabled(false);
+			area.setEnabled(false);
+		}
 
 		// we need save, removeTab, and refresh buttons
 		collaborator.hPanel.clear();
@@ -131,8 +140,8 @@ public class DocLockedReader implements AsyncCallback<LockedDocument> {
 		collaborator.hPanel.add(collaborator.refresh);
 		collaborator.hPanel.add(collaborator.removeTabButton);
 
-		collaborator.saveDocButton.setEnabled(true);
-		collaborator.removeTabButton.setEnabled(true);
-		collaborator.refresh.setEnabled(false);
+		collaborator.enableButton(collaborator.saveDocButton);
+		collaborator.enableButton(collaborator.removeTabButton);
+		collaborator.disableButton(collaborator.refresh);
 	}
 }

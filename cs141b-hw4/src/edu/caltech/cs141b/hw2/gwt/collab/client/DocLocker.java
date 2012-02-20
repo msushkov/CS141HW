@@ -54,39 +54,4 @@ public class DocLocker implements AsyncCallback<Void> {
 	public void onSuccess(Void result) {
 		collaborator.statusUpdate("In document queue");
 	}
-
-	/**
-	 * If we successfully acquired the locker - can now edit the doc.
-	 * 
-	 * @param result
-	 * @param side
-	 * @param index
-	 */
-	/*
-	 * protected void gotDoc(LockedDocument result, String side, int index) { if
-	 * (side.equals("left")) collaborator.setGenericObjects(true); else
-	 * collaborator.setGenericObjects(false);
-	 * 
-	 * TextBox box = collaborator.titleList.get(index); TextArea area =
-	 * collaborator.contentsList.get(index);
-	 * 
-	 * collaborator.docList.set(index, result);
-	 * 
-	 * // set the title and contents of this doc to be the current thing on the
-	 * // page box.setValue(result.getTitle());
-	 * area.setText(result.getContents());
-	 * 
-	 * // the user can now edit the title and the contents of this doc
-	 * box.setEnabled(true); area.setEnabled(true);
-	 * 
-	 * // we need save, removeTab, and refresh buttons
-	 * collaborator.hPanel.clear();
-	 * collaborator.hPanel.add(collaborator.saveDocButton);
-	 * collaborator.hPanel.add(collaborator.refresh);
-	 * collaborator.hPanel.add(collaborator.removeTabButton);
-	 * 
-	 * collaborator.saveDocButton.setEnabled(true);
-	 * collaborator.removeTabButton.setEnabled(true);
-	 * collaborator.refresh.setEnabled(false); }
-	 */
 }

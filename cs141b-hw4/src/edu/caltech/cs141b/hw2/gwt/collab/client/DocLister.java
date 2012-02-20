@@ -61,6 +61,8 @@ public class DocLister implements AsyncCallback<List<DocumentMetadata>> {
 						.getKey());
 			}
 
+			// TODO
+			
 			// after doc list refreshes, select the more recent
 			// document (at the very bottom)
 			int num = collaborator.documentList.getItemCount();				
@@ -68,7 +70,10 @@ public class DocLister implements AsyncCallback<List<DocumentMetadata>> {
 		}
 
 		// we can press the refresh button again
-		collaborator.refreshDoc.setEnabled(true);
+		collaborator.enableButton(collaborator.refreshDoc);
+		
+		// disable simulate button
+		collaborator.disableButton(collaborator.simulateButton);
 	}
 
 }
