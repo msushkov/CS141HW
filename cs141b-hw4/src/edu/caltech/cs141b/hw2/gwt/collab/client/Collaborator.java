@@ -1438,6 +1438,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	private void simulationDone(String side, AbstractDocument doc)
 	{				
+		// TODO - this is buggy
+		
 		//Window.Location.reload(); // refresh the client page
 		
 		simulationStopping = false;
@@ -1447,7 +1449,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		if (doc instanceof LockedDocument)
 			releaser.releaseLock((LockedDocument) doc);
 		
-		clearLock(null);
+		//clearLock();
 		
 		if (side.equals("left"))
 			setGenericObjects(true);
@@ -1468,6 +1470,11 @@ public class Collaborator extends Composite implements ClickHandler {
 		enableButton(createNew);
 		enableButton(refreshList);
 		enableButton(simulateButton);
+		
+		// cannot edit the title and contents of this doc
+		int ind = tabPanel.getTabBar().getSelectedTab();
+		contentsList.get(ind).setEnabled(false);
+		titleList.get(ind).setEnabled(false);
 	}
 
 	// END SIMULATION METHODS
