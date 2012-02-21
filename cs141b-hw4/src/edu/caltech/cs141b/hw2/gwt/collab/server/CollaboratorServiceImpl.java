@@ -48,9 +48,6 @@ CollaboratorService {
 
 	private static ArrayList<String> lockedDocuments = new ArrayList<String>();
 
-	// Set of all the clients that are currently running the simulation.
-	private static Set<String> simulationClients = new HashSet<String>();
-
 	// This is a bit of a hack that takes advantage of the fact all the fields
 	// are static. We need this static field to allow ClearLockServlet to access
 	// some of the non static functions of this class.
