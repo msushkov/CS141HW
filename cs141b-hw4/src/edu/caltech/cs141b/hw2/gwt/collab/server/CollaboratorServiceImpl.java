@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -31,7 +33,7 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  */
 @SuppressWarnings("serial")
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
-		CollaboratorService {
+CollaboratorService {
 
 	// This is the time in seconds that clients can lock a document
 	private static final int LOCK_TIME = 30;
@@ -39,6 +41,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	// This object maps doc keys to queues of client IDs, which are the clients
 	// waiting for the document.
 	private static Map<String, List<String>> queueMap;
+
 	// This will map document keys to who owns the document. Either "server" or
 	// the clientID.
 	private static Map<String, String> tokenMap;
@@ -438,6 +441,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 *            The key of the document that the client is waiting for
 	 */
 	private void addToDocQueue(String clientID, String documentKey) {
+		// TODO
+		// inform the client which place in line it is
+		
 		if (!queueMap.containsKey(documentKey)) {
 			queueMap.put(documentKey, Collections
 					.synchronizedList(new LinkedList<String>()));
