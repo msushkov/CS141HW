@@ -75,9 +75,9 @@ public class Collaborator extends Composite implements ClickHandler {
 	private boolean simulateLeft = true; // is the simulate doc on L or R
 	// tabpanel?
 	private int thinkTimeMin = 2000;
-	private int thinkTimeMax = 5000;
+	private int thinkTimeMax = 2000;
 	private int eatTimeMin = 4000;
-	private int eatTimeMax = 6000;
+	private int eatTimeMax = 4000;
 	private int simulationWaitTimeUntilLockReq = 1000;
 	private int lockTime = 35 * 1000;
 
@@ -109,6 +109,8 @@ public class Collaborator extends Composite implements ClickHandler {
 			simulateHungry();
 		}
 	};
+	
+
 
 	/**
 	 * Calls editSimulateDoc() when the timer fires.
@@ -247,6 +249,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		initWidget(mainOuterPanel);
 
+		
 		Random r = new Random();
 		clientID = "";
 
@@ -307,7 +310,7 @@ public class Collaborator extends Composite implements ClickHandler {
 						// Remove whitespace characters to help identify
 						// equality
 						key = key.trim();
-
+						statusUpdate(key);
 						// what if we have a message of the type position: n?
 						// update this client of its place in line
 						if (key.startsWith(positionMessagePrefix))
@@ -1328,14 +1331,20 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * Waits for a random thinking time and then becomes hungry.
 	 */
 	private void simulateThinking() {
+
 		// Generate an int between and thinkTimeMin up to but not including
 		// thinkTimeMax
 		int thinkTime = thinkTimeMin
 				+ com.google.gwt.user.client.Random.nextInt(thinkTimeMax
 						- thinkTimeMin);
+		
+		// disable any possibly running timer
+		thinkingTimer.cancel();
 
 		// wait for the thinking time and then call simulateHungry()
 		thinkingTimer.schedule(thinkTime);
+		statusUpdate("Thinking");
+
 	}
 
 	/**
@@ -1343,6 +1352,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	private void simulateHungry() 
 	{
+		statusUpdate("Hungry");
+
 		// at this point the correct doc is selected by the user since simulate
 		// button can only be pressed after user selects a doc from the doc list
 
@@ -1410,6 +1421,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 *            Which side is this doc on?
 	 */
 	public void simulateEating(LockedDocument doc, int index, String side) {
+		statusUpdate("eating");
 		simulateDoc = doc;
 		simulationTab = index;
 		simulationSide = side;
