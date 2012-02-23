@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -454,6 +452,7 @@ CollaboratorService {
 		int pos = queue.size() + 1;
 		
 		// inform the client which place in line it is
+		//System.out.println("sending pos");
 		getChannelService().sendMessage(new ChannelMessage(clientID, "position: " + pos));
 	}
 

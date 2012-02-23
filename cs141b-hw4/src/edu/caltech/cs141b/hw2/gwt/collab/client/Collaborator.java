@@ -20,6 +20,7 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -62,7 +63,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	final protected String simulateDocTitle = "Simulation Document.";
 	final protected String simulateDocContents = "Client IDs:\n";
 	final private String disabledCSS = "Disabled";
-	final protected String positionMessagePrefix = "position: ";
+	private static final String POSITION_MSG_PREFIX = "position: ";
 
 	// Boolean indicating whether a simulation is taking place
 	protected boolean simulation = false;
@@ -72,7 +73,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	private int simulationTab = 0;
 	private String simulationSide;
 	private boolean simulateLeft = true; // is the simulate doc on L or R
-	// tabpanel?
 	private int thinkTimeMin = 2000;
 	private int thinkTimeMax = 5000;
 	private int eatTimeMin = 4000;
@@ -299,6 +299,7 @@ public class Collaborator extends Composite implements ClickHandler {
 					 */
 					@Override
 					public void onMessage(String key) {
+						//System.out.println("message: " + key);
 						// Setting side to left per default
 						String side = "left";
 						int tabId = NOT_IN_TAB;
@@ -309,8 +310,8 @@ public class Collaborator extends Composite implements ClickHandler {
 
 						// what if we have a message of the type position: n?
 						// update this client of its place in line
-						if (key.startsWith(positionMessagePrefix))
-							statusUpdate("Position in line: " + key.substring(positionMessagePrefix.length()));
+						if (key.startsWith(POSITION_MSG_PREFIX))
+							statusUpdate("Position in line: " + key.substring(POSITION_MSG_PREFIX.length()));
 
 						// our message is the actual lock
 						else
