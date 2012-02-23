@@ -96,7 +96,6 @@ CollaboratorService {
 				// Do some cleanup
 				pm.close();
 			}
-
 		}
 	}
 
@@ -369,7 +368,6 @@ CollaboratorService {
 
 		// Finally, inform the client that the doc is locked and ready for them
 		getChannelService().sendMessage(new ChannelMessage(clientID, docKey));
-
 	}
 
 	/*
@@ -440,20 +438,23 @@ CollaboratorService {
 	 * @param docKey
 	 *            The key of the document that the client is waiting for
 	 */
-	private void addToDocQueue(String clientID, String documentKey) {
-		// TODO
-		// inform the client which place in line it is
-		
+	private void addToDocQueue(String clientID, String documentKey) {		
+		// if we dont already have this doc key in our map, add it in there
 		if (!queueMap.containsKey(documentKey)) {
 			queueMap.put(documentKey, Collections
 					.synchronizedList(new LinkedList<String>()));
 		}
 
+		// add the client to the queue for that particular doc
 		List<String> queue = queueMap.get(documentKey);
-
 		queue.add(clientID);
-
 		queueMap.put(documentKey, queue);
+		
+		// this is the position of the newly added client in the queue
+		int pos = queue.size() + 1;
+		
+		// inform the client which place in line it is
+		getChannelService().sendMessage(new ChannelMessage(clientID, "position: " + pos));
 	}
 
 	/**
@@ -499,7 +500,6 @@ CollaboratorService {
 	 */
 	@Override
 	public void lockDocument(String clientID, String documentKey) {
-
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
 
@@ -580,7 +580,6 @@ CollaboratorService {
 			}
 			pm.close();
 		}
-
 	}
 
 	/*
