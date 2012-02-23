@@ -281,8 +281,16 @@ textarea {
     background:transparent url(Simulate.png) no-repeat center top;
 }
 
+.simulateButtonDisabled {
+    background:transparent url(Simulate-grey.png) no-repeat center top;
+}
+
 .stopSimulateButton {
     background:transparent url(StopSimulate.png) no-repeat center top;
+}
+
+.stopSimulateButtonDisabled {
+    background:transparent url(StopSimulate-grey.png) no-repeat center top;
 }
 
 .createNewButtonDisabled {
