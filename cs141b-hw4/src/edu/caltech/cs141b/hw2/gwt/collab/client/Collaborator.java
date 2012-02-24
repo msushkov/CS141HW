@@ -299,7 +299,6 @@ public class Collaborator extends Composite implements ClickHandler {
 					 */
 					@Override
 					public void onMessage(String key) {
-						//System.out.println("message: " + key);
 						// Setting side to left per default
 						String side = "left";
 						int tabId = NOT_IN_TAB;
@@ -1177,7 +1176,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			DocLocker.lockDoc(this, doc.getKey());
 
 		disableButton(lockButton);
-		
+
 		// if in simulation, disable simulate button and the doc title and contents
 		if (simulation)
 		{

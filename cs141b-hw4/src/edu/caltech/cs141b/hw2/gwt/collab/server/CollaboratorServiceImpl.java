@@ -221,6 +221,7 @@ CollaboratorService {
 	@Override
 	public UnlockedDocument saveDocument(String clientID, LockedDocument doc)
 			throws LockExpired {
+		System.out.println(clientID + " is saving");
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -302,6 +303,7 @@ CollaboratorService {
 	private void receiveToken(String clientID, String docKey) {
 		// Return the token
 		tokenMap.put(docKey, "server");
+		System.out.println(clientID + " giving back token");
 
 		// If there is no document waiting for the document remove from list of
 		// locked docs
@@ -325,6 +327,7 @@ CollaboratorService {
 	 *            The key of the document whose token we are receiving
 	 */
 	private void sendToken(final String clientID, final String docKey) {
+		System.out.println("sending token to " + clientID);
 		// Now, set the correct clientID. We are "giving" them the token here.
 		tokenMap.put(docKey, clientID);
 
@@ -448,11 +451,15 @@ CollaboratorService {
 		queue.add(clientID);
 		queueMap.put(documentKey, queue);
 		
+		System.out.println("\nSomething");
+		for (String s : queue) {
+			System.out.print(s + ", ");
+		}
+		
 		// this is the position of the newly added client in the queue
-		int pos = queue.size() + 1;
+		int pos = queue.size();
 		
 		// inform the client which place in line it is
-		//System.out.println("sending pos");
 		getChannelService().sendMessage(new ChannelMessage(clientID, "position: " + pos));
 	}
 
@@ -501,7 +508,7 @@ CollaboratorService {
 	public void lockDocument(String clientID, String documentKey) {
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
-
+		System.out.println(clientID + " Trying to lock");
 		if (!tokenMap.containsKey(documentKey))
 			tokenMap.put(documentKey, "server");
 
@@ -543,6 +550,7 @@ CollaboratorService {
 	public LockedDocument getLockedDocument(String clientID, String documentKey)
 			throws LockUnavailable {
 
+		System.out.println(clientID + " getting locked document");
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
