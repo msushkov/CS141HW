@@ -453,10 +453,12 @@ CollaboratorService {
 		System.out.println(queue.size());
 		queueMap.put(documentKey, queue);
 		
-		System.out.println("\nSomething");
+		System.out.print("\nQueue ");
 		for (String s : queue) {
 			System.out.print(s + ", ");
 		}
+		
+		System.out.println();
 		
 		// this is the position of the newly added client in the queue
 		int pos = queue.size();

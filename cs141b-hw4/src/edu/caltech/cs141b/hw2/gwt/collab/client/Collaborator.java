@@ -95,10 +95,10 @@ public class Collaborator extends Composite implements ClickHandler {
 	// Keeps track of the shared simulation document.
 	protected LockedDocument simulateDoc;
 
-	// Set the first time we open the current simulation doc, so we dont open 
+	// Set the first time we open the current simulation doc, so we dont open
 	// more than one
 	private boolean isSimDocAlreadyOpen;
-	
+
 	/**
 	 * Calls simulateHungry() when the timer fires.
 	 */
@@ -108,8 +108,6 @@ public class Collaborator extends Composite implements ClickHandler {
 			simulateHungry();
 		}
 	};
-	
-
 
 	/**
 	 * Calls editSimulateDoc() when the timer fires.
@@ -139,7 +137,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	// For using the Channel API.
 	protected String channelID;
 	protected String clientID;
-	
+
 	// Track document information.
 	protected ArrayList<AbstractDocument> documentsLeftList = new ArrayList<AbstractDocument>();
 	protected ArrayList<AbstractDocument> documentsRightList = new ArrayList<AbstractDocument>();
@@ -248,7 +246,6 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		initWidget(mainOuterPanel);
 
-		
 		Random r = new Random();
 		clientID = "";
 
@@ -313,14 +310,16 @@ public class Collaborator extends Composite implements ClickHandler {
 						// what if we have a message of the type position: n?
 						// update this client of its place in line
 						if (key.startsWith(POSITION_MSG_PREFIX))
-							statusUpdate("Position in line: " + key.substring(POSITION_MSG_PREFIX.length()));
+							statusUpdate("Position in line: "
+									+ key.substring(POSITION_MSG_PREFIX
+											.length()));
 
 						// our message is the actual lock
-						else
-						{
+						else {
 							// see if the doc is on the left tab panel
 							for (int i = 0; i < documentsLeftList.size(); i++) {
-								if (documentsLeftList.get(i).getKey().equals(key)) {
+								if (documentsLeftList.get(i).getKey().equals(
+										key)) {
 									tabId = i;
 									break;
 								}
@@ -329,8 +328,8 @@ public class Collaborator extends Composite implements ClickHandler {
 							// If still not found look at the right documents
 							if (tabId == NOT_IN_TAB) {
 								for (int i = 0; i < documentsRightList.size(); i++) {
-									if (documentsRightList.get(i).getKey().equals(
-											key)) {
+									if (documentsRightList.get(i).getKey()
+											.equals(key)) {
 										tabId = i;
 										side = "right";
 										break;
@@ -339,16 +338,18 @@ public class Collaborator extends Composite implements ClickHandler {
 
 							}
 
-							// if we found the doc on either the right or left tab panel
+							// if we found the doc on either the right or left
+							// tab panel
 							if (tabId != NOT_IN_TAB) {
 								statusUpdate("Locked reader");
 								DocLockedReader.getLockedDoc(hacksAreLol, key,
 										side, tabId);
 
-								// Add a timer to report back to server after the
+								// Add a timer to report back to server after
+								// the
 								// time has expired.
 								clearLock(key);
-							} 
+							}
 
 							else
 								statusUpdate("ZOMG YOU GOT A LOCK BUT YOU CLOSED THE DOC YE FOOL!");
@@ -763,17 +764,14 @@ public class Collaborator extends Composite implements ClickHandler {
 		titleBox.setText(title);
 		areaBox.setText(content);
 
-		if (simulation)
-		{
-			//titleBox.setEnabled(false);
-			//areaBox.setEnabled(false);
-		}
-		else
-		{
+		if (simulation) {
+			// titleBox.setEnabled(false);
+			// areaBox.setEnabled(false);
+		} else {
 			titleBox.setEnabled(true);
 			areaBox.setEnabled(true);
 		}
-		
+
 		// if user hits the 'enter' key anywhere in the title box, move cursor
 		// to the end of the contents box
 		titleBox.addKeyUpHandler(new KeyUpHandler() {
@@ -1037,13 +1035,11 @@ public class Collaborator extends Composite implements ClickHandler {
 			releaser.releaseLock((LockedDocument) currDoc);
 		}
 
-
 		tabPanel.remove(ind);
 		docList.remove(ind);
 		contentsList.remove(ind);
 		titleList.remove(ind);
 
-		
 		// if we have another open tab before the deleted one
 		if (ind > 0) {
 			hPanel.clear();
@@ -1110,8 +1106,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		// enable 'new doc' button
 		enableButton(createNew);
 
-						// user cannot start the simulation at this point
-						disableButton(simulateButton);
+		// user cannot start the simulation at this point
+		disableButton(simulateButton);
 	}
 
 	/**
@@ -1130,7 +1126,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			// if title and contents have not been changed, no need to save
 			if (doc.getTitle().equals(titleList.get(ind).getValue())
 					&& doc.getContents()
-					.equals(contentsList.get(ind).getText()))
+							.equals(contentsList.get(ind).getText()))
 				statusUpdate("No document changes; not saving.");
 
 			// otherwise if stuff was changed, save
@@ -1180,9 +1176,9 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		disableButton(lockButton);
 
-		// if in simulation, disable simulate button and the doc title and contents
-		if (simulation)
-		{
+		// if in simulation, disable simulate button and the doc title and
+		// contents
+		if (simulation) {
 			disableButton(simulateButton);
 
 			// user cannot edit the doc while simulation is running
@@ -1228,7 +1224,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		} else {
 			documentsRightList.add(null);
 			addTab(title, "", false);
-			DocReader.readDoc(this, key, "right", documentsRightList.size() - 1);
+			DocReader
+					.readDoc(this, key, "right", documentsRightList.size() - 1);
 		}
 
 		openLatestTab(side);
@@ -1263,19 +1260,17 @@ public class Collaborator extends Composite implements ClickHandler {
 
 			// disable new doc if no more space anywhere
 			if (numLeftTabs >= maxTabsOnOneSide
-					&& numRightTabs >= maxTabsOnOneSide) 
-			{
+					&& numRightTabs >= maxTabsOnOneSide) {
 				disableButton(createNew);
 				statusUpdate("No more space on the tab panels!");
 			}
-			
+
 			// if simulation is not running or not stopping
-			if (!simulation && !simulationStopping)
-			{
+			if (!simulation && !simulationStopping) {
 				// Replace stop-simulate button with simulate button
 				docListButtonPanel.remove(stopSimulateButton);
 				docListButtonPanel.add(simulateButton);
-				
+
 				// enable simulate button
 				enableButton(simulateButton);
 			}
@@ -1298,7 +1293,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// then add the sim button so this client can enter the simulation again
 		disableButton(stopSimulateButton);
 
-		// since simulation is set to false, once the thinking/hungry/eating 
+		// since simulation is set to false, once the thinking/hungry/eating
 		// phases we started finish then we need to enable some buttons
 		// (code is in editSimulateDoc())
 	}
@@ -1313,7 +1308,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// Start the simulation
 		simulation = true;
 		simulationStopping = false;
-		
+
 		// Replace simulate button with stop simulate button
 		docListButtonPanel.remove(simulateButton);
 		docListButtonPanel.add(stopSimulateButton);
@@ -1325,7 +1320,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// aka request lock)
 		simulateThinking();
 	}
-	
+
 	/**
 	 * Waits for a random thinking time and then becomes hungry.
 	 */
@@ -1336,7 +1331,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		int thinkTime = thinkTimeMin
 				+ com.google.gwt.user.client.Random.nextInt(thinkTimeMax
 						- thinkTimeMin);
-		
+
 		// disable any possibly running timer
 		thinkingTimer.cancel();
 
@@ -1349,8 +1344,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	/**
 	 * Called after the client is done thinking.
 	 */
-	private void simulateHungry() 
-	{
+	private void simulateHungry() {
 		statusUpdate("Hungry");
 
 		// at this point the correct doc is selected by the user since simulate
@@ -1358,27 +1352,29 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// check if the current simulation doc is already open
 		// in a tab, and if so, dont open it again.
-		// for this, keep a boolean variable that we set once we open up the sim doc
+		// for this, keep a boolean variable that we set once we open up the sim
+		// doc
 		// for the first time.
-		
+
 		// if we havent already opened a simulation doc for this client
-		if (!isSimDocAlreadyOpen)
-		{
+		if (!isSimDocAlreadyOpen) {
 			isSimDocAlreadyOpen = true;
-			
+
 			// figure out which side to open the simulate doc on
 			if (documentsL.getTabBar().getTabCount() < maxTabsOnOneSide)
 				simulateLeft = true;
 			else if (documentsR.getTabBar().getTabCount() < maxTabsOnOneSide)
 				simulateLeft = false;
-			else
+			else {
 				statusUpdate("Tabs panels are full...");
-	
+				return;
+			}
+
 			// act as if the user pressed the show right or left button
 			// since we want to display the simulate doc to the user
 			showDocumentButtonHandler(simulateLeft);
 		}
-		
+
 		// disable the UI since simulation is still going
 		lockDownUI();
 
@@ -1441,29 +1437,30 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * Called when the eatingTimer goes off - we have waited the appropriate
 	 * time and can now edit the simulation doc.
 	 */
-	protected void editSimulateDoc() {		
+	protected void editSimulateDoc() {
 		// edit the simulation doc - append the client id to its contents
-
 
 		// save this simulation doc so that other clients can see its updates
 		DocSaver.saveDoc(this, simulateDoc, simulationSide, simulationTab);
-		//saveDocumentButtonHandler(simulateLeft);
-		
-		// Simulation still running? If so start thinking again. But we cannot do this here
-		// since we must make sure the doc is saved before we can continue. Thus, do this
+		// saveDocumentButtonHandler(simulateLeft);
+
+		// Simulation still running? If so start thinking again. But we cannot
+		// do this here
+		// since we must make sure the doc is saved before we can continue.
+		// Thus, do this
 		// in setDoc (called by DocSaver).
 	}
-	
+
 	/**
-	 * Called by setDoc() after saveDoc - after the eating phase. Either continues
-	 * the simulation or 
-	 * @param doc 
+	 * Called by setDoc() after saveDoc - after the eating phase. Either
+	 * continues the simulation or
+	 * 
+	 * @param doc
 	 */
-	protected void simulationDone()
-	{				
+	protected void simulationDone() {
+		System.out.println("Saved.  Trying to restart " + clientID);
 		// if we are still in simulation mode, start thinking again
-		if (simulation)
-		{
+		if (simulation) {
 			lockDownUI();
 
 			int thinkTime = thinkTimeMin
@@ -1474,14 +1471,13 @@ public class Collaborator extends Composite implements ClickHandler {
 			// entire simulation process repeats
 			thinkingTimer.schedule(thinkTime);
 		}
-		// simulation is done 
-		else 
-		{
+		// simulation is done
+		else {
 			// no longer in stopping mode
 			simulationStopping = false;
-			
+
 			// refresh the client page
-			Window.Location.reload(); 		
+			Window.Location.reload();
 		}
 	}
 
@@ -1656,7 +1652,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 
 		// disable all buttons in rightHPanel and leftHPanel
-		
+
 		for (Widget w : rightHPanel)
 			disableButton((Button) w);
 
