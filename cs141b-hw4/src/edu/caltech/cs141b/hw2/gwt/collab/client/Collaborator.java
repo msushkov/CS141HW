@@ -1599,6 +1599,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			enableButton(removeTabButton);
 
 		hPanel.add(removeTabButton);
+
 	}
 
 	/**
