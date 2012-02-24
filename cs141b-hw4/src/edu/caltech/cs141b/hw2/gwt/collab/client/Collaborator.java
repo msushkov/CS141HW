@@ -1426,6 +1426,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		simulationTab = index;
 		simulationSide = side;
 
+		simulateDoc.setContents(simulateDoc.getContents() + "\nClient: "
+				+ clientID);
 		// Wait random time before editing the doc
 		int eatTime = eatTimeMin
 				+ com.google.gwt.user.client.Random.nextInt(eatTimeMax
@@ -1442,8 +1444,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	protected void editSimulateDoc() {		
 		// edit the simulation doc - append the client id to its contents
-		simulateDoc.setContents(simulateDoc.getContents() + "\nClient: "
-				+ clientID);
+
 
 		// save this simulation doc so that other clients can see its updates
 		DocSaver.saveDoc(this, simulateDoc, simulationSide, simulationTab);

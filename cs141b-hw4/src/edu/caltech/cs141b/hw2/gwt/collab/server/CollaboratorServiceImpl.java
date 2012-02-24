@@ -446,6 +446,8 @@ CollaboratorService {
 		// add the client to the queue for that particular doc
 		List<String> queue = queueMap.get(documentKey);
 		queue.add(clientID);
+		
+		System.out.println(queue.size());
 		queueMap.put(documentKey, queue);
 		
 		// this is the position of the newly added client in the queue
