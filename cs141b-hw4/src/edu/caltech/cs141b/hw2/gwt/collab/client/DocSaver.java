@@ -90,7 +90,14 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 		}
 
 		if (lockedDocument != null)
+		{
 			collaborator.setDoc(lockedDocument.unlock(), index, side);
+			
+			// is simulation enabled? then keep going.
+			// if we are stopping, then finish.
+			if (collaborator.simulation || collaborator.simulationStopping)
+				collaborator.simulationDone();
+		}
 	}
 
 	@Override
@@ -100,6 +107,11 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 				+ "' successfully saved.");
 
 		collaborator.setDoc(result, index, side);
+		
+		// is simulation enabled? then keep going.
+		// if we are stopping, then finish.
+		if (collaborator.simulation || collaborator.simulationStopping)
+			collaborator.simulationDone();
 
 		// Refresh list in case title was changed.
 		collaborator.lister.getDocumentList();

@@ -1459,7 +1459,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * the simulation or 
 	 * @param doc 
 	 */
-	private void simulationDone()
+	protected void simulationDone()
 	{				
 		// if we are still in simulation mode, start thinking again
 		if (simulation)
@@ -1603,13 +1603,6 @@ public class Collaborator extends Composite implements ClickHandler {
 			enableButton(removeTabButton);
 
 		hPanel.add(removeTabButton);
-	
-		// end original setDoc
-		
-		// is simulation enabled? then keep going.
-		// if we are stopping, then finish.
-		if (simulation || simulationStopping)
-			simulationDone();
 	}
 
 	/**
