@@ -52,6 +52,7 @@ public class DocLocker implements AsyncCallback<Void> {
 
 	@Override
 	public void onSuccess(Void result) {
+		System.out.println("Client trying to enter queue " + collaborator.clientID);
 		collaborator.statusUpdate("In document queue");
 	}
 }
