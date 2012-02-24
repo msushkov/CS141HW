@@ -58,7 +58,7 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 		this.lockedDocument = lockedDoc;
 		this.side = side;
 		this.index = ind;
-		
+
 		collaborator.collabService.saveDocument(collaborator.clientID,
 				lockedDoc, this);
 
@@ -89,8 +89,14 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 			collaborator.releaser.releaseLock(lockedDocument);
 		}
 
-		if (lockedDocument != null)
+		if (lockedDocument != null) {
 			collaborator.setDoc(lockedDocument.unlock(), index, side);
+
+			// is simulation enabled? then keep going.
+			// if we are stopping, then finish.
+			if (collaborator.simulation || collaborator.simulationStopping)
+				collaborator.simulationDone();
+		}
 	}
 
 	@Override
@@ -101,6 +107,10 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 
 		collaborator.setDoc(result, index, side);
 
+		// is simulation enabled? then keep going.
+		// if we are stopping, then finish.
+		if (collaborator.simulation || collaborator.simulationStopping)
+			collaborator.simulationDone();
 		// Refresh list in case title was changed.
 		collaborator.lister.getDocumentList();
 

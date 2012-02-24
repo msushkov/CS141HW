@@ -1457,7 +1457,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 * 
 	 * @param doc
 	 */
-	private void simulationDone() {
+	protected void simulationDone() {
 		System.out.println("Saved.  Trying to restart " + clientID);
 		// if we are still in simulation mode, start thinking again
 		if (simulation) {
@@ -1600,12 +1600,6 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		hPanel.add(removeTabButton);
 
-		// end original setDoc
-
-		// is simulation enabled? then keep going.
-		// if we are stopping, then finish.
-		if (simulation || simulationStopping)
-			simulationDone();
 	}
 
 	/**
