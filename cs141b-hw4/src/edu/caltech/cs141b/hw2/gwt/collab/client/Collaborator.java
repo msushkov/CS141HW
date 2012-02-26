@@ -45,9 +45,13 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  */
 public class Collaborator extends Composite implements ClickHandler {
 
-	private Collaborator hacksAreLol = this;
+	private Collaborator self = this;
 
+	
+	// Length of channel ID identifier
 	private static final int CLIENT_ID_LEN = 16;
+	
+	// Possible characters for channel ID
 	private static final String POSS_LOGIN_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
 
 	final private static int maxTabTextLen = 13;
@@ -80,16 +84,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	private int simulationWaitTimeUntilLockReq = 1000;
 	private int lockTime = 35 * 1000;
 
-	private void clearLock(final String docKey) {
-		Timer cleanLocksTimer = new Timer() {
-			public void run() {
-				releaser.cleanLock(docKey);
-			}
-		};
-		cleanLocksTimer.schedule(lockTime);
-		timerMap.put(docKey, cleanLocksTimer);
-	}
-
+	// A hashmap from document keys to timers.
 	private Map<String, Timer> timerMap = new HashMap<String, Timer>();
 
 	// Keeps track of the shared simulation document.
@@ -98,38 +93,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	// Set the first time we open the current simulation doc, so we dont open
 	// more than one
 	private boolean isSimDocAlreadyOpen;
-
-	/**
-	 * Calls simulateHungry() when the timer fires.
-	 */
-	private Timer thinkingTimer = new Timer() {
-		// after the timer goes off, go to the hungry state
-		public void run() {
-			simulateHungry();
-		}
-	};
-
-	/**
-	 * Calls editSimulateDoc() when the timer fires.
-	 */
-	private Timer eatingTimer = new Timer() {
-		// when the timer goes off, we have waited some time, so can now
-		// edit the doc
-		public void run() {
-			editSimulateDoc();
-		}
-	};
-
-	/**
-	 * Calls simulateHungryLock() when the timer fires.
-	 */
-	private Timer delayProblemTimer = new Timer() {
-		// when the timer goes off, we have waited the needed time before
-		// requesting the lock, so now go ahead and request it
-		public void run() {
-			simulateHungryLock();
-		}
-	};
 
 	// The connection to the server.
 	protected CollaboratorServiceAsync collabService;
@@ -201,6 +164,58 @@ public class Collaborator extends Composite implements ClickHandler {
 	// The main outer panel where everything lives.
 	private HorizontalPanel mainOuterPanel;
 
+	
+	// TIMERS
+	/**
+	 * Calls simulateHungry() when the timer fires.
+	 */
+	private Timer thinkingTimer = new Timer() {
+		// after the timer goes off, go to the hungry state
+		public void run() {
+			simulateHungry();
+		}
+	};
+
+	
+	
+	/**
+	 * Timer which will contact server once the max lock time has expired. Calls cleanLock()
+	 */ 
+	private void clearLock(final String docKey) {
+		Timer cleanLocksTimer = new Timer() {
+			public void run() {
+				releaser.cleanLock(docKey);
+			}
+		};
+		cleanLocksTimer.schedule(lockTime);
+		
+		// Add to the docKey->Timer hashmap for bookkeeping
+		timerMap.put(docKey, cleanLocksTimer);
+	}
+	/**
+	 * Calls editSimulateDoc() when the timer fires.
+	 */
+	private Timer eatingTimer = new Timer() {
+		// when the timer goes off, we have waited some time, so can now
+		// edit the doc
+		public void run() {
+			editSimulateDoc();
+		}
+	};
+
+	/**
+	 * Calls simulateHungryLock() when the timer fires.
+	 */
+	private Timer delayProblemTimer = new Timer() {
+		// when the timer goes off, we have waited the needed time before
+		// requesting the lock, so now go ahead and request it
+		public void run() {
+			simulateHungryLock();
+		}
+	};
+	
+	
+	
 	/**
 	 * UI initialization.
 	 * 
@@ -352,7 +367,7 @@ public class Collaborator extends Composite implements ClickHandler {
 							}
 
 							else
-								statusUpdate("ZOMG YOU GOT A LOCK BUT YOU CLOSED THE DOC YE FOOL!");
+								statusUpdate("Lock acquired for closed document");
 						}
 					}
 
