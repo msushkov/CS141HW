@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 public class ClearLockServlet extends HttpServlet {
 
-	
 	/**
 	 * Cleans expired locks by calling cleanLocks() of the
 	 * CollaboratorServiceImpl class. To be called by a cron job at

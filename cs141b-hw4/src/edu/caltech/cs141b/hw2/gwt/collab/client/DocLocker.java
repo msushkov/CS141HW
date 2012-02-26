@@ -1,6 +1,5 @@
 package edu.caltech.cs141b.hw2.gwt.collab.client;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -8,6 +7,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class DocLocker implements AsyncCallback<Void> {
 
+	// Stores a reference to the collaborator object so we can communicate with 
+	// the client.
 	private Collaborator collaborator;
 
 	/**
@@ -31,8 +32,7 @@ public class DocLocker implements AsyncCallback<Void> {
 	}
 
 	/**
-	 * Sends a request to be added to the locked document queue
-	 * 
+	 * Sends a request to be added to the locked document queue.
 	 * @param key
 	 * @param side
 	 * @param index
@@ -40,19 +40,16 @@ public class DocLocker implements AsyncCallback<Void> {
 	public void lockDocument(String key) {
 		// this calls the server's method addToDocQueue: essentially
 		// asks the server to enqueue this request for the lock
-		collaborator.collabService.lockDocument(collaborator.clientID, key,
-				this);
+		collaborator.collabService.lockDocument(collaborator.clientID, key, this);
 	}
 
 	@Override
 	public void onFailure(Throwable caught) {
 		collaborator.statusUpdate("Error entering lock queue");
-		GWT.log("Error entering lock queue.", caught);
 	}
 
 	@Override
 	public void onSuccess(Void result) {
-		System.out.println("Client trying to enter queue " + collaborator.clientID);
-		collaborator.statusUpdate("In document queue");
+		collaborator.statusUpdate("In document queue.");
 	}
 }

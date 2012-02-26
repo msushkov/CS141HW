@@ -32,9 +32,9 @@ public class DocReleaser implements AsyncCallback<Void> {
 
 	@Override
 	public void onFailure(Throwable caught) {
-		if (caught instanceof LockExpired) {
+		if (caught instanceof LockExpired) 
 			collaborator.statusUpdate("Lock had already expired; release failed.");
-		} else {
+		else {
 			collaborator.statusUpdate("Error releasing document"
 					+ "; caught exception " + caught.getClass()
 					+ " with message: " + caught.getMessage());

@@ -44,6 +44,7 @@ CollaboratorService {
 	// the clientID.
 	private static Map<String, String> tokenMap;
 
+	// Contains the currently-locked documents.
 	private static ArrayList<String> lockedDocuments = new ArrayList<String>();
 
 	// This is a bit of a hack that takes advantage of the fact all the fields
@@ -52,8 +53,8 @@ CollaboratorService {
 	private static CollaboratorServiceImpl server = new CollaboratorServiceImpl();
 
 	/**
-	 * The constructor for this server. I'm not sure how GAE splits up work on
-	 * its servers, so I made sure all the maps were thread safe. Also, the cron
+	 * The constructor for this server. We are not sure how GAE splits up work on
+	 * its servers, so we made sure all the maps were thread safe. Also, the cron
 	 * job might lead to concurrent modification.
 	 */
 	public CollaboratorServiceImpl() {
@@ -64,9 +65,7 @@ CollaboratorService {
 
 	/**
 	 * Cleans lock for an individual document
-	 * 
-	 * @param docKey
-	 *            - The dockey for the document we want to clean the locks of
+	 * @param docKey The dockey for the doc we want to clean the locks of.
 	 */
 	public void cleanLock(String docKey) {
 		int notInList = -1;
@@ -148,12 +147,10 @@ CollaboratorService {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
+	 * Get the list of the documents in the datastore.
 	 * @see
-	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#getDocumentList
-	 * ()
+	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#getDocumentList()
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -185,9 +182,8 @@ CollaboratorService {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
+	 * Retrieves the given doc from the datastore.
 	 * @see
 	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#getDocument
 	 * (java.lang.String)
@@ -211,9 +207,8 @@ CollaboratorService {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
+	 * Saves the given document in the datastore.
 	 * @see
 	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#saveDocument
 	 * (edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument)
@@ -371,9 +366,8 @@ CollaboratorService {
 		getChannelService().sendMessage(new ChannelMessage(clientID, docKey));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
+	 * Release the lock of the given document.
 	 * @see
 	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#releaseLock
 	 * (edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument)
@@ -468,7 +462,7 @@ CollaboratorService {
 	}
 
 	/**
-	 * Polls the next client waiting for the specified document
+	 * Gets the next client waiting for the specified document.
 	 * 
 	 * @param documentKey
 	 *            The document we want to find the next client for
@@ -501,9 +495,8 @@ CollaboratorService {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
+	 * Locks the given document.
 	 * @see
 	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#lockDocument
 	 * (java.lang.String)
@@ -523,9 +516,8 @@ CollaboratorService {
 			addToDocQueue(clientID, documentKey);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
+	 * Called when the client first connects to the app.
 	 * @see
 	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#login(java
 	 * .lang.String)
@@ -544,10 +536,9 @@ CollaboratorService {
 		return ChannelServiceFactory.getChannelService();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeedu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#
+	/**
+	 * Get the locked doc with the given key.
+	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#
 	 * getLockedDocument(java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -593,9 +584,9 @@ CollaboratorService {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
+	 * Remove the given client from the given document queue. (This client is
+	 * no longer waiting on a lock for that doc.) 
 	 * @see
 	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#leaveLockQueue
 	 * (java.lang.String, java.lang.String)

@@ -37,7 +37,7 @@ public class DocLockedReader implements AsyncCallback<LockedDocument> {
 	}
 
 	/**
-	 * Sends a request to fetch a locked doc
+	 * Sends a request to the server to fetch a locked doc.
 	 * @param key
 	 * @param side
 	 * @param index
@@ -52,15 +52,14 @@ public class DocLockedReader implements AsyncCallback<LockedDocument> {
 	@Override
 	public void onFailure(Throwable caught) {
 		collaborator.statusUpdate("Error retrieving document");
-		GWT.log("Error retrieving document", caught);
-
+		
 		// set and enable/disable correct buttons
 		lockFailed();
 	}
 
 	@Override
 	public void onSuccess(LockedDocument result) {
-		collaborator.statusUpdate("Document Retrieved");
+		collaborator.statusUpdate("Document Retrieved.");
 		
 		// if we are in simulation mode (or stopping), then go into the
 		// "eating" part of the simulation (if we are stopping then at least
@@ -100,7 +99,6 @@ public class DocLockedReader implements AsyncCallback<LockedDocument> {
 
 	/**
 	 * If we successfully acquired the locker - can now edit the doc.
-	 * 
 	 * @param result
 	 * @param side
 	 * @param index

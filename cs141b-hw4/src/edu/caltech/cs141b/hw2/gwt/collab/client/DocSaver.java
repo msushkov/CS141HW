@@ -45,8 +45,7 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 	}
 
 	/**
-	 * Starts the save request
-	 * 
+	 * Starts the save request to the server.
 	 * @param lockedDoc
 	 *            The document to lock
 	 * @param side
@@ -59,6 +58,7 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 		this.side = side;
 		this.index = ind;
 
+		// make the server request
 		collaborator.collabService.saveDocument(collaborator.clientID,
 				lockedDoc, this);
 
@@ -81,11 +81,12 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 	public void onFailure(Throwable caught) {
 		if (caught instanceof LockExpired)
 			collaborator.statusUpdate("Lock had already expired; save failed.");
-		else {
+		else 
+		{
 			collaborator.statusUpdate("Error saving document"
 					+ "; caught exception " + caught.getClass()
 					+ " with message: " + caught.getMessage());
-			GWT.log("Error saving document.", caught);
+
 			collaborator.releaser.releaseLock(lockedDocument);
 		}
 
@@ -111,6 +112,7 @@ public class DocSaver implements AsyncCallback<UnlockedDocument> {
 		// if we are stopping, then finish.
 		if (collaborator.simulation || collaborator.simulationStopping)
 			collaborator.simulationDone();
+		
 		// Refresh list in case title was changed.
 		collaborator.lister.getDocumentList();
 

@@ -62,6 +62,8 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 			collaborator.showButtonL.setEnabled(true);
 		else
 			collaborator.showButtonR.setEnabled(true);
+		
+		
 	}
 
 	@Override
