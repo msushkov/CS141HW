@@ -1045,7 +1045,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// remove this client from the server's waiting queue associated
 		// with this doc
-		if (currDoc instanceof LockedDocument) {
+		if (currDoc.getKey() != null && currDoc instanceof LockedDocument) {
 			closer.removeFromServerQueue(currDoc.getKey());
 			releaser.releaseLock((LockedDocument) currDoc);
 		}
