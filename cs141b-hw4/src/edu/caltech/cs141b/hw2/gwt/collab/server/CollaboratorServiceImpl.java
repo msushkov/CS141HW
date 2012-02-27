@@ -143,6 +143,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// Check if there are clients waiting for the document
 			for (String docKey : toClear) {
 				String previousClient = tokenMap.get(docKey);
+				System.out.println("Clearing for " + docKey + " and client = " + previousClient);
 				server.receiveToken(previousClient, docKey);
 			}
 		}

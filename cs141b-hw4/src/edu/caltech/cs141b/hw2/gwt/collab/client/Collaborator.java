@@ -175,6 +175,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	private Timer thinkingTimer = new Timer() {
 		// after the timer goes off, go to the hungry state
 		public void run() {
+			statusUpdate("Thinking");
 			simulateHungry();
 		}
 	};
@@ -274,6 +275,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 
 		System.out.println(clientID);
+		statusUpdate(clientID);
 
 		collabService.login(clientID, new AsyncCallback<String>() {
 
@@ -299,7 +301,6 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	private void loginComplete(String id) {
 		this.channelID = id;
-
 		System.out.println(id);
 
 		// defines how we receives messages from the server
