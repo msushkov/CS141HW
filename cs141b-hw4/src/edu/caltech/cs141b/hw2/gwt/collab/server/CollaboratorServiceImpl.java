@@ -143,7 +143,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// Check if there are clients waiting for the document
 			for (String docKey : toClear) {
 				String previousClient = tokenMap.get(docKey);
-				System.out.println("Clearing for " + docKey + " and client = " + previousClient);
+				System.out.println("Clearing for " + docKey + " and client = "
+						+ previousClient);
 				server.receiveToken(previousClient, docKey);
 			}
 		}
@@ -595,7 +596,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 	/**
 	 * Remove the given client from the given document queue. (This client is no
-	 * longer waiting on a lock for that doc.)
+	 * longer waiting on a lock for that doc.) It also makes sure that the token
+	 * gets passed on to the next document if the client was holding the token.
 	 * 
 	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#leaveLockQueue
 	 *      (java.lang.String, java.lang.String)
@@ -603,20 +605,23 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public void leaveLockQueue(String clientID, String documentKey) {
 		removeClient(clientID, documentKey);
+		if (tokenMap.get(documentKey).equals(clientID)) {
+			receiveToken(clientID, documentKey);
+		}
 	}
 
 	@Override
 	public void logout(String clientID) {
-		System.out.println("logging out");
+		System.out.println("server logout");
 		for (String docKey : queueMap.keySet()) {
-			removeClient(clientID, docKey);
+			leaveLockQueue(clientID, docKey);
 		}
-		
-		/*for ()
-		for (String s : queue) {
-			
-			System.out.print(s + ", ");
-		}*/
+
+		/*
+		 * for () for (String s : queue) {
+		 * 
+		 * System.out.print(s + ", "); }
+		 */
 	}
 
 }
