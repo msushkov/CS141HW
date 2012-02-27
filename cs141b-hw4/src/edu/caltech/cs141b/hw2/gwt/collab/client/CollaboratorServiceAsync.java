@@ -37,4 +37,6 @@ public interface CollaboratorServiceAsync {
 
 	void cleanLock(String documentKey, AsyncCallback<Void> callback);
 
+	void logout(String clientID, AsyncCallback<Void> callback);
+
 }

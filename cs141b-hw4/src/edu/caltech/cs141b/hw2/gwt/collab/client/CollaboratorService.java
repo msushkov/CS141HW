@@ -26,6 +26,8 @@ public interface CollaboratorService extends RemoteService {
 	 * @return The channel ID
 	 */
 	String login(String clientID);
+	
+	void logout(String clientID);
 
 	/**
 	 * Used to get a list of the currently available documents.

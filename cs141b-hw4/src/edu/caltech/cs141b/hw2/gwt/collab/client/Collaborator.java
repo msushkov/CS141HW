@@ -15,12 +15,15 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.WindowCloseListener;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -45,13 +48,13 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  */
 public class Collaborator extends Composite implements ClickHandler {
 
-	// A reference to the current Collaborator object - 
-	// used for channel communication. 
+	// A reference to the current Collaborator object -
+	// used for channel communication.
 	private Collaborator self = this;
-	
+
 	// Length of channel ID identifier
 	private static final int CLIENT_ID_LEN = 16;
-	
+
 	// Possible characters for channel ID
 	private static final String POSS_LOGIN_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
 
@@ -92,7 +95,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	// Keeps track of the shared simulation document.
 	protected LockedDocument simulateDoc;
 
-	// Set the first time we open the current simulation doc, so we 
+	// Set the first time we open the current simulation doc, so we
 	// dont open more than one.
 	private boolean isSimDocAlreadyOpen;
 
@@ -168,7 +171,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	// =====================================================================
 	// TIMERS
-	
+
 	/**
 	 * Calls simulateHungry() when the timer fires.
 	 */
@@ -180,9 +183,9 @@ public class Collaborator extends Composite implements ClickHandler {
 	};
 
 	/**
-	 * Timer which will contact server once the max lock time has expired. 
-	 * Calls cleanLock().
-	 */ 
+	 * Timer which will contact server once the max lock time has expired. Calls
+	 * cleanLock().
+	 */
 	private void clearLock(final String docKey) {
 		Timer cleanLocksTimer = new Timer() {
 			public void run() {
@@ -190,11 +193,11 @@ public class Collaborator extends Composite implements ClickHandler {
 			}
 		};
 		cleanLocksTimer.schedule(lockTime);
-		
+
 		// Add to the docKey->Timer hashmap for bookkeeping
 		timerMap.put(docKey, cleanLocksTimer);
 	}
-	
+
 	/**
 	 * Calls editSimulateDoc() when the timer fires.
 	 */
@@ -216,10 +219,10 @@ public class Collaborator extends Composite implements ClickHandler {
 			simulateHungryLock();
 		}
 	};
-	
+
 	// END TIMERS
 	// =====================================================================
-	
+
 	/**
 	 * UI initialization.
 	 * 
@@ -295,7 +298,9 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	/**
 	 * Called after the user loads the app - when the "login" is done.
-	 * @param id The id of the current channel.
+	 * 
+	 * @param id
+	 *            The id of the current channel.
 	 */
 	private void loginComplete(String id) {
 		this.channelID = id;
@@ -338,25 +343,21 @@ public class Collaborator extends Composite implements ClickHandler {
 											.length()));
 
 						// our message is the actual lock
-						else 
-						{
+						else {
 							// see if the doc is on the left tab panel
-							for (int i = 0; i < documentsLeftList.size(); i++) 
-							{
-								if (documentsLeftList.get(i).getKey().equals(key)) 
-								{
+							for (int i = 0; i < documentsLeftList.size(); i++) {
+								if (documentsLeftList.get(i).getKey().equals(
+										key)) {
 									tabId = i;
 									break;
 								}
 							}
 
 							// If still not found look at the right documents
-							if (tabId == NOT_IN_TAB) 
-							{
-								for (int i = 0; i < documentsRightList.size(); i++) 
-								{
-									if (documentsRightList.get(i).getKey().equals(key)) 
-									{
+							if (tabId == NOT_IN_TAB) {
+								for (int i = 0; i < documentsRightList.size(); i++) {
+									if (documentsRightList.get(i).getKey()
+											.equals(key)) {
 										tabId = i;
 										side = "right";
 										break;
@@ -367,12 +368,12 @@ public class Collaborator extends Composite implements ClickHandler {
 
 							// if we found the doc on either the right or left
 							// tab panel
-							if (tabId != NOT_IN_TAB) 
-							{
+							if (tabId != NOT_IN_TAB) {
 								statusUpdate("Locked reader.");
-								
+
 								// get the locked document from the datastore
-								DocLockedReader.getLockedDoc(self, key, side, tabId);
+								DocLockedReader.getLockedDoc(self, key, side,
+										tabId);
 
 								// Add a timer to report back to server after
 								// the time has expired.
@@ -400,6 +401,16 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// refresh document list on login
 		lister.getDocumentList();
+
+		Window.addCloseHandler(new CloseHandler<Window>() {
+			@Override
+			public void onClose(CloseEvent<Window> event) {
+				System.out.print(clientID + " logging out");
+				DocLogout logout = new DocLogout(self);
+				logout.logout();
+
+			}
+		});
 	}
 
 	/**
@@ -609,9 +620,10 @@ public class Collaborator extends Composite implements ClickHandler {
 		documentsR.setWidth("100%");
 	}
 
-	/** 
-	 * Shorten 'title' so that it is of length 'len' - 3, 
-	 * with ... at the end. Used for displaying doc titles in the tab panel. 
+	/**
+	 * Shorten 'title' so that it is of length 'len' - 3, with ... at the end.
+	 * Used for displaying doc titles in the tab panel.
+	 * 
 	 * @param title
 	 * @param len
 	 * @return
@@ -708,8 +720,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 *            the status to add to the console window
 	 */
 	protected void statusUpdate(String status) {
-		//while (statusArea.getWidgetCount() > maxConsoleEnt)
-//			statusArea.remove(1);
+		// while (statusArea.getWidgetCount() > maxConsoleEnt)
+		// statusArea.remove(1);
 
 		final HTML statusUpd = new HTML(status);
 		statusArea.add(statusUpd);
@@ -899,8 +911,9 @@ public class Collaborator extends Composite implements ClickHandler {
 
 	/**
 	 * Receives button events.
+	 * 
 	 * @see com.google.gwt.event.dom.client.ClickHandler#onClick
-	 * (com.google.gwt.event.dom.client.ClickEvent)
+	 *      (com.google.gwt.event.dom.client.ClickEvent)
 	 */
 	@Override
 	public void onClick(ClickEvent event) {
@@ -909,14 +922,13 @@ public class Collaborator extends Composite implements ClickHandler {
 			lister.getDocumentList();
 
 		// pressed 'new doc' button
-		else if (event.getSource().equals(createNew)) 
-		{
+		else if (event.getSource().equals(createNew)) {
 			if (documentsL.getTabBar().getTabCount() < maxTabsOnOneSide)
 				createNewDocumentButtonHandler("left");
 			else if (documentsR.getTabBar().getTabCount() < maxTabsOnOneSide)
 				createNewDocumentButtonHandler("right");
 		}
-		
+
 		// pressed left 'get lock' button
 		else if (event.getSource().equals(lockButtonL))
 			lockDocumentButtonHandler(true);
@@ -1104,13 +1116,11 @@ public class Collaborator extends Composite implements ClickHandler {
 		}
 
 		// otherwise, if this tab has no tabs to its left
-		else 
-		{
+		else {
 			int numTabsLeft = tabPanel.getTabBar().getTabCount();
 
 			// if we still have tabs left (on the right)
-			if (numTabsLeft > 0) 
-			{
+			if (numTabsLeft > 0) {
 				// select the next tab to the right (the new first tab)
 				tabPanel.selectTab(0);
 
@@ -1118,30 +1128,27 @@ public class Collaborator extends Composite implements ClickHandler {
 
 				// if the title (and contents) of the next tab is non-editable,
 				// then add 'lock', 'removeTab', and 'refresh' buttons
-				if (!titleList.get(0).isEnabled()) 
-				{
+				if (!titleList.get(0).isEnabled()) {
 					hPanel.add(lockButton);
 					enableButton(lockButton);
 					enableButton(refresh);
 				}
-				
+
 				// title and contents are editable, so add 'save', 'remove', and
 				// 'refresh' buttons (refresh must be disabled)
-				else 
-				{
+				else {
 					hPanel.add(saveDocButton);
 					enableButton(saveDocButton);
 					disableButton(refresh);
 				}
-				
+
 				hPanel.add(refresh);
 				hPanel.add(removeTabButton);
 				enableButton(removeTabButton);
 			}
-			
+
 			// if no longer have any tabs on the left, disable all buttons
-			else 
-			{
+			else {
 				for (Widget w : hPanel)
 					disableButton((Button) w);
 			}
@@ -1169,12 +1176,12 @@ public class Collaborator extends Composite implements ClickHandler {
 		if (doc instanceof LockedDocument) {
 			// if title and contents have not been changed, no need to save
 			if (doc.getTitle().equals(titleList.get(ind).getValue())
-					&& doc.getContents().equals(contentsList.get(ind).getText()))
+					&& doc.getContents()
+							.equals(contentsList.get(ind).getText()))
 				statusUpdate("No document changes; not saving.");
 
 			// otherwise if stuff was changed, save
-			else 
-			{
+			else {
 				LockedDocument ld = (LockedDocument) doc;
 				String title = titleList.get(ind).getText();
 				String contents = contentsList.get(ind).getText();
@@ -1182,19 +1189,18 @@ public class Collaborator extends Composite implements ClickHandler {
 				// if the title and contents are less than the max length,
 				// then save this doc
 				if (title.length() < maxTitleLength
-						&& contents.length() < maxContentsLength) 
-				{
+						&& contents.length() < maxContentsLength) {
 					ld.setTitle(title);
 					ld.setContents(contents);
 					DocSaver.saveDoc(this, ld, side, ind);
 				}
-				
+
 				// otherwise, print error messages to console
-				
+
 				else if (contents.length() >= maxContentsLength)
 					statusUpdate("Error: Can't save; contents must be less than "
 							+ maxContentsLength + " characters.");
-				
+
 				else if (title.length() >= maxTitleLength)
 					statusUpdate("Error: Can't save; title must be less than "
 							+ maxTitleLength + " characters.");
@@ -1226,8 +1232,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// if in simulation, disable simulate button and the doc title and
 		// contents
-		if (simulation) 
-		{
+		if (simulation) {
 			disableButton(simulateButton);
 
 			// user cannot edit the doc while simulation is running
@@ -1386,7 +1391,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// wait for the thinking time and then call simulateHungry()
 		thinkingTimer.schedule(thinkTime);
-		
+
 		statusUpdate("Thinking");
 	}
 
@@ -1465,15 +1470,15 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	public void simulateEating(LockedDocument doc, int index, String side) {
 		statusUpdate("Eating");
-		
+
 		simulateDoc = doc;
 		simulationTab = index;
 		simulationSide = side;
 
-		// append this client ID to the contents of this simulation doc 
+		// append this client ID to the contents of this simulation doc
 		simulateDoc.setContents(simulateDoc.getContents() + "\nClient: "
 				+ clientID);
-		
+
 		// Wait random time before editing the doc
 		int eatTime = eatTimeMin
 				+ com.google.gwt.user.client.Random.nextInt(eatTimeMax
@@ -1494,7 +1499,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// saveDocumentButtonHandler(simulateLeft);
 
 		// Simulation still running? If so start thinking again. But we cannot
-		// do this here since we must make sure the doc is saved before we can 
+		// do this here since we must make sure the doc is saved before we can
 		// continue. Thus, do this in setDoc (called by DocSaver).
 	}
 
@@ -1517,7 +1522,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			// entire simulation process repeats
 			thinkingTimer.schedule(thinkTime);
 		}
-		
+
 		// simulation is done
 		else {
 			// no longer in stopping mode

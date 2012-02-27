@@ -365,12 +365,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 
 		// Finally, inform the client that the doc is locked and ready for them
-		try {
-			getChannelService().sendMessage(
-					new ChannelMessage(clientID, docKey));
-		} catch (Exception e) {
-			System.out.println("fdsafdsafuhdfaguhipogphijodfasklhjfasdljk");
-		}
+		getChannelService().sendMessage(new ChannelMessage(clientID, docKey));
 
 	}
 
@@ -466,12 +461,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		int pos = queue.size();
 
 		// inform the client which place in line it is
-		try {
-			getChannelService().sendMessage(
+		getChannelService().sendMessage(
 				new ChannelMessage(clientID, "position: " + pos));
-		} catch (Exception e) {
-			System.out.println("FBDSAFKHJDSLAKFJDSKLF;ADJSKFDSJFKL;SDAJKL;");
-		}
 	}
 
 	/**
@@ -501,11 +492,14 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	private boolean removeClient(String clientID, String documentKey) {
 		List<String> queue = queueMap.get(documentKey);
+		boolean inQueue = false;
 		if (queue != null) {
-			return queue.remove(clientID);
+			inQueue = queue.remove(clientID);
+			while (queue.remove(clientID)) {
+			}
 		}
 
-		return false;
+		return inQueue;
 	}
 
 	/**
@@ -608,6 +602,20 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public void leaveLockQueue(String clientID, String documentKey) {
 		removeClient(clientID, documentKey);
+	}
+
+	@Override
+	public void logout(String clientID) {
+		System.out.println("logging out");
+		for (String docKey : queueMap.keySet()) {
+			removeClient(clientID, docKey);
+		}
+		
+		/*for ()
+		for (String s : queue) {
+			
+			System.out.print(s + ", ");
+		}*/
 	}
 
 }
