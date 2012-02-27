@@ -365,7 +365,13 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 
 		// Finally, inform the client that the doc is locked and ready for them
-		getChannelService().sendMessage(new ChannelMessage(clientID, docKey));
+		try {
+			getChannelService().sendMessage(
+					new ChannelMessage(clientID, docKey));
+		} catch (Exception e) {
+			System.out.println("fdsafdsafuhdfaguhipogphijodfasklhjfasdljk");
+		}
+
 	}
 
 	/**
@@ -460,8 +466,12 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		int pos = queue.size();
 
 		// inform the client which place in line it is
-		getChannelService().sendMessage(
+		try {
+			getChannelService().sendMessage(
 				new ChannelMessage(clientID, "position: " + pos));
+		} catch (Exception e) {
+			System.out.println("FBDSAFKHJDSLAKFJDSKLF;ADJSKFDSJFKL;SDAJKL;");
+		}
 	}
 
 	/**
