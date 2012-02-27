@@ -1,6 +1,7 @@
 package edu.caltech.cs141b.hw2.gwt.collab.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.com.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
@@ -63,6 +64,10 @@ public class DocReader implements AsyncCallback<UnlockedDocument> {
 		else
 			collaborator.showButtonR.setEnabled(true);
 		
+		// For the rare event of a document failing to read during simulation,
+		// make sure we don't start pressing buttons and abort by refreshing the page.
+		if (collaborator.simulation || collaborator.simulationStopping)
+			Window.Location.reload();
 		
 	}
 
