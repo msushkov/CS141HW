@@ -31,7 +31,7 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  */
 @SuppressWarnings("serial")
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
-CollaboratorService {
+		CollaboratorService {
 
 	// This is the time in seconds that clients can lock a document
 	private static final int LOCK_TIME = 30;
@@ -53,9 +53,9 @@ CollaboratorService {
 	private static CollaboratorServiceImpl server = new CollaboratorServiceImpl();
 
 	/**
-	 * The constructor for this server. We are not sure how GAE splits up work on
-	 * its servers, so we made sure all the maps were thread safe. Also, the cron
-	 * job might lead to concurrent modification.
+	 * The constructor for this server. We are not sure how GAE splits up work
+	 * on its servers, so we made sure all the maps were thread safe. Also, the
+	 * cron job might lead to concurrent modification.
 	 */
 	public CollaboratorServiceImpl() {
 		queueMap = Collections
@@ -65,7 +65,9 @@ CollaboratorService {
 
 	/**
 	 * Cleans lock for an individual document
-	 * @param docKey The dockey for the doc we want to clean the locks of.
+	 * 
+	 * @param docKey
+	 *            The dockey for the doc we want to clean the locks of.
 	 */
 	public void cleanLock(String docKey) {
 		int notInList = -1;
@@ -149,8 +151,8 @@ CollaboratorService {
 
 	/**
 	 * Get the list of the documents in the datastore.
-	 * @see
-	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#getDocumentList()
+	 * 
+	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#getDocumentList()
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -184,9 +186,9 @@ CollaboratorService {
 
 	/**
 	 * Retrieves the given doc from the datastore.
-	 * @see
-	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#getDocument
-	 * (java.lang.String)
+	 * 
+	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#getDocument
+	 *      (java.lang.String)
 	 */
 	@Override
 	public UnlockedDocument getDocument(String documentKey) {
@@ -209,9 +211,9 @@ CollaboratorService {
 
 	/**
 	 * Saves the given document in the datastore.
-	 * @see
-	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#saveDocument
-	 * (edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument)
+	 * 
+	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#saveDocument
+	 *      (edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument)
 	 */
 	@Override
 	public UnlockedDocument saveDocument(String clientID, LockedDocument doc)
@@ -272,9 +274,6 @@ CollaboratorService {
 			// ...Ending transaction
 			t.commit();
 
-			// Now, take the token back
-			receiveToken(clientID, stringKey);
-
 			// Return the unlocked document
 			return toSave.getUnlockedDoc();
 		} finally {
@@ -283,6 +282,9 @@ CollaboratorService {
 				t.rollback();
 			}
 			pm.close();
+
+			// Now, take the token back
+			receiveToken(clientID, stringKey);
 		}
 	}
 
@@ -368,9 +370,9 @@ CollaboratorService {
 
 	/**
 	 * Release the lock of the given document.
-	 * @see
-	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#releaseLock
-	 * (edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument)
+	 * 
+	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#releaseLock
+	 *      (edu.caltech.cs141b.hw2.gwt.collab.shared.LockedDocument)
 	 */
 	@Override
 	public void releaseLock(String clientID, LockedDocument doc)
@@ -433,7 +435,7 @@ CollaboratorService {
 	 * @param docKey
 	 *            The key of the document that the client is waiting for
 	 */
-	private void addToDocQueue(String clientID, String documentKey) {		
+	private void addToDocQueue(String clientID, String documentKey) {
 		// if we dont already have this doc key in our map, add it in there
 		if (!queueMap.containsKey(documentKey)) {
 			queueMap.put(documentKey, Collections
@@ -443,22 +445,23 @@ CollaboratorService {
 		// add the client to the queue for that particular doc
 		List<String> queue = queueMap.get(documentKey);
 		queue.add(clientID);
-		
+
 		System.out.println(queue.size());
 		queueMap.put(documentKey, queue);
-		
+
 		System.out.print("\nQueue ");
 		for (String s : queue) {
 			System.out.print(s + ", ");
 		}
-		
+
 		System.out.println();
-		
+
 		// this is the position of the newly added client in the queue
 		int pos = queue.size();
-		
+
 		// inform the client which place in line it is
-		getChannelService().sendMessage(new ChannelMessage(clientID, "position: " + pos));
+		getChannelService().sendMessage(
+				new ChannelMessage(clientID, "position: " + pos));
 	}
 
 	/**
@@ -497,9 +500,9 @@ CollaboratorService {
 
 	/**
 	 * Locks the given document.
-	 * @see
-	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#lockDocument
-	 * (java.lang.String)
+	 * 
+	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#lockDocument
+	 *      (java.lang.String)
 	 */
 	@Override
 	public void lockDocument(String clientID, String documentKey) {
@@ -518,9 +521,9 @@ CollaboratorService {
 
 	/**
 	 * Called when the client first connects to the app.
-	 * @see
-	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#login(java
-	 * .lang.String)
+	 * 
+	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#login(java
+	 *      .lang.String)
 	 */
 	@Override
 	public String login(String clientID) {
@@ -538,8 +541,9 @@ CollaboratorService {
 
 	/**
 	 * Get the locked doc with the given key.
+	 * 
 	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#
-	 * getLockedDocument(java.lang.String, java.lang.String)
+	 *      getLockedDocument(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public LockedDocument getLockedDocument(String clientID, String documentKey)
@@ -585,11 +589,11 @@ CollaboratorService {
 	}
 
 	/**
-	 * Remove the given client from the given document queue. (This client is
-	 * no longer waiting on a lock for that doc.) 
-	 * @see
-	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#leaveLockQueue
-	 * (java.lang.String, java.lang.String)
+	 * Remove the given client from the given document queue. (This client is no
+	 * longer waiting on a lock for that doc.)
+	 * 
+	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#leaveLockQueue
+	 *      (java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void leaveLockQueue(String clientID, String documentKey) {
