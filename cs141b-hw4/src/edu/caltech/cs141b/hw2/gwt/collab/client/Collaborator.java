@@ -708,8 +708,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 *            the status to add to the console window
 	 */
 	protected void statusUpdate(String status) {
-		while (statusArea.getWidgetCount() > maxConsoleEnt)
-			statusArea.remove(1);
+		//while (statusArea.getWidgetCount() > maxConsoleEnt)
+//			statusArea.remove(1);
 
 		final HTML statusUpd = new HTML(status);
 		statusArea.add(statusUpd);
@@ -1464,7 +1464,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	 *            Which side is this doc on?
 	 */
 	public void simulateEating(LockedDocument doc, int index, String side) {
-		statusUpdate("eating");
+		statusUpdate("Eating");
 		
 		simulateDoc = doc;
 		simulationTab = index;
