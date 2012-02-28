@@ -27,6 +27,10 @@ public interface CollaboratorService extends RemoteService {
 	 */
 	String login(String clientID);
 	
+	/**
+	 * This allows you to logout and dequeue from all the queues you are in
+	 * @param clientID The client ID of the client who is logging out
+	 */
 	void logout(String clientID);
 
 	/**

@@ -1,6 +1,5 @@
 package edu.caltech.cs141b.hw2.gwt.collab.client;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TextArea;

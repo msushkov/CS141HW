@@ -4,14 +4,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * Used to remove a client form the document queue
+ * Allow a client to logout
  */
 public class DocLogout implements AsyncCallback<Void> {
 
 	private Collaborator collaborator;
 
 	/**
-	 * Constructor for DocCloser. Note that there is no internal state and
+	 * Constructor for DocLogout. Note that there is no internal state and
 	 * thus no static constructor method is necessary.
 	 * 
 	 * @param collaborator
@@ -22,7 +22,7 @@ public class DocLogout implements AsyncCallback<Void> {
 
 	
 	public void logout() {
-		// remove this doc from our request queue
+		// remove this doc from all the request queues and return any tokens
 		collaborator.collabService.logout(collaborator.clientID, this);
 	}
 

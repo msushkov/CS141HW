@@ -52,7 +52,7 @@ public class Collaborator extends Composite implements ClickHandler {
 	private Collaborator self = this;
 
 	// Length of channel ID identifier
-	private static final int CLIENT_ID_LEN = 16;
+	private static final int CLIENT_ID_LEN = 24;
 
 	// Possible characters for channel ID
 	private static final String POSS_LOGIN_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
@@ -276,9 +276,6 @@ public class Collaborator extends Composite implements ClickHandler {
 					.length()));
 		}
 
-		System.out.println(clientID);
-		statusUpdate(clientID);
-
 		collabService.login(clientID, new AsyncCallback<String>() {
 
 			@Override
@@ -305,21 +302,19 @@ public class Collaborator extends Composite implements ClickHandler {
 	 */
 	private void loginComplete(String id) {
 		this.channelID = id;
-		System.out.println(id);
 
 		// defines how we receives messages from the server
 		ChannelFactory.createChannel(id, new ChannelCreatedCallback() {
 
 			@Override
 			public void onChannelCreated(Channel channel) {
-				System.out.println("created");
 
 				// open the channel
 				channel.open(new SocketListener() {
 
 					@Override
 					public void onOpen() {
-						System.out.println("open");
+						// Do nothing
 					}
 
 					/**
@@ -387,12 +382,12 @@ public class Collaborator extends Composite implements ClickHandler {
 
 					@Override
 					public void onClose() {
-						System.out.println("close");
+						// Do nothing
 					}
 
 					@Override
 					public void onError(SocketError error) {
-						System.out.println("error " + error.getDescription());
+						statusUpdate("Error: " + error.getDescription());
 
 					}
 				});
@@ -405,7 +400,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		Window.addCloseHandler(new CloseHandler<Window>() {
 			@Override
 			public void onClose(CloseEvent<Window> event) {
-				System.out.println(clientID + " logging out");
 				DocLogout logout = new DocLogout(self);
 				logout.logout();
 

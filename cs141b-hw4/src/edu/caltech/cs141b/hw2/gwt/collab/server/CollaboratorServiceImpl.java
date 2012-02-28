@@ -143,8 +143,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// Check if there are clients waiting for the document
 			for (String docKey : toClear) {
 				String previousClient = tokenMap.get(docKey);
-				System.out.println("Clearing for " + docKey + " and client = "
-						+ previousClient);
 				server.receiveToken(previousClient, docKey);
 			}
 		}
@@ -220,7 +218,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public UnlockedDocument saveDocument(String clientID, LockedDocument doc)
 			throws LockExpired {
-		System.out.println(clientID + " is saving");
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -302,7 +299,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	private void receiveToken(String clientID, String docKey) {
 		// Return the token
 		tokenMap.put(docKey, "server");
-		System.out.println(clientID + " giving back token");
 
 		// If there is no document waiting for the document remove from list of
 		// locked docs
@@ -326,7 +322,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 *            The key of the document whose token we are receiving
 	 */
 	private void sendToken(final String clientID, final String docKey) {
-		System.out.println("sending token to " + clientID);
 		// Now, set the correct clientID. We are "giving" them the token here.
 		tokenMap.put(docKey, clientID);
 
@@ -449,15 +444,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		List<String> queue = queueMap.get(documentKey);
 		queue.add(clientID);
 
-		System.out.println(queue.size());
 		queueMap.put(documentKey, queue);
-
-		System.out.print("\nQueue ");
-		for (String s : queue) {
-			System.out.print(s + ", ");
-		}
-
-		System.out.println();
 
 		// this is the position of the newly added client in the queue
 		int pos = queue.size();
@@ -514,7 +501,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	public void lockDocument(String clientID, String documentKey) {
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
-		System.out.println(clientID + " Trying to lock");
 		if (!tokenMap.containsKey(documentKey))
 			tokenMap.put(documentKey, "server");
 
@@ -554,8 +540,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public LockedDocument getLockedDocument(String clientID, String documentKey)
 			throws LockUnavailable {
-
-		System.out.println(clientID + " getting locked document");
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -610,18 +594,13 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#logout(java.lang.String)
+	 */
 	@Override
 	public void logout(String clientID) {
-		System.out.println("server logout");
 		for (String docKey : queueMap.keySet()) {
 			leaveLockQueue(clientID, docKey);
 		}
-
-		/*
-		 * for () for (String s : queue) {
-		 * 
-		 * System.out.print(s + ", "); }
-		 */
 	}
-
 }
