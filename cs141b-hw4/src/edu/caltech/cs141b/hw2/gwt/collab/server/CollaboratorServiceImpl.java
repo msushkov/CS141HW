@@ -483,7 +483,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		List<String> queue = queueMap.get(documentKey);
 		boolean inQueue = false;
 		if (queue != null) {
+			// Remove the first client from the list and record whether there is
+			// at least one client to remove
 			inQueue = queue.remove(clientID);
+			// Remove the rest of the clients from the list
 			while (queue.remove(clientID)) {
 			}
 		}
@@ -594,8 +597,12 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#logout(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.caltech.cs141b.hw2.gwt.collab.client.CollaboratorService#logout(java
+	 * .lang.String)
 	 */
 	@Override
 	public void logout(String clientID) {
