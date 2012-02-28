@@ -508,7 +508,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		VerticalPanel consoleDP = new VerticalPanel();
 		consoleDP.setStyleName("consoleDP");
-		consoleDP.setWidth("320px");
+		consoleDP.setWidth("330px");
 		consoleDP.setHeight("250px");
 		HTML consoleTitle = new HTML("<h2>Console</h2>");
 		statusArea.setSpacing(10);
@@ -721,8 +721,8 @@ public class Collaborator extends Composite implements ClickHandler {
 	 *            the status to add to the console window
 	 */
 	protected void statusUpdate(String status) {
-		// while (statusArea.getWidgetCount() > maxConsoleEnt)
-		// statusArea.remove(1);
+		while (statusArea.getWidgetCount() > maxConsoleEnt)
+			statusArea.remove(1);
 
 		final HTML statusUpd = new HTML(status);
 		statusArea.add(statusUpd);
