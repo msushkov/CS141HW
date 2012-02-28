@@ -1,0 +1,401 @@
+body {
+	color: white;
+	margin: 0px;
+	border: 0px;
+	padding: 0px;
+	background: #141414;
+	direction: ltr;
+	margin-left: 0;
+	font-family: sans-serif;
+	margin-right: 0;
+	/*margin-top: 0;
+	margin-bottom: 0;*/
+	padding: 0;
+	height: 95%;
+	width: 100%;
+	text-align: center;
+	/*min-height: 100%;*/
+	
+}
+h1 {
+	color: black;
+}
+h2 {
+	font-stretch: narrower;
+	font-weight: 500;
+	margin: 4px;
+	color: #e7e0e0;
+	/*text-decoration: bold; */
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.gwt-HTML h2 {
+
+background: #3c455e; /* Old browsers */
+background: -moz-linear-gradient(top,  #3c455e 0%, #2e3548 24%, #1b2131 50%, #292f3f 79%, #31394d 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#3c455e), color-stop(24%,#2e3548), color-stop(50%,#1b2131), color-stop(79%,#292f3f), color-stop(100%,#31394d)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #3c455e 0%,#2e3548 24%,#1b2131 50%,#292f3f 79%,#31394d 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #3c455e 0%,#2e3548 24%,#1b2131 50%,#292f3f 79%,#31394d 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #3c455e 0%,#2e3548 24%,#1b2131 50%,#292f3f 79%,#31394d 100%); /* IE10+ */
+background: linear-gradient(top,  #3c455e 0%,#2e3548 24%,#1b2131 50%,#292f3f 79%,#31394d 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3c455e', endColorstr='#31394d',GradientType=0 ); /* IE6-9 */
+
+border-radius: 5px;
+
+}
+
+#application {
+	height: 100%;
+	width: 100%;
+	min-width: 1026px;
+	/*margin-left: auto;
+	margin-right: auto; */
+}
+.app-title {
+	font-size: 4em;
+	font-family: sans-serif;
+	display: inline;
+	margin: 10px;
+	text-align: center;
+	color: black;
+	font-weight: bold;
+	text-align: center;
+}
+
+.mainOuterPanel {
+	width: 100%;
+	max-height: 500px;
+}
+
+.docsAndConsoleVertPanel {
+	width: 200px;
+	float: left;
+}
+
+.docListPanel {
+	width: 100%;
+	/*width: 200px;
+	max-width: 200px;*/
+}
+
+.openDocsOuterPanel, .openDocsInnerPanel {
+	width: 100%;
+}
+
+
+
+.gwt-TabPanel {
+	background: #555050;
+	height: 100%;
+	border-radius: 12px;
+	/*min-height: 400px;*/
+	/*height: 100%;
+	width: 350px;*/
+}
+
+.gwt-TabPanelBottom {
+	/*background: white;
+	height: 100%;
+	min-height: 400px;*/
+	height: 100%;
+} 
+.gwt-TabBar {
+	border-color: white;
+	/*width: 350px; */
+	height: 35px;
+	padding-top: 6px;
+	/*background-color: #c5c2ff; */
+	/*background-color: navy;*/
+	
+	-webkit-border-top-left-radius: 12px;
+	-webkit-border-top-right-radius: 12px;
+	-moz-border-radius-topleft: 12px;
+	-moz-border-radius-topright: 12px;
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+	
+	background: #2d2d2d; /* Old browsers */
+background: #272727; /* Old browsers */
+background: -moz-linear-gradient(top,  #272727 0%, #202020 40%, #171717 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#272727), color-stop(40%,#202020), color-stop(100%,#171717)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* IE10+ */
+background: linear-gradient(top,  #272727 0%,#202020 40%,#171717 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#272727', endColorstr='#171717',GradientType=0 ); /* IE6-9 */
+
+	
+	
+	
+	
+}
+.gwt-TabBar .gwt-TabBarItem {
+	margin-left: 4px;
+	padding: 4px 8px 4px 8px;
+	height: 20px;
+	cursor: pointer;
+	cursor: hand;
+	color: white;
+	font-size: 1em;
+	vertical-align: auto;
+	font-weight: normal;
+	text-align: center;
+	background: #928989;
+	/*background: #bed9f9; #9cc3f1; */
+	outline-width: 0px;
+
+	/*background: #56A0D3;*/
+	
+	-moz-border-radius: 6px 6px 0px 0px;
+	border-radius: 6px 6px 0px 0px;
+}
+.gwt-TabBar .gwt-TabBarItem-selected {
+	cursor: default;
+	background-color: #555050;
+	color: white;
+	font-weight: bold;
+
+}
+
+
+.documentTextBox {
+	font-size: 1.1em;
+	resize: none;
+	border-radius: 12px;
+	background: #555050;
+	color: white;
+	outline-color: white;
+
+	
+}
+
+.titleBox {
+	color: white;
+	font-size: 24px;
+	resize: none;
+	border-radius: 5px;
+	font-weight: bold;
+	background: #555050;
+	outline-color: white;
+	border: 0px;
+	
+}
+
+.gwt-ListBox {
+	border-radius: 5px;
+	/*background-color: black; */
+	color: white;
+	border 0px;
+	outline-width: 0;
+	
+	
+background: rgb(5,2,8); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(5,2,8,1) 0%, rgba(5,2,10,1) 50%, rgba(5,2,10,1) 51%, rgba(7,3,15,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(5,2,8,1)), color-stop(50%,rgba(5,2,10,1)), color-stop(51%,rgba(5,2,10,1)), color-stop(100%,rgba(7,3,15,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, rgba(5,2,8,1) 0%,rgba(5,2,10,1) 50%,rgba(5,2,10,1) 51%,rgba(7,3,15,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, rgba(5,2,8,1) 0%,rgba(5,2,10,1) 50%,rgba(5,2,10,1) 51%,rgba(7,3,15,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, rgba(5,2,8,1) 0%,rgba(5,2,10,1) 50%,rgba(5,2,10,1) 51%,rgba(7,3,15,1) 100%); /* IE10+ */
+background: linear-gradient(top, rgba(5,2,8,1) 0%,rgba(5,2,10,1) 50%,rgba(5,2,10,1) 51%,rgba(7,3,15,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#050208', endColorstr='#07030f',GradientType=0 ); /* IE6-9 */
+
+}
+
+.consoleDP {
+	/*font-size: 4px;*/
+}
+
+.statusArea {
+	font-size: 14px;
+}
+
+
+/* Sexy borders */
+/*.consoleDP {
+	border: solid;
+	border-width: 1px;
+	border-radius: 15px;
+	
+} */
+
+/*.leftPanel {
+	border-right: solid;
+	border-width: 2px;
+}*/
+textarea {
+	font-family: sans-serif;
+	border: 0px;
+}
+
+
+
+
+
+/* Sizes */
+
+
+
+
+/* Remove yellow border selected */
+.gwt-TabBar .gwt-TabBarItem-wrapper-selected {
+	border-color: white;
+}
+
+
+
+/* BUTTONS */
+
+.gwt-Button{
+  width: 55px;
+  height: 50px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  text-indent: -1000em;
+  cursor: pointer; /* hand-shaped cursor */
+  cursor: hand; /* for IE 5.x */
+}
+
+.saveButton {
+    background:transparent url(Save.png) no-repeat center top;
+}
+
+.saveButtonDisabled {
+    background:transparent url(Save-grey.png) no-repeat center top;
+	
+}
+
+.lockButton {
+    background:transparent url(Lock.png) no-repeat center top;
+
+}
+.lockButtonDisabled {
+    background:transparent url(Lock-grey.png) no-repeat center top;
+}
+
+.createNewButton {
+    background:transparent url(NewDoc.png) no-repeat center top;
+}
+
+.simulateButton {
+    background:transparent url(Simulate.png) no-repeat center top;
+}
+
+.simulateButtonDisabled {
+    background:transparent url(Simulate-grey.png) no-repeat center top;
+}
+
+.stopSimulateButton {
+    background:transparent url(StopSimulate.png) no-repeat center top;
+}
+
+.stopSimulateButtonDisabled {
+    background:transparent url(StopSimulate-grey.png) no-repeat center top;
+}
+
+.createNewButtonDisabled {
+    background:transparent url(NewDoc-grey.png) no-repeat center top;
+}
+
+
+.refreshButton {
+    background:transparent url(Refresh.png) no-repeat center top;
+}
+
+.refreshButtonDisabled {
+    background:transparent url(Refresh-grey.png) no-repeat center top;
+}
+
+.showLButton {
+	background:transparent url(L.png) no-repeat center top;
+}
+
+.showLButtonDisabled {
+	background:transparent url(L-grey.png) no-repeat center top;
+}
+
+.showRButton {
+	background:transparent url(R.png) no-repeat center top;
+}
+
+.showRButtonDisabled {
+	background:transparent url(R-grey.png) no-repeat center top;
+}
+
+.removeButton {
+	background:transparent url(Close.png) no-repeat center top;
+}
+
+.removeButtonDisabled {
+	background:transparent url(Close-grey.png) no-repeat center top;
+}
+
+
+/* ADDING JUNK */
+
+/*.gwt-TabBar .gwt-TabBarItem {
+	margin-left: 4px;
+	padding: 4px 8px 4px 8px;
+	height: 20px;
+	cursor: pointer;
+	cursor: hand;
+	color: black;
+	font-size: 1em;
+	vertical-align: auto;
+	font-weight: normal;
+	text-align: center;
+	background: #bed9f9; /*#9cc3f1; 
+	/*background: #56A0D3;
+	-moz-border-radius: 6px 6px 0px 0px;
+	border-radius: 6px 6px 0px 0px;
+}
+
+
+.gwt-TabBar .gwt-TabBarItem-selected {
+	cursor: default;
+	background: white;
+	color: black;
+	font-weight: bold;
+}*/
+.gwt-DecoratedTabBar .tabMiddleLeft, .gwt-DecoratedTabBar .tabMiddleRight {
+	width: 3px;
+	padding: 0px;
+	background: #8E8E8E;
+}
+.gwt-DecoratedTabBar .tabMiddleLeftInner, .gwt-DecoratedTabBar .tabMiddleRightInner {
+	width: 1px;
+	height: 1px;
+}
+.gwt-DecoratedTabBar .tabMiddleCenter {
+	padding: 0px 5px 4px 5px;
+	cursor: pointer;
+	cursor: hand;
+	color: #fff;
+	font-weight: normal;
+	text-align: center;
+	background: #8E8E8E;
+}
+.gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabTopCenter {
+	background: #fff;
+}
+.gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabTopLeft {
+	background: url(images/circles.png) no-repeat -6px 0px;
+	-background: url(images/circles_ie6.png) no-repeat -6px 0px;
+}
+.gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabTopRight {
+	background: url(images/circles.png) no-repeat -9px 0px;
+	-background: url(images/circles_ie6.png) no-repeat -9px 0px;
+}
+.gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabMiddleLeft, .gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabMiddleRight {
+	background: #fff;
+}
+.gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabMiddleCenter {
+	cursor: default;
+	background: #fff;
+	color: #333;
+	font-weight: bold;
+}
+.gwt-DecoratedTabBar .gwt-TabBarItem-disabled .tabMiddleCenter {
+	cursor: default;
+	color: #999999;
+}
