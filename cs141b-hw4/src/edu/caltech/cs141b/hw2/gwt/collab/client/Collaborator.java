@@ -82,10 +82,10 @@ public class Collaborator extends Composite implements ClickHandler {
 	private int simulationTab = 0;
 	private String simulationSide;
 	private boolean simulateLeft = true; // is the simulate doc on L or R
-	private int thinkTimeMin = 2000;
-	private int thinkTimeMax = 2000;
-	private int eatTimeMin = 4000;
-	private int eatTimeMax = 4000;
+	private int thinkTimeMin = 1500;
+	private int thinkTimeMax = 2500;
+	private int eatTimeMin = 3000;
+	private int eatTimeMax = 5000;
 	private int simulationWaitTimeUntilLockReq = 1000;
 	private int lockTime = 35 * 1000;
 
