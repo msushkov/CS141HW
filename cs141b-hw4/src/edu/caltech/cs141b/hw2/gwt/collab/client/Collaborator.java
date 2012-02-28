@@ -1392,7 +1392,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		// wait for the thinking time and then call simulateHungry()
 		thinkingTimer.schedule(thinkTime);
 
-		statusUpdate("Thinking");
 	}
 
 	/**
