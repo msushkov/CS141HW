@@ -1340,6 +1340,8 @@ public class Collaborator extends Composite implements ClickHandler {
 		// stuff can still go on, and when that finishes (for this client only),
 		// then add the sim button so this client can enter the simulation again
 		disableButton(stopSimulateButton);
+		
+		statusUpdate("Stopping the simulation...");
 
 		// since simulation is set to false, once the thinking/hungry/eating
 		// phases we started finish then we need to enable some buttons
@@ -1521,6 +1523,8 @@ public class Collaborator extends Composite implements ClickHandler {
 			// no longer in stopping mode
 			simulationStopping = false;
 
+			statusUpdate("Simulation done.");
+			
 			// refresh the client page
 			Window.Location.reload();
 		}
