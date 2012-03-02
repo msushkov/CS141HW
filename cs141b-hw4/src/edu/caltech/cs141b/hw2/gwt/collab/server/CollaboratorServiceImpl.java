@@ -40,10 +40,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	// waiting for the document.
 	private static Map<String, List<String>> queueMap;
 
-	// This will map document keys to who owns the document. Either "server" or
-	// the clientID.
-	private static Map<String, String> tokenMap;
-
 	// Contains the currently-locked documents.
 	private static ArrayList<String> lockedDocuments = new ArrayList<String>();
 
@@ -60,7 +56,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	public CollaboratorServiceImpl() {
 		queueMap = Collections
 				.synchronizedMap(new HashMap<String, List<String>>());
-		tokenMap = Collections.synchronizedMap(new HashMap<String, String>());
 	}
 
 	/**
@@ -70,32 +65,24 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 *            The dockey for the doc we want to clean the locks of.
 	 */
 	public void cleanLock(String docKey) {
-		int notInList = -1;
-		int docIndex = lockedDocuments.indexOf(docKey);
-
-		if (docIndex != notInList) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-
-			try {
-				// Create the key
-				Key key = KeyFactory.stringToKey(docKey);
-
-				// Get the document from the Datastore
-				Document doc = pm.getObjectById(Document.class, key);
-
-				// If the doc is locked and the lock expired
-				if (doc.isLocked()
-						&& doc.getLockedUntil().before(
-								new Date(System.currentTimeMillis()))) {
-					String previousClient = tokenMap.get(docKey);
-					server.receiveToken(previousClient, docKey);
-				}
-
-			} finally {
-				// Do some cleanup
-				pm.close();
-			}
-		}
+		/*
+		 * int notInList = -1; int docIndex = lockedDocuments.indexOf(docKey);
+		 * 
+		 * if (docIndex != notInList) { PersistenceManager pm =
+		 * PMF.get().getPersistenceManager();
+		 * 
+		 * try { // Create the key Key key = KeyFactory.stringToKey(docKey);
+		 * 
+		 * // Get the document from the Datastore Document doc =
+		 * pm.getObjectById(Document.class, key);
+		 * 
+		 * // If the doc is locked and the lock expired if (doc.isLocked() &&
+		 * doc.getLockedUntil().before( new Date(System.currentTimeMillis()))) {
+		 * String previousClient = tokenMap.get(docKey);
+		 * server.receiveToken(previousClient, docKey); }
+		 * 
+		 * } finally { // Do some cleanup pm.close(); } }
+		 */
 	}
 
 	/**
@@ -104,7 +91,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	public static void cleanLocks() {
 		// Clean up documents if there are document currently locked
 		if (!lockedDocuments.isEmpty()) {
-			ArrayList<String> toClear = new ArrayList<String>();
+			ArrayList<Document> toClear = new ArrayList<Document>();
 
 			for (String docKey : lockedDocuments) {
 				PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -123,11 +110,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 					if (doc.isLocked()
 							&& doc.getLockedUntil().before(
 									new Date(System.currentTimeMillis()))) {
-						toClear.add(docKey);
-						if (queueMap.containsKey(docKey)) {
-							toClear.add(docKey);
+						toClear.add(doc);
 
-						}
 					}
 					// ...Ending transaction
 					t.commit();
@@ -141,12 +125,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			}
 
 			// Check if there are clients waiting for the document
-			for (String docKey : toClear) {
-				String previousClient = tokenMap.get(docKey);
-				server.receiveToken(previousClient, docKey);
+			for (Document doc : toClear) {
+				server.receiveToken(doc.getLockedBy(), doc.getKey());
 			}
 		}
-
 	}
 
 	/**
@@ -227,12 +209,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 		Transaction t = pm.currentTransaction();
 		try {
-			// If the doc has no key, it's a new document, so create a new
-			// document
-
 			// Starting transaction...
 			t.begin();
 
+			// If the doc has no key, it's a new document, so create a new
+			// document
 			if (stringKey == null) {
 				// First unlock it
 				toSave = new Document(doc.unlock());
@@ -297,20 +278,50 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 *            The key of the document whose token we are receiving
 	 */
 	private void receiveToken(String clientID, String docKey) {
-		// Return the token
-		tokenMap.put(docKey, "server");
 
 		// If there is no document waiting for the document remove from list of
 		// locked docs
-		if (!queueMap.containsKey(docKey) && lockedDocuments.contains(docKey)) {
-			lockedDocuments.remove(docKey);
+		// NOTE THIS IS A BUG ANYWAY LOL I'M COMMENTING THIS SHIT OUT
+		/*
+		 * if (!queueMap.containsKey(docKey) &&
+		 * lockedDocuments.contains(docKey)) { lockedDocuments.remove(docKey); }
+		 */
+
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Document toSave;
+		String newClientID = null;
+
+		Transaction t = pm.currentTransaction();
+
+		try {
+			// Starting transaction...
+			t.begin();
+			// Create the key
+			Key key = KeyFactory.stringToKey(docKey);
+
+			// Get the document corresponding to the key
+			toSave = pm.getObjectById(Document.class, key);
+
+			newClientID = toSave.pollNextClient();
+			toSave.unlock();
+
+			pm.makePersistent(toSave);
+
+			t.commit();
+		} finally {
+			// Do some cleanup
+			if (t.isActive()) {
+				t.rollback();
+			}
+
+			pm.close();
+
+			// Now, try to send a token if we can
+			if (newClientID != null) {
+				sendToken(newClientID, docKey);
+			}
 		}
 
-		// Now, try to send a token if we can
-		clientID = pollNextClient(docKey);
-		if (clientID != null) {
-			sendToken(clientID, docKey);
-		}
 	}
 
 	/**
@@ -321,14 +332,13 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * @param docKey
 	 *            The key of the document whose token we are receiving
 	 */
-	private void sendToken(final String clientID, final String docKey) {
-		// Now, set the correct clientID. We are "giving" them the token here.
-		tokenMap.put(docKey, clientID);
+	private void sendToken(String clientID, String docKey) {
 
 		// Add to list of locked documents if not already in there
-		if (!lockedDocuments.contains(docKey)) {
-			lockedDocuments.add(docKey);
-		}
+		/*
+		 * if (!lockedDocuments.contains(docKey)) { lockedDocuments.add(docKey);
+		 * }
+		 */
 
 		// Now, let's lock the document
 		// Get the PM
@@ -352,6 +362,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			pm.makePersistent(toSave);
 
 			t.commit();
+
+			// Finally, inform the client that the doc is locked and ready for
+			// them
+			getChannelService().sendMessage(
+					new ChannelMessage(clientID, docKey));
 		} finally {
 			// Do some cleanup
 			if (t.isActive()) {
@@ -360,9 +375,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			pm.close();
 		}
-
-		// Finally, inform the client that the doc is locked and ready for them
-		getChannelService().sendMessage(new ChannelMessage(clientID, docKey));
 
 	}
 
@@ -433,26 +445,24 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * @param docKey
 	 *            The key of the document that the client is waiting for
 	 */
-	private void addToDocQueue(String clientID, String documentKey) {
-		// if we dont already have this doc key in our map, add it in there
-		if (!queueMap.containsKey(documentKey)) {
-			queueMap.put(documentKey, Collections
-					.synchronizedList(new LinkedList<String>()));
-		}
-
-		// add the client to the queue for that particular doc
-		List<String> queue = queueMap.get(documentKey);
-		queue.add(clientID);
-
-		queueMap.put(documentKey, queue);
-
-		// this is the position of the newly added client in the queue
-		int pos = queue.size();
-
-		// inform the client which place in line it is
-		getChannelService().sendMessage(
-				new ChannelMessage(clientID, "position: " + pos));
-	}
+	/*
+	 * private void addToDocQueue(String clientID, String documentKey) { // if
+	 * we dont already have this doc key in our map, add it in there if
+	 * (!queueMap.containsKey(documentKey)) { queueMap.put(documentKey,
+	 * Collections.synchronizedList(new LinkedList<String>())); }
+	 * 
+	 * // add the client to the queue for that particular doc List<String> queue
+	 * = queueMap.get(documentKey); queue.add(clientID);
+	 * 
+	 * queueMap.put(documentKey, queue);
+	 * 
+	 * // this is the position of the newly added client in the queue int pos =
+	 * queue.size();
+	 * 
+	 * // inform the client which place in line it is
+	 * getChannelService().sendMessage( new ChannelMessage(clientID,
+	 * "position: " + pos)); }
+	 */
 
 	/**
 	 * Gets the next client waiting for the specified document.
@@ -461,14 +471,13 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 *            The document we want to find the next client for
 	 * @return A client ID of the next client waiting on this doc
 	 */
-	private String pollNextClient(String documentKey) {
-		List<String> queue = queueMap.get(documentKey);
-		if (queue != null && !queue.isEmpty()) {
-			return queue.remove(0);
-		}
-
-		return null;
-	}
+	/*
+	 * private String pollNextClient(String documentKey) { List<String> queue =
+	 * queueMap.get(documentKey); if (queue != null && !queue.isEmpty()) {
+	 * return queue.remove(0); }
+	 * 
+	 * return null; }
+	 */
 
 	/**
 	 * Removes a client from the specified doc queue
@@ -479,20 +488,16 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 *            The document we are trying to dequeue the client
 	 * @return Whether the client was removed successfully
 	 */
-	private boolean removeClient(String clientID, String documentKey) {
-		List<String> queue = queueMap.get(documentKey);
-		boolean inQueue = false;
-		if (queue != null) {
-			// Remove the first client from the list and record whether there is
-			// at least one client to remove
-			inQueue = queue.remove(clientID);
-			// Remove the rest of the clients from the list
-			while (queue.remove(clientID)) {
-			}
-		}
-
-		return inQueue;
-	}
+	/*
+	 * private boolean removeClient(String clientID, String documentKey) {
+	 * List<String> queue = queueMap.get(documentKey); boolean inQueue = false;
+	 * if (queue != null) { // Remove the first client from the list and record
+	 * whether there is // at least one client to remove inQueue =
+	 * queue.remove(clientID); // Remove the rest of the clients from the list
+	 * while (queue.remove(clientID)) { } }
+	 * 
+	 * return inQueue; }
+	 */
 
 	/**
 	 * Locks the given document.
@@ -504,14 +509,40 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	public void lockDocument(String clientID, String documentKey) {
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
-		if (!tokenMap.containsKey(documentKey))
-			tokenMap.put(documentKey, "server");
 
-		// Check if we have the token. If we do, send the token out immediately
-		if (tokenMap.get(documentKey).equals("server"))
-			sendToken(clientID, documentKey);
-		else
-			addToDocQueue(clientID, documentKey);
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Document toSave = null;
+
+		Transaction t = pm.currentTransaction();
+
+		try {
+			// Starting transaction...
+			t.begin();
+			// Create the key
+			Key key = KeyFactory.stringToKey(documentKey);
+
+			// Get the document corresponding to the key
+			toSave = pm.getObjectById(Document.class, key);
+			if (toSave.isLocked()) {
+				toSave.addToWaitingList(clientID);
+			}
+
+			pm.makePersistent(toSave);
+
+			t.commit();
+		} finally {
+			// Do some cleanup
+			if (t.isActive()) {
+				t.rollback();
+			}
+
+			pm.close();
+			
+			// UGH I have to put this here b/c sendToken can't go in a transaction >.> I'm sorry...
+			if (!toSave.isLocked()) {
+				sendToken(clientID, documentKey);
+			}
+		}
 	}
 
 	/**
@@ -591,10 +622,37 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	@Override
 	public void leaveLockQueue(String clientID, String documentKey) {
-		removeClient(clientID, documentKey);
-		if (tokenMap.get(documentKey).equals(clientID)) {
-			receiveToken(clientID, documentKey);
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Document toSave = null;
+
+		Transaction t = pm.currentTransaction();
+
+		try {
+			// Starting transaction...
+			t.begin();
+			// Create the key
+			Key key = KeyFactory.stringToKey(documentKey);
+
+			// Get the document corresponding to the key
+			toSave = pm.getObjectById(Document.class, key);
+			toSave.removeClient(clientID);
+
+			pm.makePersistent(toSave);
+
+			t.commit();
+		} finally {
+			// Do some cleanup
+			if (t.isActive()) {
+				t.rollback();
+			}
+
+			pm.close();
+
+			if (toSave != null && toSave.getLockedBy().equals(clientID)) {
+				receiveToken(clientID, documentKey);
+			}
 		}
+
 	}
 
 	/*
