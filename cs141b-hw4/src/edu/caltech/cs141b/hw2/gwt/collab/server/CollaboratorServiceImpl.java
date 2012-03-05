@@ -32,8 +32,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	// This is the time in seconds that clients can lock a document
 	private static final int LOCK_TIME = 30;
 
-	private static final Key lockListKey = KeyFactory
-			.stringToKey("lockedDocuments");
+	private static final Key lockListKey = KeyFactory.createKey(
+			LockedDocuments.class.getSimpleName(), "lockedDocuments");
 
 	// This object maps doc keys to queues of client IDs, which are the clients
 	// waiting for the document.
@@ -66,9 +66,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	public void cleanLock(String docKey) {
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		LockedDocuments lockedDocsObj = pm.getObjectById(LockedDocuments.class,
-				lockListKey);
-		List<String> lockedDocKeys = lockedDocsObj.getLockedDocs();
+		// LockedDocuments lockedDocsObj =
+		// pm.getObjectById(LockedDocuments.class,
+		// lockListKey);
+		// List<String> lockedDocKeys = lockedDocsObj.getLockedDocs();
 		Transaction t = pm.currentTransaction();
 		String lockedBy = null;
 		boolean returning = false;
@@ -157,75 +158,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 		// Finally close the PM
 		pm.close();
-
-		// Gets all the ids
-		// Query query = pm.newQuery("select id from " +
-		// LockedDocumentJDO.class.getName());
-		// List<String> lockedKeys = (List<String>) query.execute();
-		//
-		// for (String key : lockedKeys)
-		// try {
-		// // Query the Datastore and iterate through all the Documents in the
-		// // Datastore
-		// for (String key : {
-		// pm.get
-		//
-		// toSave = pm.getObjectById(Document.class, key);
-		//
-		// // Get the document metadata from the Documents
-		// DocumentMetadata metaDoc = new DocumentMetadata(doc.getKey(),
-		// doc.getTitle());
-		// docList.add(metaDoc);
-		// }
-		//
-		// // Return the list of docs
-		// return docList;
-		// } finally {
-		// // Do cleanup
-		// query.closeAll();
-		// pm.close();
-		// }
-
-		// // Clean up documents if there are document currently locked
-		// if (!lockedDocuments.isEmpty()) {
-		// ArrayList<Document> toClear = new ArrayList<Document>();
-		//
-		// for (String docKey : lockedDocuments) {
-		// PersistenceManager pm = PMF.get().getPersistenceManager();
-		// Transaction t = pm.currentTransaction();
-		// try {
-		// // Starting transaction...
-		// t.begin();
-		//
-		// // Create the key
-		// Key key = KeyFactory.stringToKey(docKey);
-		//
-		// // Get the document from the Datastore
-		// Document doc = pm.getObjectById(Document.class, key);
-		//
-		// // If the doc is locked and the lock expired
-		// if (doc.isLocked()
-		// && doc.getLockedUntil().before(
-		// new Date(System.currentTimeMillis()))) {
-		// toClear.add(doc);
-		//
-		// }
-		// // ...Ending transaction
-		// t.commit();
-		// } finally {
-		// // Do some cleanup
-		// if (t.isActive()) {
-		// t.rollback();
-		// }
-		// pm.close();
-		// }
-		// }
-		//
-		// // Check if there are clients waiting for the document
-		// for (Document doc : toClear) {
-		// server.receiveToken(doc.getLockedBy(), doc.getKey());
-		// }
-		// }
 	}
 
 	/**
@@ -237,42 +169,32 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public List<DocumentMetadata> getDocumentList() {
 
-		
 		System.out.println("RUNNING");
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = pm.newQuery(LockedDocuments.class);
-
-		List<LockedDocuments> lockedDocs = (List<LockedDocuments>) query
-				.execute();
-
-		// Add the unique lockedDocument entity if not already there
-		if (lockedDocs.size() < 1) {
-		LockedDocuments lockedDocuments = new LockedDocuments();
-		Transaction t = pm.currentTransaction();
-		try {
-			// Starting transaction...
-			t.begin();
-
-			// Save the unique entity
-			pm.makePersistent(lockedDocuments);
-			t.commit();
-		} finally {
-			// Do some cleanup
-			if (t.isActive()) {
-				t.rollback();
-			}
-
-		}
-		// Independently of existance close the query and persistance manager
-		query.closeAll();
-		pm.close();
-		 }
+		/*
+		 * PersistenceManager pm = PMF.get().getPersistenceManager(); Query
+		 * query = pm.newQuery(LockedDocuments.class);
+		 * 
+		 * List<LockedDocuments> lockedDocs = (List<LockedDocuments>) query
+		 * .execute();
+		 * 
+		 * // Add the unique lockedDocument entity if not already there if
+		 * (lockedDocs.size() < 1) { LockedDocuments lockedDocuments = new
+		 * LockedDocuments(); Transaction t = pm.currentTransaction(); try { //
+		 * Starting transaction... t.begin();
+		 * 
+		 * // Save the unique entity pm.makePersistent(lockedDocuments);
+		 * t.commit(); } finally { // Do some cleanup if (t.isActive()) {
+		 * t.rollback(); }
+		 * 
+		 * } // Independently of existance close the query and persistance
+		 * manager query.closeAll(); pm.close(); }
+		 */
 
 		// Get the PM
-		pm = PMF.get().getPersistenceManager();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		// Make the Document query
-		query = pm.newQuery(Document.class);
+		Query query = pm.newQuery(Document.class);
 
 		ArrayList<DocumentMetadata> docList = new ArrayList<DocumentMetadata>();
 
@@ -366,7 +288,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 				// Check that the person trying to save has the lock and that
 				// the lock hasn't expired
-				if (lockedBy.equals(identity)
+				if (lockedBy != null && lockedBy.equals(identity)
 						&& lockedUntil.after(new Date(System
 								.currentTimeMillis()))) {
 					// If both are fulfilled, update and unlock the doc
@@ -395,7 +317,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			pm.close();
 
 			// Now, take the token back
-			receiveToken(clientID, stringKey);
+			if (stringKey != null) {
+				receiveToken(clientID, stringKey);
+			}
 		}
 	}
 
@@ -434,16 +358,18 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			toSave = pm.getObjectById(Document.class, key);
 
 			// Set next client if there's a queue
-			if (toSave.hasQueue()) {
-				newClientID = toSave.pollNextClient();
-			}
+			// if (toSave.hasQueue()) {
+			System.out.println("lol poll");
+			newClientID = toSave.pollNextClient();
+			System.out.println(newClientID);
+			// }
 			// Else remove it from locked docs
-			else {
-				LockedDocuments lockedDocsObj = pm.getObjectById(
-						LockedDocuments.class, lockListKey);
-				lockedDocsObj.removeDocument(docKey);
-				pm.makePersistent(lockedDocsObj);
-			}
+			/*
+			 * else { LockedDocuments lockedDocsObj = pm.getObjectById(
+			 * LockedDocuments.class, lockListKey);
+			 * lockedDocsObj.removeDocument(docKey);
+			 * pm.makePersistent(lockedDocsObj); }
+			 */
 
 			toSave.unlock();
 
@@ -502,10 +428,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			// Add key to locked documents (will only get added if it isn't
 			// already there)
-			LockedDocuments lockedDocs = pm.getObjectById(
-					LockedDocuments.class, lockListKey);
-			lockedDocs.addDocument(docKey);
-			pm.makePersistent(lockedDocs);
+			/*
+			 * LockedDocuments lockedDocs = pm.getObjectById(
+			 * LockedDocuments.class, lockListKey);
+			 * lockedDocs.addDocument(docKey); pm.makePersistent(lockedDocs);
+			 */
 
 			pm.makePersistent(toSave);
 
@@ -558,7 +485,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			// Make sure that the person unlocking is the person who locked the
 			// doc.
-			if (lockedBy.equals(identity)) {
+			if (lockedBy != null && lockedBy.equals(identity)) {
 				// Unlock it
 				toSave.unlock();
 
@@ -672,6 +599,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// Get the document corresponding to the key
 			toSave = pm.getObjectById(Document.class, key);
 			if (toSave.isLocked()) {
+				System.out.println("locked");
 				toSave.addToWaitingList(clientID);
 			}
 
@@ -813,7 +741,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	@Override
 	public void logout(String clientID) {
-		//PersistenceManager pm = PMF.get().getPersistenceManager();
+		// PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		// for (String docKey : queueMap.keySet()) {
 		// leaveLockQueue(clientID, docKey);

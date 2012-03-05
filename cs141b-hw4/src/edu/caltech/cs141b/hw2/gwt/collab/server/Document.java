@@ -113,7 +113,11 @@ public class Document {
 	}
 
 	public String pollNextClient() {
-		return waitingClients.poll();
+		if (waitingClients.isEmpty()) {
+			return null;
+		} else {
+			return waitingClients.remove(0);
+		}
 	}
 	
 	public void addToWaitingList(String client) {
