@@ -165,6 +165,11 @@ public class Document {
 		this.lockedBy = null;
 	}
 
+	
+	public boolean hasQueue() {
+		return !waitingClients.isEmpty();
+	}
+	
 	// Document type converters
 
 	/**
@@ -186,5 +191,6 @@ public class Document {
 				keyString, title, content.getValue());
 		return doc;
 	}
+	
 
 }
