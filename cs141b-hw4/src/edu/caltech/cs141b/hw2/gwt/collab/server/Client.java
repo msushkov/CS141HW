@@ -15,13 +15,13 @@ public class Client {
 	
 	
 	@PrimaryKey
-	String key;
+	String id;
 	
 	public Client(String clientID) {
-		key = clientID;
+		id = clientID;
 	}
 	
-	public void addDocument(String key) {
+	public void addDoc(String key) {
 		// Add doc key if it doesn't exist
 		if (!myDocs.contains(key)) {
 			myDocs.add(key);
@@ -32,7 +32,7 @@ public class Client {
 		return myDocs;
 	}
 	
-	public void removeDocument(String key) {
+	public void rmDoc(String key) {
 		// Remove dockey if it exists
 		myDocs.remove(key);
 	}
