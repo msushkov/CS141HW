@@ -59,6 +59,7 @@ CollaboratorService {
 		PersistenceManager pm = PMF.get().getPersistenceManager(); Query
 		query = pm.newQuery(LockedDocuments.class);
 
+		@SuppressWarnings("unchecked")
 		List<LockedDocuments> lockedDocs = (List<LockedDocuments>) query.execute();
 
 		// Add the unique lockedDocument entity if not already there
@@ -388,11 +389,6 @@ CollaboratorService {
 
 		// If there is no document waiting for the document remove from list of
 		// locked docs
-		// NOTE THIS IS A BUG ANYWAY LOL I'M COMMENTING THIS SHIT OUT
-		/*
-		 * if (!queueMap.containsKey(docKey) &&
-		 * lockedDocuments.contains(docKey)) { lockedDocuments.remove(docKey); }
-		 */
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Document toSave;
@@ -463,10 +459,6 @@ CollaboratorService {
 	private void sendToken(String clientID, String docKey) {
 
 		// Add to list of locked documents if not already in there
-		/*
-		 * if (!lockedDocuments.contains(docKey)) { lockedDocuments.add(docKey);
-		 * }
-		 */
 		// Now, let's lock the document
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -488,10 +480,6 @@ CollaboratorService {
 
 			// Add key to locked documents (will only get added if it isn't
 			// already there)
-
-
-
-
 			pm.makePersistent(toSave);
 
 			t.commit();
