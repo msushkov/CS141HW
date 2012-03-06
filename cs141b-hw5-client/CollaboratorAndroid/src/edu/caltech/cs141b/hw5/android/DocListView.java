@@ -1,10 +1,11 @@
 package edu.caltech.cs141b.hw5.android;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -13,9 +14,14 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import edu.caltech.cs141b.hw5.android.data.DocumentMetadata;
+import edu.caltech.cs141b.hw5.android.data.InvalidRequest;
+import edu.caltech.cs141b.hw5.android.data.UnlockedDocument;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
 public class DocListView extends ListActivity {
+	// debugging
+	private static String TAG = "AndroidActivity";
+
 	// makes server calls
 	CollabServiceWrapper service;
 
@@ -33,11 +39,10 @@ public class DocListView extends ListActivity {
 	public void getDocList() {
 		// get the docs from the server
 		List<DocumentMetadata> docs = service.getDocumentList();
-		ArrayList<String> titles = new ArrayList<String>();
 
-		for (DocumentMetadata doc : docs) {
-			titles.add(doc.getTitle());
-		}
+		// reverse list as to get new content on top
+		Collections.reverse(docs);
+
 		// set the model for the list view, uses toString() method to get names.
 		setListAdapter(new ArrayAdapter<DocumentMetadata>(this,
 				android.R.layout.simple_list_item_1, docs));
@@ -47,12 +52,20 @@ public class DocListView extends ListActivity {
 
 		// define the action for when the user presses a doc in the list
 		lv.setOnItemClickListener(new OnItemClickListener() {
-
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// get the currently-selected doc
-				DocumentMetadata currDoc = (DocumentMetadata) lv
+				DocumentMetadata selectedDoc = (DocumentMetadata) lv
 						.getItemAtPosition(position);
+
+				try {
+					UnlockedDocument doc = service.getDocument(selectedDoc
+							.getKey());
+
+				} catch (InvalidRequest e) {
+					Log.d(TAG, "Invalid request");
+					e.printStackTrace();
+				}
 
 				// TODO
 				// display the given doc - maybe open a new text view?
