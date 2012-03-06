@@ -36,7 +36,7 @@ public class CollabServiceWrapper {
 	 * @return
 	 */
 	public List<DocumentMetadata> getDocumentList() {		
-		Log.i(TAG, "Starting getting doucment list...");
+		Log.i(TAG, "Starting getting document list...");
 
 		RequestMessage request = RequestMessage.newBuilder()
 				.setRequestType(RequestType.GET_DOCUMENT_LIST)
@@ -57,7 +57,7 @@ public class CollabServiceWrapper {
 				}
 			}			
 		} catch (InterruptedException e) {
-			Log.e(TAG, "Thrad interrupted." + e.getMessage());
+			Log.e(TAG, "Thread interrupted." + e.getMessage());
 		} catch (ExecutionException e) {
 			Log.e(TAG, "Getting response terminated from exception." + e.getMessage());
 		}		
