@@ -821,7 +821,17 @@ CollaboratorService {
 		
 		// Finally delete the client
 		pm = PMF.get().getPersistenceManager();
-		Client client = pm.getObjectById(Client.class, clientID);
-		pm.deletePersistent(client);
+		Transaction t = pm.currentTransaction();
+		try {
+			t.begin();
+			Client client = pm.getObjectById(Client.class, clientID);
+			pm.deletePersistent(client);
+			t.commit();
+		} finally {
+			if (t.isActive()) {
+				t.rollback();
+			}
+			pm.close();
+		}
 	}
 }
