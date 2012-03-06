@@ -25,6 +25,10 @@ public class CollaboratorAndroidActivity extends Activity {
         Log.d(TAG, "starting activity");
         String docsInfo = "";
         
+        TextView tv = new TextView(this);
+        tv.setText("Hello, Android");
+        setContentView(tv);
+        
         // Test getting the document list and print it out on screen
         CollabServiceWrapper service = new CollabServiceWrapper();      
         List<DocumentMetadata> metas = service.getDocumentList();
@@ -33,6 +37,7 @@ public class CollaboratorAndroidActivity extends Activity {
         	docsInfo += meta.getKey() + ": " + meta.getTitle() + "\n"; 
         }
         
+        /*
         // Try lock and unlocking a document
         try {
 			LockedDocument ld = service.lockDocument(metas.get(0).getKey());
@@ -59,5 +64,7 @@ public class CollaboratorAndroidActivity extends Activity {
         tv.setText(docsInfo);
         setContentView(tv);
         //setContentView(R.layout.main);
+        */
+        
     }
 }
