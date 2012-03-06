@@ -7,15 +7,15 @@ package edu.caltech.cs141b.hw5.android.data;
  * creation or modification dates, they need only be added to this class.
  */
 public class DocumentMetadata {
-	
+
 	private String key = null;
 	private String title = null;
-	
+
 	// Required by GWT serialization.
 	public DocumentMetadata() {
-		
+
 	}
-	
+
 	public DocumentMetadata(String key, String title) {
 		this.key = key;
 		this.title = title;
@@ -28,6 +28,9 @@ public class DocumentMetadata {
 	public String getTitle() {
 		return title;
 	}
-	
-}
 
+	@Override
+	public String toString() {
+		return title;
+	}
+}

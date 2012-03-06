@@ -3,5 +3,6 @@
 
     <string name="hello">Hello World, CollaboratorAndroidActivity!</string>
     <string name="app_name">CollaboratorAndroid</string>
+    <string name="Title">Title</string>
 
 </resources>
