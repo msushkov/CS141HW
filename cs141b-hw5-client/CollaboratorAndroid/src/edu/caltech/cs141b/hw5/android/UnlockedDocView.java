@@ -17,7 +17,7 @@ import android.widget.ListView;
 import edu.caltech.cs141b.hw5.android.data.DocumentMetadata;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
-public class DocListView extends ListActivity {
+public class UnlockedDocView extends ListActivity {
 	// makes server calls
 	CollabServiceWrapper service;
 
@@ -25,49 +25,18 @@ public class DocListView extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// TODO
-		// get the service from the caller
+		service = new CollabServiceWrapper();
+
+		Bundle extras = getIntent().getExtras();
 		
-		getDocList();
+		displayUnlockedDoc();
 	}
 
 	/**
-	 * Get the document list from the server.
+	 * Display the 
 	 */
-	public void getDocList() {
-		// get the docs from the server
-		List<DocumentMetadata> docs = service.getDocumentList();
-		ArrayList<String> titles = new ArrayList<String>();
-
-		for (DocumentMetadata doc : docs) {
-			titles.add(doc.getTitle());
-		}
-		// set the model for the list view, uses toString() method to get names.
-		setListAdapter(new ArrayAdapter<DocumentMetadata>(this,
-				android.R.layout.simple_list_item_1, docs));
-
-		final ListView lv = getListView();
-		lv.setTextFilterEnabled(true);
-
-		// define the action for when the user presses a doc in the list
-		lv.setOnItemClickListener(new OnItemClickListener() {
-
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				// get the currently-selected doc
-				DocumentMetadata currDoc = (DocumentMetadata) lv
-						.getItemAtPosition(position);
-
-				// TODO
-				// display the given doc - maybe open a new text view?
-				// displayDoc(currDoc);
-				
-				
-				//Intent unlockedDocActivity = new Intent(this, UnlockedDocView.class);
-				
-				//startActivity();
-			}
-		});
+	public void displayUnlockedDoc() {
+		
 
 		// Try lock and unlocking a document
 		// try {
@@ -103,9 +72,6 @@ public class DocListView extends ListActivity {
 		return true;
 	}
 	
-	/**
-	 * Click handler for the menu buttons.
-	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// display the list menu
@@ -116,17 +82,17 @@ public class DocListView extends ListActivity {
 		{
 			// new doc is pressed
 			case R.id.newDoc:
-				// start new doc view activity
+				
 				return true;
 
-			// refresh is pressed
-			case R.id.refreshList:
-				getDocList();
-				//startActivity(new Intent(this, DocListView.class));
+			case R.id.docList:
+				startActivity(new Intent(this, UnlockedDocView.class));
 				return true;
 			
 			default:
 				return true;
 		}
+
 	}
 }
+
