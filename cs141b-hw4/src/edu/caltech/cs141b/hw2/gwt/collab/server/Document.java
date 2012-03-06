@@ -98,18 +98,9 @@ public class Document {
 		return lockedUntil;
 	}
 
-	public boolean removeClient(String clientID) {
-		boolean inQueue = false;
-		Iterator<String> it = waitingClients.iterator();
-		while (it.hasNext()) {
-			String client = it.next();
-			if (client.equals(clientID)) {
-				inQueue = true;
-				it.remove();
-			}
-		}
-
-		return inQueue;
+	public void removeClient(String clientID) {
+		// Remove client from queue if it's there.
+		waitingClients.remove(clientID);
 	}
 
 	public String pollNextClient() {
@@ -121,7 +112,10 @@ public class Document {
 	}
 	
 	public void addToWaitingList(String client) {
-		waitingClients.add(client);
+		// Add client to waiting list if it's not already waiting
+		if (!waitingClients.contains(client)) {
+			waitingClients.add(client);
+		}
 	}
 
 	/*
