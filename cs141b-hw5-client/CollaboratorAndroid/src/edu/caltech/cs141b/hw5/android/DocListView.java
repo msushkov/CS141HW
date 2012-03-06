@@ -20,19 +20,23 @@ import edu.caltech.cs141b.hw5.android.data.InvalidRequest;
 import edu.caltech.cs141b.hw5.android.data.UnlockedDocument;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
+/**
+ * Displays the doc list.
+ * @author msushkov
+ *
+ */
 public class DocListView extends ListActivity {
 	// debugging
 	private static String TAG = "AndroidActivity";
 
 	// makes server calls
-	CollabServiceWrapper service;
+	private CollabServiceWrapper service;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// TODO
-		// get the service from the caller
+		service = new CollabServiceWrapper();
 		
 		getDocList();
 	}
@@ -60,23 +64,17 @@ public class DocListView extends ListActivity {
 					int position, long id) {
 				// get the currently-selected doc
 				DocumentMetadata selectedDoc = (DocumentMetadata) lv
+				DocumentMetadata currDoc = (DocumentMetadata) lv
 						.getItemAtPosition(position);
-
-				try {
-					UnlockedDocument doc = service.getDocument(selectedDoc
-							.getKey());
-
-				} catch (InvalidRequest e) {
-					Log.d(TAG, "Invalid request");
-					e.printStackTrace();
-				}
 
 				// TODO
 				// display the given doc - maybe open a new text view?
 				// displayDoc(currDoc);
 				
+				Intent unlockedDocIntent = new Intent(DocListView.this, UnlockedDocView.class);
+				Bundle b = new Bundle();
 				
-				//Intent unlockedDocActivity = new Intent(this, UnlockedDocView.class);
+				unlockedDocIntent.putExtra("doc", currDoc);
 				
 				//startActivity();
 			}
@@ -111,8 +109,7 @@ public class DocListView extends ListActivity {
 	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.listmenu, menu);
+		getMenuInflater().inflate(R.menu.listmenu, menu);
 		return true;
 	}
 	
@@ -122,7 +119,7 @@ public class DocListView extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// display the list menu
-		setContentView(R.menu.listmenu);
+		//setContentView(R.menu.listmenu);
 		
 		// which button did the user press?
 		switch (item.getItemId()) 
