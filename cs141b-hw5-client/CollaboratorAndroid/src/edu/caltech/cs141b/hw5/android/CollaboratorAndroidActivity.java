@@ -13,9 +13,9 @@ public class CollaboratorAndroidActivity extends Activity {
 
 	// debugging
 	private static String TAG = "AndroidActivity";
-
+	
 	// makes server calls
-	CollabServiceWrapper service;
+	public CollabServiceWrapper service;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -23,14 +23,18 @@ public class CollaboratorAndroidActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		Log.d(TAG, "starting activity");
+		
+		service = new CollabServiceWrapper();
 
-		// service = new CollabServiceWrapper();
-
+		Intent listIntent = new Intent(this, DocListView.class);
+		//listIntent.putExtra("service", service);
+		
 		// start a new activity: in this case, the doc list view
-		//
+		//startActivity();
 
 		// Display a new document per default
-		createDoc();
+		//createDoc();
+		
 		// can make it so that an activity returns some value - can use
 		// this when selecting something in the doc list
 	}
