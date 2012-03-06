@@ -17,12 +17,6 @@ public final class CollabMessages {
     LOCK_EXPIRED(4, 4),
     ;
     
-    public static final int SUCCESS_VALUE = 0;
-    public static final int UNKNOWN_ERROR_VALUE = 1;
-    public static final int INVALID_REQUEST_VALUE = 2;
-    public static final int LOCK_UNAVAILABLE_VALUE = 3;
-    public static final int LOCK_EXPIRED_VALUE = 4;
-    
     
     public final int getNumber() { return value; }
     
@@ -45,13 +39,14 @@ public final class CollabMessages {
         internalValueMap =
           new com.google.protobuf.Internal.EnumLiteMap<StatusType>() {
             public StatusType findValueByNumber(int number) {
-              return StatusType.valueOf(number);
-            }
+              return StatusType.valueOf(number)
+    ;        }
           };
     
+    private final int index;
     private final int value;
-    
     private StatusType(int index, int value) {
+      this.index = index;
       this.value = value;
     }
     
@@ -66,12 +61,6 @@ public final class CollabMessages {
     SAVE_DOCUMENT(3, 3),
     RELEASE_LOCK(4, 4),
     ;
-    
-    public static final int GET_DOCUMENT_LIST_VALUE = 0;
-    public static final int LOCK_DOCUMENT_VALUE = 1;
-    public static final int GET_DOCUMENT_VALUE = 2;
-    public static final int SAVE_DOCUMENT_VALUE = 3;
-    public static final int RELEASE_LOCK_VALUE = 4;
     
     
     public final int getNumber() { return value; }
@@ -95,36 +84,25 @@ public final class CollabMessages {
         internalValueMap =
           new com.google.protobuf.Internal.EnumLiteMap<RequestType>() {
             public RequestType findValueByNumber(int number) {
-              return RequestType.valueOf(number);
-            }
+              return RequestType.valueOf(number)
+    ;        }
           };
     
+    private final int index;
     private final int value;
-    
     private RequestType(int index, int value) {
+      this.index = index;
       this.value = value;
     }
     
     // @@protoc_insertion_point(enum_scope:cs141b.RequestType)
   }
   
-  public interface DocumentMetaInfoOrBuilder
-      extends com.google.protobuf.MessageLiteOrBuilder {
-    
-    // required string key = 1;
-    boolean hasKey();
-    String getKey();
-    
-    // required string title = 2;
-    boolean hasTitle();
-    String getTitle();
-  }
   public static final class DocumentMetaInfo extends
-      com.google.protobuf.GeneratedMessageLite
-      implements DocumentMetaInfoOrBuilder {
+      com.google.protobuf.GeneratedMessageLite {
     // Use DocumentMetaInfo.newBuilder() to construct.
-    private DocumentMetaInfo(Builder builder) {
-      super(builder);
+    private DocumentMetaInfo() {
+      initFields();
     }
     private DocumentMetaInfo(boolean noInit) {}
     
@@ -137,100 +115,36 @@ public final class CollabMessages {
       return defaultInstance;
     }
     
-    private int bitField0_;
     // required string key = 1;
     public static final int KEY_FIELD_NUMBER = 1;
-    private java.lang.Object key_;
-    public boolean hasKey() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public String getKey() {
-      java.lang.Object ref = key_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          key_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getKeyBytes() {
-      java.lang.Object ref = key_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        key_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+    private boolean hasKey;
+    private java.lang.String key_ = "";
+    public boolean hasKey() { return hasKey; }
+    public java.lang.String getKey() { return key_; }
     
     // required string title = 2;
     public static final int TITLE_FIELD_NUMBER = 2;
-    private java.lang.Object title_;
-    public boolean hasTitle() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public String getTitle() {
-      java.lang.Object ref = title_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          title_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getTitleBytes() {
-      java.lang.Object ref = title_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        title_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+    private boolean hasTitle;
+    private java.lang.String title_ = "";
+    public boolean hasTitle() { return hasTitle; }
+    public java.lang.String getTitle() { return title_; }
     
     private void initFields() {
-      key_ = "";
-      title_ = "";
     }
-    private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      if (!hasKey()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasTitle()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
+      if (!hasKey) return false;
+      if (!hasTitle) return false;
       return true;
     }
     
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getKeyBytes());
+      if (hasKey()) {
+        output.writeString(1, getKey());
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getTitleBytes());
+      if (hasTitle()) {
+        output.writeString(2, getTitle());
       }
     }
     
@@ -240,23 +154,16 @@ public final class CollabMessages {
       if (size != -1) return size;
     
       size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+      if (hasKey()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getKeyBytes());
+          .computeStringSize(1, getKey());
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+      if (hasTitle()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getTitleBytes());
+          .computeStringSize(2, getTitle());
       }
       memoizedSerializedSize = size;
       return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
     }
     
     public static edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo parseFrom(
@@ -335,68 +242,66 @@ public final class CollabMessages {
     
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageLite.Builder<
-          edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo, Builder>
-        implements edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfoOrBuilder {
+          edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo, Builder> {
+      private edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo result;
+      
       // Construct using edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
+      private Builder() {}
+      
+      private static Builder create() {
+        Builder builder = new Builder();
+        builder.result = new edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo();
+        return builder;
       }
       
-      private void maybeForceBuilderInitialization() {
-      }
-      private static Builder create() {
-        return new Builder();
+      protected edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo internalGetResult() {
+        return result;
       }
       
       public Builder clear() {
-        super.clear();
-        key_ = "";
-        bitField0_ = (bitField0_ & ~0x00000001);
-        title_ = "";
-        bitField0_ = (bitField0_ & ~0x00000002);
+        if (result == null) {
+          throw new IllegalStateException(
+            "Cannot call clear() after build().");
+        }
+        result = new edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo();
         return this;
       }
       
       public Builder clone() {
-        return create().mergeFrom(buildPartial());
+        return create().mergeFrom(result);
       }
       
       public edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo getDefaultInstanceForType() {
         return edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo.getDefaultInstance();
       }
       
+      public boolean isInitialized() {
+        return result.isInitialized();
+      }
       public edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo build() {
-        edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo result = buildPartial();
-        if (!result.isInitialized()) {
+        if (result != null && !isInitialized()) {
           throw newUninitializedMessageException(result);
         }
-        return result;
+        return buildPartial();
       }
       
       private edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo result = buildPartial();
-        if (!result.isInitialized()) {
+        if (!isInitialized()) {
           throw newUninitializedMessageException(
             result).asInvalidProtocolBufferException();
         }
-        return result;
+        return buildPartial();
       }
       
       public edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo buildPartial() {
-        edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo result = new edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
+        if (result == null) {
+          throw new IllegalStateException(
+            "build() has already been called on this Builder.");
         }
-        result.key_ = key_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.title_ = title_;
-        result.bitField0_ = to_bitField0_;
-        return result;
+        edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       public Builder mergeFrom(edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo other) {
@@ -410,18 +315,6 @@ public final class CollabMessages {
         return this;
       }
       
-      public final boolean isInitialized() {
-        if (!hasKey()) {
-          
-          return false;
-        }
-        if (!hasTitle()) {
-          
-          return false;
-        }
-        return true;
-      }
-      
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -430,101 +323,66 @@ public final class CollabMessages {
           int tag = input.readTag();
           switch (tag) {
             case 0:
-              
               return this;
             default: {
               if (!parseUnknownField(input, extensionRegistry, tag)) {
-                
                 return this;
               }
               break;
             }
             case 10: {
-              bitField0_ |= 0x00000001;
-              key_ = input.readBytes();
+              setKey(input.readString());
               break;
             }
             case 18: {
-              bitField0_ |= 0x00000002;
-              title_ = input.readBytes();
+              setTitle(input.readString());
               break;
             }
           }
         }
       }
       
-      private int bitField0_;
       
       // required string key = 1;
-      private java.lang.Object key_ = "";
       public boolean hasKey() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
+        return result.hasKey();
       }
-      public String getKey() {
-        java.lang.Object ref = key_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          key_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public java.lang.String getKey() {
+        return result.getKey();
       }
-      public Builder setKey(String value) {
+      public Builder setKey(java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
-        key_ = value;
-        
+  result.hasKey = true;
+        result.key_ = value;
         return this;
       }
       public Builder clearKey() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        key_ = getDefaultInstance().getKey();
-        
+        result.hasKey = false;
+        result.key_ = getDefaultInstance().getKey();
         return this;
-      }
-      void setKey(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000001;
-        key_ = value;
-        
       }
       
       // required string title = 2;
-      private java.lang.Object title_ = "";
       public boolean hasTitle() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return result.hasTitle();
       }
-      public String getTitle() {
-        java.lang.Object ref = title_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          title_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public java.lang.String getTitle() {
+        return result.getTitle();
       }
-      public Builder setTitle(String value) {
+      public Builder setTitle(java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
-        title_ = value;
-        
+  result.hasTitle = true;
+        result.title_ = value;
         return this;
       }
       public Builder clearTitle() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        title_ = getDefaultInstance().getTitle();
-        
+        result.hasTitle = false;
+        result.title_ = getDefaultInstance().getTitle();
         return this;
-      }
-      void setTitle(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000002;
-        title_ = value;
-        
       }
       
       // @@protoc_insertion_point(builder_scope:cs141b.DocumentMetaInfo)
@@ -532,41 +390,18 @@ public final class CollabMessages {
     
     static {
       defaultInstance = new DocumentMetaInfo(true);
+      edu.caltech.cs141b.hw5.data.CollabMessages.internalForceInit();
       defaultInstance.initFields();
     }
     
     // @@protoc_insertion_point(class_scope:cs141b.DocumentMetaInfo)
   }
   
-  public interface LockedDocumentInfoOrBuilder
-      extends com.google.protobuf.MessageLiteOrBuilder {
-    
-    // optional string lockedBy = 1;
-    boolean hasLockedBy();
-    String getLockedBy();
-    
-    // optional int64 lockedUntil = 2;
-    boolean hasLockedUntil();
-    long getLockedUntil();
-    
-    // optional string key = 3;
-    boolean hasKey();
-    String getKey();
-    
-    // required string title = 4;
-    boolean hasTitle();
-    String getTitle();
-    
-    // required string contents = 5;
-    boolean hasContents();
-    String getContents();
-  }
   public static final class LockedDocumentInfo extends
-      com.google.protobuf.GeneratedMessageLite
-      implements LockedDocumentInfoOrBuilder {
+      com.google.protobuf.GeneratedMessageLite {
     // Use LockedDocumentInfo.newBuilder() to construct.
-    private LockedDocumentInfo(Builder builder) {
-      super(builder);
+    private LockedDocumentInfo() {
+      initFields();
     }
     private LockedDocumentInfo(boolean noInit) {}
     
@@ -579,186 +414,66 @@ public final class CollabMessages {
       return defaultInstance;
     }
     
-    private int bitField0_;
     // optional string lockedBy = 1;
     public static final int LOCKEDBY_FIELD_NUMBER = 1;
-    private java.lang.Object lockedBy_;
-    public boolean hasLockedBy() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public String getLockedBy() {
-      java.lang.Object ref = lockedBy_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          lockedBy_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getLockedByBytes() {
-      java.lang.Object ref = lockedBy_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        lockedBy_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+    private boolean hasLockedBy;
+    private java.lang.String lockedBy_ = "";
+    public boolean hasLockedBy() { return hasLockedBy; }
+    public java.lang.String getLockedBy() { return lockedBy_; }
     
     // optional int64 lockedUntil = 2;
     public static final int LOCKEDUNTIL_FIELD_NUMBER = 2;
-    private long lockedUntil_;
-    public boolean hasLockedUntil() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public long getLockedUntil() {
-      return lockedUntil_;
-    }
+    private boolean hasLockedUntil;
+    private long lockedUntil_ = 0L;
+    public boolean hasLockedUntil() { return hasLockedUntil; }
+    public long getLockedUntil() { return lockedUntil_; }
     
     // optional string key = 3;
     public static final int KEY_FIELD_NUMBER = 3;
-    private java.lang.Object key_;
-    public boolean hasKey() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    public String getKey() {
-      java.lang.Object ref = key_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          key_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getKeyBytes() {
-      java.lang.Object ref = key_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        key_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+    private boolean hasKey;
+    private java.lang.String key_ = "";
+    public boolean hasKey() { return hasKey; }
+    public java.lang.String getKey() { return key_; }
     
     // required string title = 4;
     public static final int TITLE_FIELD_NUMBER = 4;
-    private java.lang.Object title_;
-    public boolean hasTitle() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
-    }
-    public String getTitle() {
-      java.lang.Object ref = title_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          title_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getTitleBytes() {
-      java.lang.Object ref = title_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        title_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+    private boolean hasTitle;
+    private java.lang.String title_ = "";
+    public boolean hasTitle() { return hasTitle; }
+    public java.lang.String getTitle() { return title_; }
     
     // required string contents = 5;
     public static final int CONTENTS_FIELD_NUMBER = 5;
-    private java.lang.Object contents_;
-    public boolean hasContents() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
-    }
-    public String getContents() {
-      java.lang.Object ref = contents_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          contents_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getContentsBytes() {
-      java.lang.Object ref = contents_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        contents_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+    private boolean hasContents;
+    private java.lang.String contents_ = "";
+    public boolean hasContents() { return hasContents; }
+    public java.lang.String getContents() { return contents_; }
     
     private void initFields() {
-      lockedBy_ = "";
-      lockedUntil_ = 0L;
-      key_ = "";
-      title_ = "";
-      contents_ = "";
     }
-    private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      if (!hasTitle()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasContents()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
+      if (!hasTitle) return false;
+      if (!hasContents) return false;
       return true;
     }
     
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getLockedByBytes());
+      if (hasLockedBy()) {
+        output.writeString(1, getLockedBy());
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt64(2, lockedUntil_);
+      if (hasLockedUntil()) {
+        output.writeInt64(2, getLockedUntil());
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getKeyBytes());
+      if (hasKey()) {
+        output.writeString(3, getKey());
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(4, getTitleBytes());
+      if (hasTitle()) {
+        output.writeString(4, getTitle());
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeBytes(5, getContentsBytes());
+      if (hasContents()) {
+        output.writeString(5, getContents());
       }
     }
     
@@ -768,35 +483,28 @@ public final class CollabMessages {
       if (size != -1) return size;
     
       size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+      if (hasLockedBy()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getLockedByBytes());
+          .computeStringSize(1, getLockedBy());
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+      if (hasLockedUntil()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(2, lockedUntil_);
+          .computeInt64Size(2, getLockedUntil());
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      if (hasKey()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getKeyBytes());
+          .computeStringSize(3, getKey());
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (hasTitle()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getTitleBytes());
+          .computeStringSize(4, getTitle());
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (hasContents()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(5, getContentsBytes());
+          .computeStringSize(5, getContents());
       }
       memoizedSerializedSize = size;
       return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
     }
     
     public static edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo parseFrom(
@@ -875,86 +583,66 @@ public final class CollabMessages {
     
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageLite.Builder<
-          edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo, Builder>
-        implements edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfoOrBuilder {
+          edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo, Builder> {
+      private edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo result;
+      
       // Construct using edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
+      private Builder() {}
+      
+      private static Builder create() {
+        Builder builder = new Builder();
+        builder.result = new edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo();
+        return builder;
       }
       
-      private void maybeForceBuilderInitialization() {
-      }
-      private static Builder create() {
-        return new Builder();
+      protected edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo internalGetResult() {
+        return result;
       }
       
       public Builder clear() {
-        super.clear();
-        lockedBy_ = "";
-        bitField0_ = (bitField0_ & ~0x00000001);
-        lockedUntil_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        key_ = "";
-        bitField0_ = (bitField0_ & ~0x00000004);
-        title_ = "";
-        bitField0_ = (bitField0_ & ~0x00000008);
-        contents_ = "";
-        bitField0_ = (bitField0_ & ~0x00000010);
+        if (result == null) {
+          throw new IllegalStateException(
+            "Cannot call clear() after build().");
+        }
+        result = new edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo();
         return this;
       }
       
       public Builder clone() {
-        return create().mergeFrom(buildPartial());
+        return create().mergeFrom(result);
       }
       
       public edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo getDefaultInstanceForType() {
         return edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance();
       }
       
+      public boolean isInitialized() {
+        return result.isInitialized();
+      }
       public edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo build() {
-        edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo result = buildPartial();
-        if (!result.isInitialized()) {
+        if (result != null && !isInitialized()) {
           throw newUninitializedMessageException(result);
         }
-        return result;
+        return buildPartial();
       }
       
       private edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo result = buildPartial();
-        if (!result.isInitialized()) {
+        if (!isInitialized()) {
           throw newUninitializedMessageException(
             result).asInvalidProtocolBufferException();
         }
-        return result;
+        return buildPartial();
       }
       
       public edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo buildPartial() {
-        edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo result = new edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
+        if (result == null) {
+          throw new IllegalStateException(
+            "build() has already been called on this Builder.");
         }
-        result.lockedBy_ = lockedBy_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.lockedUntil_ = lockedUntil_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.key_ = key_;
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
-        }
-        result.title_ = title_;
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-          to_bitField0_ |= 0x00000010;
-        }
-        result.contents_ = contents_;
-        result.bitField0_ = to_bitField0_;
-        return result;
+        edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       public Builder mergeFrom(edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo other) {
@@ -977,18 +665,6 @@ public final class CollabMessages {
         return this;
       }
       
-      public final boolean isInitialized() {
-        if (!hasTitle()) {
-          
-          return false;
-        }
-        if (!hasContents()) {
-          
-          return false;
-        }
-        return true;
-      }
-      
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -997,209 +673,138 @@ public final class CollabMessages {
           int tag = input.readTag();
           switch (tag) {
             case 0:
-              
               return this;
             default: {
               if (!parseUnknownField(input, extensionRegistry, tag)) {
-                
                 return this;
               }
               break;
             }
             case 10: {
-              bitField0_ |= 0x00000001;
-              lockedBy_ = input.readBytes();
+              setLockedBy(input.readString());
               break;
             }
             case 16: {
-              bitField0_ |= 0x00000002;
-              lockedUntil_ = input.readInt64();
+              setLockedUntil(input.readInt64());
               break;
             }
             case 26: {
-              bitField0_ |= 0x00000004;
-              key_ = input.readBytes();
+              setKey(input.readString());
               break;
             }
             case 34: {
-              bitField0_ |= 0x00000008;
-              title_ = input.readBytes();
+              setTitle(input.readString());
               break;
             }
             case 42: {
-              bitField0_ |= 0x00000010;
-              contents_ = input.readBytes();
+              setContents(input.readString());
               break;
             }
           }
         }
       }
       
-      private int bitField0_;
       
       // optional string lockedBy = 1;
-      private java.lang.Object lockedBy_ = "";
       public boolean hasLockedBy() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
+        return result.hasLockedBy();
       }
-      public String getLockedBy() {
-        java.lang.Object ref = lockedBy_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          lockedBy_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public java.lang.String getLockedBy() {
+        return result.getLockedBy();
       }
-      public Builder setLockedBy(String value) {
+      public Builder setLockedBy(java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
-        lockedBy_ = value;
-        
+  result.hasLockedBy = true;
+        result.lockedBy_ = value;
         return this;
       }
       public Builder clearLockedBy() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        lockedBy_ = getDefaultInstance().getLockedBy();
-        
+        result.hasLockedBy = false;
+        result.lockedBy_ = getDefaultInstance().getLockedBy();
         return this;
-      }
-      void setLockedBy(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000001;
-        lockedBy_ = value;
-        
       }
       
       // optional int64 lockedUntil = 2;
-      private long lockedUntil_ ;
       public boolean hasLockedUntil() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return result.hasLockedUntil();
       }
       public long getLockedUntil() {
-        return lockedUntil_;
+        return result.getLockedUntil();
       }
       public Builder setLockedUntil(long value) {
-        bitField0_ |= 0x00000002;
-        lockedUntil_ = value;
-        
+        result.hasLockedUntil = true;
+        result.lockedUntil_ = value;
         return this;
       }
       public Builder clearLockedUntil() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        lockedUntil_ = 0L;
-        
+        result.hasLockedUntil = false;
+        result.lockedUntil_ = 0L;
         return this;
       }
       
       // optional string key = 3;
-      private java.lang.Object key_ = "";
       public boolean hasKey() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return result.hasKey();
       }
-      public String getKey() {
-        java.lang.Object ref = key_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          key_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public java.lang.String getKey() {
+        return result.getKey();
       }
-      public Builder setKey(String value) {
+      public Builder setKey(java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000004;
-        key_ = value;
-        
+  result.hasKey = true;
+        result.key_ = value;
         return this;
       }
       public Builder clearKey() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        key_ = getDefaultInstance().getKey();
-        
+        result.hasKey = false;
+        result.key_ = getDefaultInstance().getKey();
         return this;
-      }
-      void setKey(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000004;
-        key_ = value;
-        
       }
       
       // required string title = 4;
-      private java.lang.Object title_ = "";
       public boolean hasTitle() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return result.hasTitle();
       }
-      public String getTitle() {
-        java.lang.Object ref = title_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          title_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public java.lang.String getTitle() {
+        return result.getTitle();
       }
-      public Builder setTitle(String value) {
+      public Builder setTitle(java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
-        title_ = value;
-        
+  result.hasTitle = true;
+        result.title_ = value;
         return this;
       }
       public Builder clearTitle() {
-        bitField0_ = (bitField0_ & ~0x00000008);
-        title_ = getDefaultInstance().getTitle();
-        
+        result.hasTitle = false;
+        result.title_ = getDefaultInstance().getTitle();
         return this;
-      }
-      void setTitle(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000008;
-        title_ = value;
-        
       }
       
       // required string contents = 5;
-      private java.lang.Object contents_ = "";
       public boolean hasContents() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return result.hasContents();
       }
-      public String getContents() {
-        java.lang.Object ref = contents_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          contents_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public java.lang.String getContents() {
+        return result.getContents();
       }
-      public Builder setContents(String value) {
+      public Builder setContents(java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000010;
-        contents_ = value;
-        
+  result.hasContents = true;
+        result.contents_ = value;
         return this;
       }
       public Builder clearContents() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        contents_ = getDefaultInstance().getContents();
-        
+        result.hasContents = false;
+        result.contents_ = getDefaultInstance().getContents();
         return this;
-      }
-      void setContents(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000010;
-        contents_ = value;
-        
       }
       
       // @@protoc_insertion_point(builder_scope:cs141b.LockedDocumentInfo)
@@ -1207,33 +812,18 @@ public final class CollabMessages {
     
     static {
       defaultInstance = new LockedDocumentInfo(true);
+      edu.caltech.cs141b.hw5.data.CollabMessages.internalForceInit();
       defaultInstance.initFields();
     }
     
     // @@protoc_insertion_point(class_scope:cs141b.LockedDocumentInfo)
   }
   
-  public interface UnlockedDocumentInfoOrBuilder
-      extends com.google.protobuf.MessageLiteOrBuilder {
-    
-    // required string key = 1;
-    boolean hasKey();
-    String getKey();
-    
-    // required string title = 2;
-    boolean hasTitle();
-    String getTitle();
-    
-    // required string contents = 3;
-    boolean hasContents();
-    String getContents();
-  }
   public static final class UnlockedDocumentInfo extends
-      com.google.protobuf.GeneratedMessageLite
-      implements UnlockedDocumentInfoOrBuilder {
+      com.google.protobuf.GeneratedMessageLite {
     // Use UnlockedDocumentInfo.newBuilder() to construct.
-    private UnlockedDocumentInfo(Builder builder) {
-      super(builder);
+    private UnlockedDocumentInfo() {
+      initFields();
     }
     private UnlockedDocumentInfo(boolean noInit) {}
     
@@ -1246,140 +836,47 @@ public final class CollabMessages {
       return defaultInstance;
     }
     
-    private int bitField0_;
     // required string key = 1;
     public static final int KEY_FIELD_NUMBER = 1;
-    private java.lang.Object key_;
-    public boolean hasKey() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public String getKey() {
-      java.lang.Object ref = key_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          key_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getKeyBytes() {
-      java.lang.Object ref = key_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        key_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+    private boolean hasKey;
+    private java.lang.String key_ = "";
+    public boolean hasKey() { return hasKey; }
+    public java.lang.String getKey() { return key_; }
     
     // required string title = 2;
     public static final int TITLE_FIELD_NUMBER = 2;
-    private java.lang.Object title_;
-    public boolean hasTitle() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public String getTitle() {
-      java.lang.Object ref = title_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          title_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getTitleBytes() {
-      java.lang.Object ref = title_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        title_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+    private boolean hasTitle;
+    private java.lang.String title_ = "";
+    public boolean hasTitle() { return hasTitle; }
+    public java.lang.String getTitle() { return title_; }
     
     // required string contents = 3;
     public static final int CONTENTS_FIELD_NUMBER = 3;
-    private java.lang.Object contents_;
-    public boolean hasContents() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    public String getContents() {
-      java.lang.Object ref = contents_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          contents_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getContentsBytes() {
-      java.lang.Object ref = contents_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        contents_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+    private boolean hasContents;
+    private java.lang.String contents_ = "";
+    public boolean hasContents() { return hasContents; }
+    public java.lang.String getContents() { return contents_; }
     
     private void initFields() {
-      key_ = "";
-      title_ = "";
-      contents_ = "";
     }
-    private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      if (!hasKey()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasTitle()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasContents()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
+      if (!hasKey) return false;
+      if (!hasTitle) return false;
+      if (!hasContents) return false;
       return true;
     }
     
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getKeyBytes());
+      if (hasKey()) {
+        output.writeString(1, getKey());
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getTitleBytes());
+      if (hasTitle()) {
+        output.writeString(2, getTitle());
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getContentsBytes());
+      if (hasContents()) {
+        output.writeString(3, getContents());
       }
     }
     
@@ -1389,27 +886,20 @@ public final class CollabMessages {
       if (size != -1) return size;
     
       size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+      if (hasKey()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getKeyBytes());
+          .computeStringSize(1, getKey());
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+      if (hasTitle()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getTitleBytes());
+          .computeStringSize(2, getTitle());
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      if (hasContents()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getContentsBytes());
+          .computeStringSize(3, getContents());
       }
       memoizedSerializedSize = size;
       return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
     }
     
     public static edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo parseFrom(
@@ -1488,74 +978,66 @@ public final class CollabMessages {
     
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageLite.Builder<
-          edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo, Builder>
-        implements edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfoOrBuilder {
+          edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo, Builder> {
+      private edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo result;
+      
       // Construct using edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
+      private Builder() {}
+      
+      private static Builder create() {
+        Builder builder = new Builder();
+        builder.result = new edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo();
+        return builder;
       }
       
-      private void maybeForceBuilderInitialization() {
-      }
-      private static Builder create() {
-        return new Builder();
+      protected edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo internalGetResult() {
+        return result;
       }
       
       public Builder clear() {
-        super.clear();
-        key_ = "";
-        bitField0_ = (bitField0_ & ~0x00000001);
-        title_ = "";
-        bitField0_ = (bitField0_ & ~0x00000002);
-        contents_ = "";
-        bitField0_ = (bitField0_ & ~0x00000004);
+        if (result == null) {
+          throw new IllegalStateException(
+            "Cannot call clear() after build().");
+        }
+        result = new edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo();
         return this;
       }
       
       public Builder clone() {
-        return create().mergeFrom(buildPartial());
+        return create().mergeFrom(result);
       }
       
       public edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo getDefaultInstanceForType() {
         return edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.getDefaultInstance();
       }
       
+      public boolean isInitialized() {
+        return result.isInitialized();
+      }
       public edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo build() {
-        edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo result = buildPartial();
-        if (!result.isInitialized()) {
+        if (result != null && !isInitialized()) {
           throw newUninitializedMessageException(result);
         }
-        return result;
+        return buildPartial();
       }
       
       private edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo result = buildPartial();
-        if (!result.isInitialized()) {
+        if (!isInitialized()) {
           throw newUninitializedMessageException(
             result).asInvalidProtocolBufferException();
         }
-        return result;
+        return buildPartial();
       }
       
       public edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo buildPartial() {
-        edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo result = new edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
+        if (result == null) {
+          throw new IllegalStateException(
+            "build() has already been called on this Builder.");
         }
-        result.key_ = key_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.title_ = title_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.contents_ = contents_;
-        result.bitField0_ = to_bitField0_;
-        return result;
+        edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       public Builder mergeFrom(edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo other) {
@@ -1572,22 +1054,6 @@ public final class CollabMessages {
         return this;
       }
       
-      public final boolean isInitialized() {
-        if (!hasKey()) {
-          
-          return false;
-        }
-        if (!hasTitle()) {
-          
-          return false;
-        }
-        if (!hasContents()) {
-          
-          return false;
-        }
-        return true;
-      }
-      
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1596,142 +1062,91 @@ public final class CollabMessages {
           int tag = input.readTag();
           switch (tag) {
             case 0:
-              
               return this;
             default: {
               if (!parseUnknownField(input, extensionRegistry, tag)) {
-                
                 return this;
               }
               break;
             }
             case 10: {
-              bitField0_ |= 0x00000001;
-              key_ = input.readBytes();
+              setKey(input.readString());
               break;
             }
             case 18: {
-              bitField0_ |= 0x00000002;
-              title_ = input.readBytes();
+              setTitle(input.readString());
               break;
             }
             case 26: {
-              bitField0_ |= 0x00000004;
-              contents_ = input.readBytes();
+              setContents(input.readString());
               break;
             }
           }
         }
       }
       
-      private int bitField0_;
       
       // required string key = 1;
-      private java.lang.Object key_ = "";
       public boolean hasKey() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
+        return result.hasKey();
       }
-      public String getKey() {
-        java.lang.Object ref = key_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          key_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public java.lang.String getKey() {
+        return result.getKey();
       }
-      public Builder setKey(String value) {
+      public Builder setKey(java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
-        key_ = value;
-        
+  result.hasKey = true;
+        result.key_ = value;
         return this;
       }
       public Builder clearKey() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        key_ = getDefaultInstance().getKey();
-        
+        result.hasKey = false;
+        result.key_ = getDefaultInstance().getKey();
         return this;
-      }
-      void setKey(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000001;
-        key_ = value;
-        
       }
       
       // required string title = 2;
-      private java.lang.Object title_ = "";
       public boolean hasTitle() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return result.hasTitle();
       }
-      public String getTitle() {
-        java.lang.Object ref = title_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          title_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public java.lang.String getTitle() {
+        return result.getTitle();
       }
-      public Builder setTitle(String value) {
+      public Builder setTitle(java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
-        title_ = value;
-        
+  result.hasTitle = true;
+        result.title_ = value;
         return this;
       }
       public Builder clearTitle() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        title_ = getDefaultInstance().getTitle();
-        
+        result.hasTitle = false;
+        result.title_ = getDefaultInstance().getTitle();
         return this;
-      }
-      void setTitle(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000002;
-        title_ = value;
-        
       }
       
       // required string contents = 3;
-      private java.lang.Object contents_ = "";
       public boolean hasContents() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return result.hasContents();
       }
-      public String getContents() {
-        java.lang.Object ref = contents_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          contents_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public java.lang.String getContents() {
+        return result.getContents();
       }
-      public Builder setContents(String value) {
+      public Builder setContents(java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000004;
-        contents_ = value;
-        
+  result.hasContents = true;
+        result.contents_ = value;
         return this;
       }
       public Builder clearContents() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        contents_ = getDefaultInstance().getContents();
-        
+        result.hasContents = false;
+        result.contents_ = getDefaultInstance().getContents();
         return this;
-      }
-      void setContents(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000004;
-        contents_ = value;
-        
       }
       
       // @@protoc_insertion_point(builder_scope:cs141b.UnlockedDocumentInfo)
@@ -1739,33 +1154,18 @@ public final class CollabMessages {
     
     static {
       defaultInstance = new UnlockedDocumentInfo(true);
+      edu.caltech.cs141b.hw5.data.CollabMessages.internalForceInit();
       defaultInstance.initFields();
     }
     
     // @@protoc_insertion_point(class_scope:cs141b.UnlockedDocumentInfo)
   }
   
-  public interface RequestMessageOrBuilder
-      extends com.google.protobuf.MessageLiteOrBuilder {
-    
-    // required .cs141b.RequestType requestType = 1;
-    boolean hasRequestType();
-    edu.caltech.cs141b.hw5.data.CollabMessages.RequestType getRequestType();
-    
-    // optional string documentKey = 2;
-    boolean hasDocumentKey();
-    String getDocumentKey();
-    
-    // optional .cs141b.LockedDocumentInfo lockedDoc = 3;
-    boolean hasLockedDoc();
-    edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo getLockedDoc();
-  }
   public static final class RequestMessage extends
-      com.google.protobuf.GeneratedMessageLite
-      implements RequestMessageOrBuilder {
+      com.google.protobuf.GeneratedMessageLite {
     // Use RequestMessage.newBuilder() to construct.
-    private RequestMessage(Builder builder) {
-      super(builder);
+    private RequestMessage() {
+      initFields();
     }
     private RequestMessage(boolean noInit) {}
     
@@ -1778,94 +1178,50 @@ public final class CollabMessages {
       return defaultInstance;
     }
     
-    private int bitField0_;
     // required .cs141b.RequestType requestType = 1;
     public static final int REQUESTTYPE_FIELD_NUMBER = 1;
+    private boolean hasRequestType;
     private edu.caltech.cs141b.hw5.data.CollabMessages.RequestType requestType_;
-    public boolean hasRequestType() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public edu.caltech.cs141b.hw5.data.CollabMessages.RequestType getRequestType() {
-      return requestType_;
-    }
+    public boolean hasRequestType() { return hasRequestType; }
+    public edu.caltech.cs141b.hw5.data.CollabMessages.RequestType getRequestType() { return requestType_; }
     
     // optional string documentKey = 2;
     public static final int DOCUMENTKEY_FIELD_NUMBER = 2;
-    private java.lang.Object documentKey_;
-    public boolean hasDocumentKey() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public String getDocumentKey() {
-      java.lang.Object ref = documentKey_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          documentKey_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getDocumentKeyBytes() {
-      java.lang.Object ref = documentKey_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        documentKey_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+    private boolean hasDocumentKey;
+    private java.lang.String documentKey_ = "";
+    public boolean hasDocumentKey() { return hasDocumentKey; }
+    public java.lang.String getDocumentKey() { return documentKey_; }
     
     // optional .cs141b.LockedDocumentInfo lockedDoc = 3;
     public static final int LOCKEDDOC_FIELD_NUMBER = 3;
+    private boolean hasLockedDoc;
     private edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo lockedDoc_;
-    public boolean hasLockedDoc() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    public edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo getLockedDoc() {
-      return lockedDoc_;
-    }
+    public boolean hasLockedDoc() { return hasLockedDoc; }
+    public edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo getLockedDoc() { return lockedDoc_; }
     
     private void initFields() {
       requestType_ = edu.caltech.cs141b.hw5.data.CollabMessages.RequestType.GET_DOCUMENT_LIST;
-      documentKey_ = "";
       lockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance();
     }
-    private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      if (!hasRequestType()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
+      if (!hasRequestType) return false;
       if (hasLockedDoc()) {
-        if (!getLockedDoc().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
+        if (!getLockedDoc().isInitialized()) return false;
       }
-      memoizedIsInitialized = 1;
       return true;
     }
     
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeEnum(1, requestType_.getNumber());
+      if (hasRequestType()) {
+        output.writeEnum(1, getRequestType().getNumber());
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getDocumentKeyBytes());
+      if (hasDocumentKey()) {
+        output.writeString(2, getDocumentKey());
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(3, lockedDoc_);
+      if (hasLockedDoc()) {
+        output.writeMessage(3, getLockedDoc());
       }
     }
     
@@ -1875,27 +1231,20 @@ public final class CollabMessages {
       if (size != -1) return size;
     
       size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+      if (hasRequestType()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, requestType_.getNumber());
+          .computeEnumSize(1, getRequestType().getNumber());
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+      if (hasDocumentKey()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getDocumentKeyBytes());
+          .computeStringSize(2, getDocumentKey());
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      if (hasLockedDoc()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, lockedDoc_);
+          .computeMessageSize(3, getLockedDoc());
       }
       memoizedSerializedSize = size;
       return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
     }
     
     public static edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage parseFrom(
@@ -1974,74 +1323,66 @@ public final class CollabMessages {
     
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageLite.Builder<
-          edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage, Builder>
-        implements edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessageOrBuilder {
+          edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage, Builder> {
+      private edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage result;
+      
       // Construct using edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
+      private Builder() {}
+      
+      private static Builder create() {
+        Builder builder = new Builder();
+        builder.result = new edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage();
+        return builder;
       }
       
-      private void maybeForceBuilderInitialization() {
-      }
-      private static Builder create() {
-        return new Builder();
+      protected edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage internalGetResult() {
+        return result;
       }
       
       public Builder clear() {
-        super.clear();
-        requestType_ = edu.caltech.cs141b.hw5.data.CollabMessages.RequestType.GET_DOCUMENT_LIST;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        documentKey_ = "";
-        bitField0_ = (bitField0_ & ~0x00000002);
-        lockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance();
-        bitField0_ = (bitField0_ & ~0x00000004);
+        if (result == null) {
+          throw new IllegalStateException(
+            "Cannot call clear() after build().");
+        }
+        result = new edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage();
         return this;
       }
       
       public Builder clone() {
-        return create().mergeFrom(buildPartial());
+        return create().mergeFrom(result);
       }
       
       public edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage getDefaultInstanceForType() {
         return edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage.getDefaultInstance();
       }
       
+      public boolean isInitialized() {
+        return result.isInitialized();
+      }
       public edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage build() {
-        edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage result = buildPartial();
-        if (!result.isInitialized()) {
+        if (result != null && !isInitialized()) {
           throw newUninitializedMessageException(result);
         }
-        return result;
+        return buildPartial();
       }
       
       private edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage result = buildPartial();
-        if (!result.isInitialized()) {
+        if (!isInitialized()) {
           throw newUninitializedMessageException(
             result).asInvalidProtocolBufferException();
         }
-        return result;
+        return buildPartial();
       }
       
       public edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage buildPartial() {
-        edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage result = new edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
+        if (result == null) {
+          throw new IllegalStateException(
+            "build() has already been called on this Builder.");
         }
-        result.requestType_ = requestType_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.documentKey_ = documentKey_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.lockedDoc_ = lockedDoc_;
-        result.bitField0_ = to_bitField0_;
-        return result;
+        edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       public Builder mergeFrom(edu.caltech.cs141b.hw5.data.CollabMessages.RequestMessage other) {
@@ -2058,20 +1399,6 @@ public final class CollabMessages {
         return this;
       }
       
-      public final boolean isInitialized() {
-        if (!hasRequestType()) {
-          
-          return false;
-        }
-        if (hasLockedDoc()) {
-          if (!getLockedDoc().isInitialized()) {
-            
-            return false;
-          }
-        }
-        return true;
-      }
-      
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2080,11 +1407,9 @@ public final class CollabMessages {
           int tag = input.readTag();
           switch (tag) {
             case 0:
-              
               return this;
             default: {
               if (!parseUnknownField(input, extensionRegistry, tag)) {
-                
                 return this;
               }
               break;
@@ -2093,14 +1418,12 @@ public final class CollabMessages {
               int rawValue = input.readEnum();
               edu.caltech.cs141b.hw5.data.CollabMessages.RequestType value = edu.caltech.cs141b.hw5.data.CollabMessages.RequestType.valueOf(rawValue);
               if (value != null) {
-                bitField0_ |= 0x00000001;
-                requestType_ = value;
+                setRequestType(value);
               }
               break;
             }
             case 18: {
-              bitField0_ |= 0x00000002;
-              documentKey_ = input.readBytes();
+              setDocumentKey(input.readString());
               break;
             }
             case 26: {
@@ -2116,108 +1439,83 @@ public final class CollabMessages {
         }
       }
       
-      private int bitField0_;
       
       // required .cs141b.RequestType requestType = 1;
-      private edu.caltech.cs141b.hw5.data.CollabMessages.RequestType requestType_ = edu.caltech.cs141b.hw5.data.CollabMessages.RequestType.GET_DOCUMENT_LIST;
       public boolean hasRequestType() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
+        return result.hasRequestType();
       }
       public edu.caltech.cs141b.hw5.data.CollabMessages.RequestType getRequestType() {
-        return requestType_;
+        return result.getRequestType();
       }
       public Builder setRequestType(edu.caltech.cs141b.hw5.data.CollabMessages.RequestType value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000001;
-        requestType_ = value;
-        
+        result.hasRequestType = true;
+        result.requestType_ = value;
         return this;
       }
       public Builder clearRequestType() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        requestType_ = edu.caltech.cs141b.hw5.data.CollabMessages.RequestType.GET_DOCUMENT_LIST;
-        
+        result.hasRequestType = false;
+        result.requestType_ = edu.caltech.cs141b.hw5.data.CollabMessages.RequestType.GET_DOCUMENT_LIST;
         return this;
       }
       
       // optional string documentKey = 2;
-      private java.lang.Object documentKey_ = "";
       public boolean hasDocumentKey() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return result.hasDocumentKey();
       }
-      public String getDocumentKey() {
-        java.lang.Object ref = documentKey_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          documentKey_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public java.lang.String getDocumentKey() {
+        return result.getDocumentKey();
       }
-      public Builder setDocumentKey(String value) {
+      public Builder setDocumentKey(java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
-        documentKey_ = value;
-        
+  result.hasDocumentKey = true;
+        result.documentKey_ = value;
         return this;
       }
       public Builder clearDocumentKey() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        documentKey_ = getDefaultInstance().getDocumentKey();
-        
+        result.hasDocumentKey = false;
+        result.documentKey_ = getDefaultInstance().getDocumentKey();
         return this;
-      }
-      void setDocumentKey(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000002;
-        documentKey_ = value;
-        
       }
       
       // optional .cs141b.LockedDocumentInfo lockedDoc = 3;
-      private edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo lockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance();
       public boolean hasLockedDoc() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return result.hasLockedDoc();
       }
       public edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo getLockedDoc() {
-        return lockedDoc_;
+        return result.getLockedDoc();
       }
       public Builder setLockedDoc(edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        lockedDoc_ = value;
-        
-        bitField0_ |= 0x00000004;
+        result.hasLockedDoc = true;
+        result.lockedDoc_ = value;
         return this;
       }
-      public Builder setLockedDoc(
-          edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.Builder builderForValue) {
-        lockedDoc_ = builderForValue.build();
-        
-        bitField0_ |= 0x00000004;
+      public Builder setLockedDoc(edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.Builder builderForValue) {
+        result.hasLockedDoc = true;
+        result.lockedDoc_ = builderForValue.build();
         return this;
       }
       public Builder mergeLockedDoc(edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo value) {
-        if (((bitField0_ & 0x00000004) == 0x00000004) &&
-            lockedDoc_ != edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance()) {
-          lockedDoc_ =
-            edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.newBuilder(lockedDoc_).mergeFrom(value).buildPartial();
+        if (result.hasLockedDoc() &&
+            result.lockedDoc_ != edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance()) {
+          result.lockedDoc_ =
+            edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.newBuilder(result.lockedDoc_).mergeFrom(value).buildPartial();
         } else {
-          lockedDoc_ = value;
+          result.lockedDoc_ = value;
         }
-        
-        bitField0_ |= 0x00000004;
+        result.hasLockedDoc = true;
         return this;
       }
       public Builder clearLockedDoc() {
-        lockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance();
-        
-        bitField0_ = (bitField0_ & ~0x00000004);
+        result.hasLockedDoc = false;
+        result.lockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance();
         return this;
       }
       
@@ -2226,43 +1524,18 @@ public final class CollabMessages {
     
     static {
       defaultInstance = new RequestMessage(true);
+      edu.caltech.cs141b.hw5.data.CollabMessages.internalForceInit();
       defaultInstance.initFields();
     }
     
     // @@protoc_insertion_point(class_scope:cs141b.RequestMessage)
   }
   
-  public interface ResponseMessageOrBuilder
-      extends com.google.protobuf.MessageLiteOrBuilder {
-    
-    // required .cs141b.StatusType statusType = 1;
-    boolean hasStatusType();
-    edu.caltech.cs141b.hw5.data.CollabMessages.StatusType getStatusType();
-    
-    // optional string message = 2;
-    boolean hasMessage();
-    String getMessage();
-    
-    // repeated .cs141b.DocumentMetaInfo docMeta = 3;
-    java.util.List<edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo> 
-        getDocMetaList();
-    edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo getDocMeta(int index);
-    int getDocMetaCount();
-    
-    // optional .cs141b.LockedDocumentInfo lockedDoc = 4;
-    boolean hasLockedDoc();
-    edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo getLockedDoc();
-    
-    // optional .cs141b.UnlockedDocumentInfo unlockedDoc = 5;
-    boolean hasUnlockedDoc();
-    edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo getUnlockedDoc();
-  }
   public static final class ResponseMessage extends
-      com.google.protobuf.GeneratedMessageLite
-      implements ResponseMessageOrBuilder {
+      com.google.protobuf.GeneratedMessageLite {
     // Use ResponseMessage.newBuilder() to construct.
-    private ResponseMessage(Builder builder) {
-      super(builder);
+    private ResponseMessage() {
+      initFields();
     }
     private ResponseMessage(boolean noInit) {}
     
@@ -2275,145 +1548,82 @@ public final class CollabMessages {
       return defaultInstance;
     }
     
-    private int bitField0_;
     // required .cs141b.StatusType statusType = 1;
     public static final int STATUSTYPE_FIELD_NUMBER = 1;
+    private boolean hasStatusType;
     private edu.caltech.cs141b.hw5.data.CollabMessages.StatusType statusType_;
-    public boolean hasStatusType() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public edu.caltech.cs141b.hw5.data.CollabMessages.StatusType getStatusType() {
-      return statusType_;
-    }
+    public boolean hasStatusType() { return hasStatusType; }
+    public edu.caltech.cs141b.hw5.data.CollabMessages.StatusType getStatusType() { return statusType_; }
     
     // optional string message = 2;
     public static final int MESSAGE_FIELD_NUMBER = 2;
-    private java.lang.Object message_;
-    public boolean hasMessage() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public String getMessage() {
-      java.lang.Object ref = message_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          message_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getMessageBytes() {
-      java.lang.Object ref = message_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        message_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+    private boolean hasMessage;
+    private java.lang.String message_ = "";
+    public boolean hasMessage() { return hasMessage; }
+    public java.lang.String getMessage() { return message_; }
     
     // repeated .cs141b.DocumentMetaInfo docMeta = 3;
     public static final int DOCMETA_FIELD_NUMBER = 3;
-    private java.util.List<edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo> docMeta_;
+    private java.util.List<edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo> docMeta_ =
+      java.util.Collections.emptyList();
     public java.util.List<edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo> getDocMetaList() {
       return docMeta_;
     }
-    public java.util.List<? extends edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfoOrBuilder> 
-        getDocMetaOrBuilderList() {
-      return docMeta_;
-    }
-    public int getDocMetaCount() {
-      return docMeta_.size();
-    }
+    public int getDocMetaCount() { return docMeta_.size(); }
     public edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo getDocMeta(int index) {
-      return docMeta_.get(index);
-    }
-    public edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfoOrBuilder getDocMetaOrBuilder(
-        int index) {
       return docMeta_.get(index);
     }
     
     // optional .cs141b.LockedDocumentInfo lockedDoc = 4;
     public static final int LOCKEDDOC_FIELD_NUMBER = 4;
+    private boolean hasLockedDoc;
     private edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo lockedDoc_;
-    public boolean hasLockedDoc() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    public edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo getLockedDoc() {
-      return lockedDoc_;
-    }
+    public boolean hasLockedDoc() { return hasLockedDoc; }
+    public edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo getLockedDoc() { return lockedDoc_; }
     
     // optional .cs141b.UnlockedDocumentInfo unlockedDoc = 5;
     public static final int UNLOCKEDDOC_FIELD_NUMBER = 5;
+    private boolean hasUnlockedDoc;
     private edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo unlockedDoc_;
-    public boolean hasUnlockedDoc() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
-    }
-    public edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo getUnlockedDoc() {
-      return unlockedDoc_;
-    }
+    public boolean hasUnlockedDoc() { return hasUnlockedDoc; }
+    public edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo getUnlockedDoc() { return unlockedDoc_; }
     
     private void initFields() {
       statusType_ = edu.caltech.cs141b.hw5.data.CollabMessages.StatusType.SUCCESS;
-      message_ = "";
-      docMeta_ = java.util.Collections.emptyList();
       lockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance();
       unlockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.getDefaultInstance();
     }
-    private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      if (!hasStatusType()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      for (int i = 0; i < getDocMetaCount(); i++) {
-        if (!getDocMeta(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
+      if (!hasStatusType) return false;
+      for (edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo element : getDocMetaList()) {
+        if (!element.isInitialized()) return false;
       }
       if (hasLockedDoc()) {
-        if (!getLockedDoc().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
+        if (!getLockedDoc().isInitialized()) return false;
       }
       if (hasUnlockedDoc()) {
-        if (!getUnlockedDoc().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
+        if (!getUnlockedDoc().isInitialized()) return false;
       }
-      memoizedIsInitialized = 1;
       return true;
     }
     
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeEnum(1, statusType_.getNumber());
+      if (hasStatusType()) {
+        output.writeEnum(1, getStatusType().getNumber());
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getMessageBytes());
+      if (hasMessage()) {
+        output.writeString(2, getMessage());
       }
-      for (int i = 0; i < docMeta_.size(); i++) {
-        output.writeMessage(3, docMeta_.get(i));
+      for (edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo element : getDocMetaList()) {
+        output.writeMessage(3, element);
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(4, lockedDoc_);
+      if (hasLockedDoc()) {
+        output.writeMessage(4, getLockedDoc());
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeMessage(5, unlockedDoc_);
+      if (hasUnlockedDoc()) {
+        output.writeMessage(5, getUnlockedDoc());
       }
     }
     
@@ -2423,35 +1633,28 @@ public final class CollabMessages {
       if (size != -1) return size;
     
       size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+      if (hasStatusType()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, statusType_.getNumber());
+          .computeEnumSize(1, getStatusType().getNumber());
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+      if (hasMessage()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getMessageBytes());
+          .computeStringSize(2, getMessage());
       }
-      for (int i = 0; i < docMeta_.size(); i++) {
+      for (edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo element : getDocMetaList()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, docMeta_.get(i));
+          .computeMessageSize(3, element);
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      if (hasLockedDoc()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, lockedDoc_);
+          .computeMessageSize(4, getLockedDoc());
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (hasUnlockedDoc()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, unlockedDoc_);
+          .computeMessageSize(5, getUnlockedDoc());
       }
       memoizedSerializedSize = size;
       return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
     }
     
     public static edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage parseFrom(
@@ -2530,87 +1733,70 @@ public final class CollabMessages {
     
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageLite.Builder<
-          edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage, Builder>
-        implements edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessageOrBuilder {
+          edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage, Builder> {
+      private edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage result;
+      
       // Construct using edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
+      private Builder() {}
+      
+      private static Builder create() {
+        Builder builder = new Builder();
+        builder.result = new edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage();
+        return builder;
       }
       
-      private void maybeForceBuilderInitialization() {
-      }
-      private static Builder create() {
-        return new Builder();
+      protected edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage internalGetResult() {
+        return result;
       }
       
       public Builder clear() {
-        super.clear();
-        statusType_ = edu.caltech.cs141b.hw5.data.CollabMessages.StatusType.SUCCESS;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        message_ = "";
-        bitField0_ = (bitField0_ & ~0x00000002);
-        docMeta_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000004);
-        lockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance();
-        bitField0_ = (bitField0_ & ~0x00000008);
-        unlockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.getDefaultInstance();
-        bitField0_ = (bitField0_ & ~0x00000010);
+        if (result == null) {
+          throw new IllegalStateException(
+            "Cannot call clear() after build().");
+        }
+        result = new edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage();
         return this;
       }
       
       public Builder clone() {
-        return create().mergeFrom(buildPartial());
+        return create().mergeFrom(result);
       }
       
       public edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage getDefaultInstanceForType() {
         return edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage.getDefaultInstance();
       }
       
+      public boolean isInitialized() {
+        return result.isInitialized();
+      }
       public edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage build() {
-        edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage result = buildPartial();
-        if (!result.isInitialized()) {
+        if (result != null && !isInitialized()) {
           throw newUninitializedMessageException(result);
         }
-        return result;
+        return buildPartial();
       }
       
       private edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage result = buildPartial();
-        if (!result.isInitialized()) {
+        if (!isInitialized()) {
           throw newUninitializedMessageException(
             result).asInvalidProtocolBufferException();
         }
-        return result;
+        return buildPartial();
       }
       
       public edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage buildPartial() {
-        edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage result = new edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
+        if (result == null) {
+          throw new IllegalStateException(
+            "build() has already been called on this Builder.");
         }
-        result.statusType_ = statusType_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
+        if (result.docMeta_ != java.util.Collections.EMPTY_LIST) {
+          result.docMeta_ =
+            java.util.Collections.unmodifiableList(result.docMeta_);
         }
-        result.message_ = message_;
-        if (((bitField0_ & 0x00000004) == 0x00000004)) {
-          docMeta_ = java.util.Collections.unmodifiableList(docMeta_);
-          bitField0_ = (bitField0_ & ~0x00000004);
-        }
-        result.docMeta_ = docMeta_;
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.lockedDoc_ = lockedDoc_;
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-          to_bitField0_ |= 0x00000008;
-        }
-        result.unlockedDoc_ = unlockedDoc_;
-        result.bitField0_ = to_bitField0_;
-        return result;
+        edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       public Builder mergeFrom(edu.caltech.cs141b.hw5.data.CollabMessages.ResponseMessage other) {
@@ -2622,14 +1808,10 @@ public final class CollabMessages {
           setMessage(other.getMessage());
         }
         if (!other.docMeta_.isEmpty()) {
-          if (docMeta_.isEmpty()) {
-            docMeta_ = other.docMeta_;
-            bitField0_ = (bitField0_ & ~0x00000004);
-          } else {
-            ensureDocMetaIsMutable();
-            docMeta_.addAll(other.docMeta_);
+          if (result.docMeta_.isEmpty()) {
+            result.docMeta_ = new java.util.ArrayList<edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo>();
           }
-          
+          result.docMeta_.addAll(other.docMeta_);
         }
         if (other.hasLockedDoc()) {
           mergeLockedDoc(other.getLockedDoc());
@@ -2640,32 +1822,6 @@ public final class CollabMessages {
         return this;
       }
       
-      public final boolean isInitialized() {
-        if (!hasStatusType()) {
-          
-          return false;
-        }
-        for (int i = 0; i < getDocMetaCount(); i++) {
-          if (!getDocMeta(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        if (hasLockedDoc()) {
-          if (!getLockedDoc().isInitialized()) {
-            
-            return false;
-          }
-        }
-        if (hasUnlockedDoc()) {
-          if (!getUnlockedDoc().isInitialized()) {
-            
-            return false;
-          }
-        }
-        return true;
-      }
-      
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2674,11 +1830,9 @@ public final class CollabMessages {
           int tag = input.readTag();
           switch (tag) {
             case 0:
-              
               return this;
             default: {
               if (!parseUnknownField(input, extensionRegistry, tag)) {
-                
                 return this;
               }
               break;
@@ -2687,14 +1841,12 @@ public final class CollabMessages {
               int rawValue = input.readEnum();
               edu.caltech.cs141b.hw5.data.CollabMessages.StatusType value = edu.caltech.cs141b.hw5.data.CollabMessages.StatusType.valueOf(rawValue);
               if (value != null) {
-                bitField0_ |= 0x00000001;
-                statusType_ = value;
+                setStatusType(value);
               }
               break;
             }
             case 18: {
-              bitField0_ |= 0x00000002;
-              message_ = input.readBytes();
+              setMessage(input.readString());
               break;
             }
             case 26: {
@@ -2725,240 +1877,171 @@ public final class CollabMessages {
         }
       }
       
-      private int bitField0_;
       
       // required .cs141b.StatusType statusType = 1;
-      private edu.caltech.cs141b.hw5.data.CollabMessages.StatusType statusType_ = edu.caltech.cs141b.hw5.data.CollabMessages.StatusType.SUCCESS;
       public boolean hasStatusType() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
+        return result.hasStatusType();
       }
       public edu.caltech.cs141b.hw5.data.CollabMessages.StatusType getStatusType() {
-        return statusType_;
+        return result.getStatusType();
       }
       public Builder setStatusType(edu.caltech.cs141b.hw5.data.CollabMessages.StatusType value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000001;
-        statusType_ = value;
-        
+        result.hasStatusType = true;
+        result.statusType_ = value;
         return this;
       }
       public Builder clearStatusType() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        statusType_ = edu.caltech.cs141b.hw5.data.CollabMessages.StatusType.SUCCESS;
-        
+        result.hasStatusType = false;
+        result.statusType_ = edu.caltech.cs141b.hw5.data.CollabMessages.StatusType.SUCCESS;
         return this;
       }
       
       // optional string message = 2;
-      private java.lang.Object message_ = "";
       public boolean hasMessage() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return result.hasMessage();
       }
-      public String getMessage() {
-        java.lang.Object ref = message_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          message_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public java.lang.String getMessage() {
+        return result.getMessage();
       }
-      public Builder setMessage(String value) {
+      public Builder setMessage(java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
-        message_ = value;
-        
+  result.hasMessage = true;
+        result.message_ = value;
         return this;
       }
       public Builder clearMessage() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        message_ = getDefaultInstance().getMessage();
-        
+        result.hasMessage = false;
+        result.message_ = getDefaultInstance().getMessage();
         return this;
-      }
-      void setMessage(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000002;
-        message_ = value;
-        
       }
       
       // repeated .cs141b.DocumentMetaInfo docMeta = 3;
-      private java.util.List<edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo> docMeta_ =
-        java.util.Collections.emptyList();
-      private void ensureDocMetaIsMutable() {
-        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
-          docMeta_ = new java.util.ArrayList<edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo>(docMeta_);
-          bitField0_ |= 0x00000004;
-         }
-      }
-      
       public java.util.List<edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo> getDocMetaList() {
-        return java.util.Collections.unmodifiableList(docMeta_);
+        return java.util.Collections.unmodifiableList(result.docMeta_);
       }
       public int getDocMetaCount() {
-        return docMeta_.size();
+        return result.getDocMetaCount();
       }
       public edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo getDocMeta(int index) {
-        return docMeta_.get(index);
+        return result.getDocMeta(index);
       }
-      public Builder setDocMeta(
-          int index, edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo value) {
+      public Builder setDocMeta(int index, edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureDocMetaIsMutable();
-        docMeta_.set(index, value);
-        
+        result.docMeta_.set(index, value);
         return this;
       }
-      public Builder setDocMeta(
-          int index, edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo.Builder builderForValue) {
-        ensureDocMetaIsMutable();
-        docMeta_.set(index, builderForValue.build());
-        
+      public Builder setDocMeta(int index, edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo.Builder builderForValue) {
+        result.docMeta_.set(index, builderForValue.build());
         return this;
       }
       public Builder addDocMeta(edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureDocMetaIsMutable();
-        docMeta_.add(value);
-        
-        return this;
-      }
-      public Builder addDocMeta(
-          int index, edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo value) {
-        if (value == null) {
-          throw new NullPointerException();
+        if (result.docMeta_.isEmpty()) {
+          result.docMeta_ = new java.util.ArrayList<edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo>();
         }
-        ensureDocMetaIsMutable();
-        docMeta_.add(index, value);
-        
+        result.docMeta_.add(value);
         return this;
       }
-      public Builder addDocMeta(
-          edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo.Builder builderForValue) {
-        ensureDocMetaIsMutable();
-        docMeta_.add(builderForValue.build());
-        
-        return this;
-      }
-      public Builder addDocMeta(
-          int index, edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo.Builder builderForValue) {
-        ensureDocMetaIsMutable();
-        docMeta_.add(index, builderForValue.build());
-        
+      public Builder addDocMeta(edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo.Builder builderForValue) {
+        if (result.docMeta_.isEmpty()) {
+          result.docMeta_ = new java.util.ArrayList<edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo>();
+        }
+        result.docMeta_.add(builderForValue.build());
         return this;
       }
       public Builder addAllDocMeta(
           java.lang.Iterable<? extends edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo> values) {
-        ensureDocMetaIsMutable();
-        super.addAll(values, docMeta_);
-        
+        if (result.docMeta_.isEmpty()) {
+          result.docMeta_ = new java.util.ArrayList<edu.caltech.cs141b.hw5.data.CollabMessages.DocumentMetaInfo>();
+        }
+        super.addAll(values, result.docMeta_);
         return this;
       }
       public Builder clearDocMeta() {
-        docMeta_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000004);
-        
-        return this;
-      }
-      public Builder removeDocMeta(int index) {
-        ensureDocMetaIsMutable();
-        docMeta_.remove(index);
-        
+        result.docMeta_ = java.util.Collections.emptyList();
         return this;
       }
       
       // optional .cs141b.LockedDocumentInfo lockedDoc = 4;
-      private edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo lockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance();
       public boolean hasLockedDoc() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return result.hasLockedDoc();
       }
       public edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo getLockedDoc() {
-        return lockedDoc_;
+        return result.getLockedDoc();
       }
       public Builder setLockedDoc(edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        lockedDoc_ = value;
-        
-        bitField0_ |= 0x00000008;
+        result.hasLockedDoc = true;
+        result.lockedDoc_ = value;
         return this;
       }
-      public Builder setLockedDoc(
-          edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.Builder builderForValue) {
-        lockedDoc_ = builderForValue.build();
-        
-        bitField0_ |= 0x00000008;
+      public Builder setLockedDoc(edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.Builder builderForValue) {
+        result.hasLockedDoc = true;
+        result.lockedDoc_ = builderForValue.build();
         return this;
       }
       public Builder mergeLockedDoc(edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo value) {
-        if (((bitField0_ & 0x00000008) == 0x00000008) &&
-            lockedDoc_ != edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance()) {
-          lockedDoc_ =
-            edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.newBuilder(lockedDoc_).mergeFrom(value).buildPartial();
+        if (result.hasLockedDoc() &&
+            result.lockedDoc_ != edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance()) {
+          result.lockedDoc_ =
+            edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.newBuilder(result.lockedDoc_).mergeFrom(value).buildPartial();
         } else {
-          lockedDoc_ = value;
+          result.lockedDoc_ = value;
         }
-        
-        bitField0_ |= 0x00000008;
+        result.hasLockedDoc = true;
         return this;
       }
       public Builder clearLockedDoc() {
-        lockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance();
-        
-        bitField0_ = (bitField0_ & ~0x00000008);
+        result.hasLockedDoc = false;
+        result.lockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.LockedDocumentInfo.getDefaultInstance();
         return this;
       }
       
       // optional .cs141b.UnlockedDocumentInfo unlockedDoc = 5;
-      private edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo unlockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.getDefaultInstance();
       public boolean hasUnlockedDoc() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return result.hasUnlockedDoc();
       }
       public edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo getUnlockedDoc() {
-        return unlockedDoc_;
+        return result.getUnlockedDoc();
       }
       public Builder setUnlockedDoc(edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        unlockedDoc_ = value;
-        
-        bitField0_ |= 0x00000010;
+        result.hasUnlockedDoc = true;
+        result.unlockedDoc_ = value;
         return this;
       }
-      public Builder setUnlockedDoc(
-          edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.Builder builderForValue) {
-        unlockedDoc_ = builderForValue.build();
-        
-        bitField0_ |= 0x00000010;
+      public Builder setUnlockedDoc(edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.Builder builderForValue) {
+        result.hasUnlockedDoc = true;
+        result.unlockedDoc_ = builderForValue.build();
         return this;
       }
       public Builder mergeUnlockedDoc(edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo value) {
-        if (((bitField0_ & 0x00000010) == 0x00000010) &&
-            unlockedDoc_ != edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.getDefaultInstance()) {
-          unlockedDoc_ =
-            edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.newBuilder(unlockedDoc_).mergeFrom(value).buildPartial();
+        if (result.hasUnlockedDoc() &&
+            result.unlockedDoc_ != edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.getDefaultInstance()) {
+          result.unlockedDoc_ =
+            edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.newBuilder(result.unlockedDoc_).mergeFrom(value).buildPartial();
         } else {
-          unlockedDoc_ = value;
+          result.unlockedDoc_ = value;
         }
-        
-        bitField0_ |= 0x00000010;
+        result.hasUnlockedDoc = true;
         return this;
       }
       public Builder clearUnlockedDoc() {
-        unlockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.getDefaultInstance();
-        
-        bitField0_ = (bitField0_ & ~0x00000010);
+        result.hasUnlockedDoc = false;
+        result.unlockedDoc_ = edu.caltech.cs141b.hw5.data.CollabMessages.UnlockedDocumentInfo.getDefaultInstance();
         return this;
       }
       
@@ -2967,6 +2050,7 @@ public final class CollabMessages {
     
     static {
       defaultInstance = new ResponseMessage(true);
+      edu.caltech.cs141b.hw5.data.CollabMessages.internalForceInit();
       defaultInstance.initFields();
     }
     
@@ -2976,6 +2060,8 @@ public final class CollabMessages {
   
   static {
   }
+  
+  public static void internalForceInit() {}
   
   // @@protoc_insertion_point(outer_class_scope)
 }
