@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import android.app.ListActivity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +13,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import edu.caltech.cs141b.hw5.android.data.DocumentMetadata;
+import edu.caltech.cs141b.hw5.android.data.LockedDocument;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
 /**
@@ -23,18 +23,22 @@ import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
  * 
  */
 public class DocListView extends ListActivity {
+
 	// debugging
-	private static String TAG = "AndroidActivity";
+	private static String TAG = "DocListView";
+
+	// initial title + contents of new doc
+	private static String newDocTitle = "Enter the document title.";
+	private static String newDocContents = "Enter the document contents.";
 
 	// makes server calls
 	private CollabServiceWrapper service;
 
+	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		service = new CollabServiceWrapper();
-
 		getDocList();
 	}
 
@@ -64,44 +68,10 @@ public class DocListView extends ListActivity {
 				DocumentMetadata currDoc = (DocumentMetadata) lv
 						.getItemAtPosition(position);
 
-				// TODO
-				// display the given doc - maybe open a new text view?
-				// displayDoc(currDoc);
-
-				Intent unlockedDocIntent = new Intent(DocListView.this,
-						UnlockedDocView.class);
-				Bundle b = new Bundle();
-
-
-				// unlockedDocIntent.putExtra("doc", currDoc);
-
-				// startActivity();
-
+				ActivityStarter.startDocViewActivity(DocListView.this, UnlockedDocView.class, currDoc);
 			}
 		});
 
-		// Try lock and unlocking a document
-		// try {
-		// LockedDocument ld = service.lockDocument(metas.get(0).getKey());
-		// Log.i(TAG, "locked");
-		//
-		// // try modify and save the document
-		// LockedDocument mld = new LockedDocument(ld.getLockedBy(),
-		// ld.getLockedUntil(), ld.getKey(),
-		// ld.getTitle() + " mod1", ld.getContents());
-		// service.saveDocument(mld);
-		// Log.i(TAG, "saved");
-		//
-		// // Should get lock expired here service.releaseLock(ld); Log.i(TAG,
-		// "unlocked"); } catch (LockExpired e) { Log.i(TAG,
-		// "lock expired when attemping release."); } catch (LockUnavailable e)
-		// { Log.i(TAG, "Lock unavailable."); } catch (InvalidRequest e) {
-		// Log.i(TAG, "Invalid request"); }
-
-		/*
-		 * ListView tv = new ListView(this); tv.ad(docsInfo);
-		 * setContentView(tv);
-		 */
 	}
 
 	/**
@@ -114,24 +84,25 @@ public class DocListView extends ListActivity {
 	}
 
 	/**
-	 * Click handler for the menu buttons.
+	 * Click handler for the menu buttons. Here the user has 2 options:
+	 * create a new doc, or refresh the doc list.
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// display the list menu
-		// setContentView(R.menu.listmenu);
-
 		// which button did the user press?
 		switch (item.getItemId()) {
+
 		// new doc is pressed
 		case R.id.newDoc:
-			// start new doc view activity
+			// start new locked doc view activity with new doc as arg
+			LockedDocument newDoc = new LockedDocument(null, null, null,
+					newDocTitle, newDocContents);
+			ActivityStarter.startDocViewActivity(this, LockedDocView.class, newDoc);
 			return true;
 
 			// refresh is pressed
 		case R.id.refreshList:
 			getDocList();
-			// startActivity(new Intent(this, DocListView.class));
 			return true;
 
 		default:

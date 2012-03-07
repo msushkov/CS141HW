@@ -1,0 +1,7 @@
+
+    <menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:id="@+id/newDoc" android:enabled="true" android:title="New Document" android:visible="true"></item>
+        <item android:id="@+id/lockDoc" android:title="Lock Document" android:enabled="false" android:visible="true"></item>
+        <item android:id="@+id/docList" android:enabled="true" android:title="Doc list" android:visible="true"></item>
+        <item android:id="@+id/refresh" android:title="Refresh"></item>
+    </menu>
