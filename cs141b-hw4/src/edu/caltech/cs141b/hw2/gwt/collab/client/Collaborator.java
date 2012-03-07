@@ -396,14 +396,8 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// refresh document list on login
 		lister.getDocumentList();
-
+		
 		Window.addWindowClosingHandler(new ClosingHandler() {
-			/*
-			 * @Override public void onClose(CloseEvent<Window> event) {
-			 * 
-			 * 
-			 * }
-			 */
 
 			@Override
 			public void onWindowClosing(ClosingEvent event) {

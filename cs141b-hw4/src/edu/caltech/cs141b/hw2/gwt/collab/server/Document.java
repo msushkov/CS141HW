@@ -97,9 +97,9 @@ public class Document {
 		return lockedUntil;
 	}
 
-	public void removeClient(String clientID) {
+	public boolean removeClient(String clientID) {
 		// Remove client from queue if it's there.
-		waitingClients.remove(clientID);
+		return waitingClients.remove(clientID);
 	}
 
 	public String pollNextClient() {
