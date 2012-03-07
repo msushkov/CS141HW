@@ -59,6 +59,7 @@ CollaboratorService {
 		PersistenceManager pm = PMF.get().getPersistenceManager(); Query
 		query = pm.newQuery(LockedDocuments.class);
 
+		@SuppressWarnings("unchecked")
 		List<LockedDocuments> lockedDocs = (List<LockedDocuments>) query.execute();
 
 		// Add the unique lockedDocument entity if not already there
@@ -95,10 +96,7 @@ CollaboratorService {
 	public void cleanLock(String docKey) {
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		// LockedDocuments lockedDocsObj =
-		// pm.getObjectById(LockedDocuments.class,
-		// lockListKey);
-		// List<String> lockedDocKeys = lockedDocsObj.getLockedDocs();
+
 		Transaction t = pm.currentTransaction();
 		String lockedBy = null;
 		boolean returning = false;
@@ -126,27 +124,6 @@ CollaboratorService {
 
 		}
 	}
-
-	// Finally close the PM
-
-	/*
-	 * int notInList = -1; int docIndex = lockedDocuments.indexOf(docKey);
-	 * 
-	 * if (docIndex != notInList) { PersistenceManager pm =
-	 * PMF.get().getPersistenceManager();
-	 * 
-	 * try { // Create the key Key key = KeyFactory.stringToKey(docKey);
-	 * 
-	 * // Get the document from the Datastore Document doc =
-	 * pm.getObjectById(Document.class, key);
-	 * 
-	 * // If the doc is locked and the lock expired if (doc.isLocked() &&
-	 * doc.getLockedUntil().before( new Date(System.currentTimeMillis()))) {
-	 * String previousClient = tokenMap.get(docKey);
-	 * server.receiveToken(previousClient, docKey); }
-	 * 
-	 * } finally { // Do some cleanup pm.close(); } }
-	 */
 
 	// Keep transactions?
 	/**
@@ -382,17 +359,10 @@ CollaboratorService {
 	 * @param docKey
 	 *            The key of the document whose token we are receiving
 	 */
-
-
 	private void receiveToken(String clientID, String docKey) {
 
 		// If there is no document waiting for the document remove from list of
 		// locked docs
-		// NOTE THIS IS A BUG ANYWAY LOL I'M COMMENTING THIS SHIT OUT
-		/*
-		 * if (!queueMap.containsKey(docKey) &&
-		 * lockedDocuments.contains(docKey)) { lockedDocuments.remove(docKey); }
-		 */
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Document toSave;
@@ -463,10 +433,6 @@ CollaboratorService {
 	private void sendToken(String clientID, String docKey) {
 
 		// Add to list of locked documents if not already in there
-		/*
-		 * if (!lockedDocuments.contains(docKey)) { lockedDocuments.add(docKey);
-		 * }
-		 */
 		// Now, let's lock the document
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -488,10 +454,6 @@ CollaboratorService {
 
 			// Add key to locked documents (will only get added if it isn't
 			// already there)
-
-
-
-
 			pm.makePersistent(toSave);
 
 			t.commit();
@@ -584,68 +546,6 @@ CollaboratorService {
 			pm.close();
 		}
 	}
-
-	/**
-	 * Adds the client ID to the correct document queue
-	 * 
-	 * @param clientID
-	 *            The ID of the client who is in the queue
-	 * @param docKey
-	 *            The key of the document that the client is waiting for
-	 */
-	//	private void addToDocQueue(String clientID, String documentKey) {
-	//		// if we dont already have this doc key in our map, add it in there
-	//
-	//
-	//		// add the client to the queue for that particular doc List<String> queue
-	//		= queueMap.get(documentKey); queue.add(clientID);
-	//
-	//		queueMap.put(documentKey, queue);
-	//
-	//		// this is the position of the newly added client in the queue int pos =
-	//		queue.size();
-	//
-	//		// inform the client which place in line it is
-	//		getChannelService().sendMessage( new ChannelMessage(clientID, "position: " + pos)); }
-
-
-
-
-
-	/**
-	 * Gets the next client waiting for the specified document.
-	 * 
-	 * @param documentKey
-	 *            The document we want to find the next client for
-	 * @return A client ID of the next client waiting on this doc
-	 */
-	/*
-	 * private String pollNextClient(String documentKey) { List<String> queue =
-	 * queueMap.get(documentKey); if (queue != null && !queue.isEmpty()) {
-	 * return queue.remove(0); }
-	 * 
-	 * return null; }
-	 */
-
-	/**
-	 * Removes a client from the specified doc queue
-	 * 
-	 * @param clientID
-	 *            The client we are trying to remove
-	 * @param documentKey
-	 *            The document we are trying to dequeue the client
-	 * @return Whether the client was removed successfully
-	 */
-	/*
-	 * private boolean removeClient(String clientID, String documentKey) {
-	 * List<String> queue = queueMap.get(documentKey); boolean inQueue = false;
-	 * if (queue != null) { // Remove the first client from the list and record
-	 * whether there is // at least one client to remove inQueue =
-	 * queue.remove(clientID); // Remove the rest of the clients from the list
-	 * while (queue.remove(clientID)) { } }
-	 * 
-	 * return inQueue; }
-	 */
 
 	/**
 	 * Locks the given document.
@@ -826,8 +726,10 @@ CollaboratorService {
 		List<String> docKeys = pm.getObjectById(Client.class, clientID).getLockedDocs();
 		pm.close();
 		
+		System.out.println("lockqueue");
 		// Remove from all these entities
 		for (String docKey : docKeys) {
+			System.out.println(docKey);
 			leaveLockQueue(clientID, docKey);
 		}
 		

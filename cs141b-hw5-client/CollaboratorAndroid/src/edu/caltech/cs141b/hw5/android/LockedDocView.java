@@ -1,13 +1,11 @@
 package edu.caltech.cs141b.hw5.android;
 
 import android.app.ListActivity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import edu.caltech.cs141b.hw5.android.data.LockedDocument;
-import edu.caltech.cs141b.hw5.android.data.UnlockedDocument;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
 public class LockedDocView extends ListActivity {

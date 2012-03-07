@@ -1,12 +1,9 @@
 package edu.caltech.cs141b.hw5.android;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
 import android.app.ListActivity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import edu.caltech.cs141b.hw5.android.data.DocumentMetadata;
 import edu.caltech.cs141b.hw5.android.data.LockedDocument;
-import edu.caltech.cs141b.hw5.android.data.UnlockedDocument;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
 /**
@@ -68,6 +64,7 @@ public class DocListView extends ListActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// get the currently-selected doc
+
 				DocumentMetadata currDoc = (DocumentMetadata) lv
 						.getItemAtPosition(position);
 
