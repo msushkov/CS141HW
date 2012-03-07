@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import edu.caltech.cs141b.hw5.android.data.LockedDocument;
-import edu.caltech.cs141b.hw5.android.data.UnlockedDocument;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
 public class UnlockedDocView extends ListActivity {
@@ -33,20 +32,22 @@ public class UnlockedDocView extends ListActivity {
 		Log.d(TAG, "created the unlocked doc view activity");
 		service = new CollabServiceWrapper();
 		displayLockedDoc(extractUnlockedDocKey());
+		setContentView(R.layout.unlockeddocgui);
+
 	}
 
 	/**
 	 * Gets the unlocked doc key that was passed to this activity.
+	 * 
 	 * @return
 	 */
-	private String extractUnlockedDocKey()
-	{
+	private String extractUnlockedDocKey() {
 		Log.i(TAG, "starting to extract unlocked doc");
 
 		String currDocKey = null;
 		Bundle extras = getIntent().getExtras();
 
-		// extract the doc key 
+		// extract the doc key
 		if (extras != null)
 			currDocKey = extras.getString(intentDataKey);
 
@@ -74,16 +75,15 @@ public class UnlockedDocView extends ListActivity {
 	}
 
 	/**
-	 * Click handler for the menu buttons. Here the user has 4 options:
-	 * create a new doc, refresh the doc list, get the lock, and refresh the doc.
-	 * New doc, refresh list, and get lock should be enabled. Refresh doc should
-	 * be disabled.
+	 * Click handler for the menu buttons. Here the user has 4 options: create a
+	 * new doc, refresh the doc list, get the lock, and refresh the doc. New
+	 * doc, refresh list, and get lock should be enabled. Refresh doc should be
+	 * disabled.
 	 */
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {	
+	public boolean onOptionsItemSelected(MenuItem item) {
 		// which button did the user press?
-		switch (item.getItemId()) 
-		{
+		switch (item.getItemId()) {
 
 		// TODO
 
@@ -95,15 +95,14 @@ public class UnlockedDocView extends ListActivity {
 					newDocTitle, newDocContents);
 
 			// start new locked doc view activity with new doc key as arg
-			startActivity(new Intent(this, 
-					LockedDocView.class).putExtra(intentDataKey, 
-							newDoc.getKey()));
+			startActivity(new Intent(this, LockedDocView.class).putExtra(
+					intentDataKey, newDoc.getKey()));
 			return true;
 
 			// get doc list is pressed
-			/*case R.id.docList:
-			startActivity(new Intent(this, UnlockedDocView.class));
-			return true;
+			/*
+			 * case R.id.docList: startActivity(new Intent(this,
+			 * UnlockedDocView.class)); return true;
 			 */
 
 		default:
@@ -112,4 +111,3 @@ public class UnlockedDocView extends ListActivity {
 
 	}
 }
-

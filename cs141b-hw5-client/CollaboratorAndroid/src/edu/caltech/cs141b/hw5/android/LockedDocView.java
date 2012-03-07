@@ -13,7 +13,7 @@ public class LockedDocView extends ListActivity {
 
 	// debugging
 	private static String TAG = "LockedDocView";
-	
+
 	// the key that identifies the doc that is passed between activities
 	public static String intentDataKey = "doc";
 
@@ -30,26 +30,28 @@ public class LockedDocView extends ListActivity {
 		super.onCreate(savedInstanceState);
 		Log.d(TAG, "created the locked doc view activity");
 		service = new CollabServiceWrapper();
-		displayLockedDoc(extractLockedDocKey());
+		// displayLockedDoc(extractLockedDocKey());
+		setContentView(R.layout.lockeddocgui);
+
 	}
-	
+
 	/**
 	 * Gets the locked doc key that was passed to this activity.
+	 * 
 	 * @return
 	 */
-	private String extractLockedDocKey()
-	{
+	private String extractLockedDocKey() {
 		Log.i(TAG, "starting to extract locked doc");
-		
+
 		// get the doc key and make a datastore query to get this doc
-		
+
 		Bundle extras = getIntent().getExtras();
 		String currDocKey = null;
 
 		// extract the doc key
 		if (extras != null)
 			currDocKey = extras.getString(intentDataKey);
-		
+
 		return currDocKey;
 	}
 
@@ -57,9 +59,9 @@ public class LockedDocView extends ListActivity {
 	 * Display the locked doc.
 	 */
 	public void displayLockedDoc(String currDocKey) {
-		
+
 		Log.i(TAG, "starting to display locked doc");
-		
+
 		// TODO
 
 	}
@@ -75,10 +77,10 @@ public class LockedDocView extends ListActivity {
 	}
 
 	/**
-	 * Click handler for the menu buttons. Here the user has 4 options:
-	 * create a new doc, refresh the doc list, get the lock, and refresh the doc.
-	 * New doc and refresh list should be enabled. Get lockRefresh doc should
-	 * be disabled.
+	 * Click handler for the menu buttons. Here the user has 4 options: create a
+	 * new doc, refresh the doc list, get the lock, and refresh the doc. New doc
+	 * and refresh list should be enabled. Get lockRefresh doc should be
+	 * disabled.
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -86,7 +88,7 @@ public class LockedDocView extends ListActivity {
 		switch (item.getItemId()) {
 
 		// TODO
-		
+
 		// new doc is pressed
 		case R.id.newDoc:
 			// do this activity again with a new doc
@@ -96,9 +98,8 @@ public class LockedDocView extends ListActivity {
 			return true;
 
 			/*
-		case R.id.docList:
-			startActivity(new Intent(this, UnlockedDocView.class));
-			return true;
+			 * case R.id.docList: startActivity(new Intent(this,
+			 * UnlockedDocView.class)); return true;
 			 */
 
 		default:
