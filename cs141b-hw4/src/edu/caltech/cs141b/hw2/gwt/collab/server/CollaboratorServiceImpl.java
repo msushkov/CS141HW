@@ -49,7 +49,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	// are static. We need this static field to allow ClearLockServlet to access
 	// some of the non static functions of this class.
 	private static CollaboratorServiceImpl server = new CollaboratorServiceImpl();
-	
 
 	/**
 	 * Cleans lock for an individual document
@@ -247,9 +246,12 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 								.currentTimeMillis()))) {
 					// If both are fulfilled, update and unlock the doc
 					toSave.update(doc);
-					toSave.unlock();
+					// toSave.unlock();
 
 				} else {
+					// Set to null to prevent the token from being returned
+					stringKey = null;
+
 					// Otherwise, throw an exception
 					throw new LockExpired();
 				}
@@ -268,9 +270,12 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			if (t.isActive()) {
 				t.rollback();
 			}
+
 			pm.close();
 
-			// Now, take the token back
+			// Now, take the token back - even if there was a concurrent
+			// modification exception or some other exception besides
+			// LockExpired.
 			if (stringKey != null) {
 				receiveToken(clientID, stringKey);
 			}
@@ -381,7 +386,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			if (newClientID != null) {
 				sendToken(newClientID, docKey);
 			}
-			// TODO: Check this out and make sure shit gets unlocked
+
 			// Otherwise remove the document from locked documents.
 			else {
 				rmLockedDoc(docKey);
@@ -423,9 +428,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// Add key to locked documents (will only get added if it isn't
 			// already there)
 			pm.makePersistent(toSave);
-
+			t.commit();
+			
+			t = pm.currentTransaction();
 			// add to locked documents and add to client ID
-
+			t.begin();
 			Client client = pm.getObjectById(Client.class, clientID);
 			client.addDoc(docKey);
 			addLockedDoc(docKey);
@@ -449,7 +456,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	}
 
 	// TODO: FIX THIS TO HANDLE NOT IN THE QUEUE
-	// TODO: Add the wrapper for lockeddocuments list
 	/**
 	 * Release the lock of the given document.
 	 * 
@@ -691,6 +697,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	public void logout(String clientID) {
 		System.out.println("logout");
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+
 		// Read all document keys the client has not finished with (queue + use)
 		List<String> docKeys = pm.getObjectById(Client.class, clientID)
 				.getLockedDocs();
