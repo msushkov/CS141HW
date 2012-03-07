@@ -60,6 +60,7 @@ public class DocListView extends ListActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// get the currently-selected doc
+
 				DocumentMetadata currDoc = (DocumentMetadata) lv
 						.getItemAtPosition(position);
 
@@ -71,9 +72,11 @@ public class DocListView extends ListActivity {
 						UnlockedDocView.class);
 				Bundle b = new Bundle();
 
+
 				// unlockedDocIntent.putExtra("doc", currDoc);
 
 				// startActivity();
+
 			}
 		});
 
