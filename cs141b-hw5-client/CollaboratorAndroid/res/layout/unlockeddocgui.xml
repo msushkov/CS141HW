@@ -10,6 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:editable="false"
+        android:freezesText="true"
+        android:inputType="none"
         android:textSize="30dp" />
 
     <EditText
@@ -18,8 +20,9 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.77"
         android:editable="false"
+        android:freezesText="true"
         android:gravity="top"
-        android:inputType="textMultiLine" >
+        android:inputType="none" >
 
         <requestFocus />
     </EditText>
