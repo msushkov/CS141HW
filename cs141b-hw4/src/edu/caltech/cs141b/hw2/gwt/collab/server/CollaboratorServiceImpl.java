@@ -91,6 +91,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 *            The dockey for the doc we want to clean the locks of.
 	 */
 	public void cleanLock(String docKey) {
+
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -103,8 +104,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			Document doc = pm.getObjectById(Document.class, key);
 
 			// Unlock if lock expired
-			if (doc.getLockedUntil().before(
-					new Date(System.currentTimeMillis()))) {
+			Date lockedTil = doc.getLockedUntil();
+			if (lockedTil != null
+					&& lockedTil.before(new Date(System.currentTimeMillis()))) {
 				lockedBy = doc.getLockedBy();
 				returning = true;
 			}
@@ -146,6 +148,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				if (doc.getLockedBy() != null
 						&& doc.getLockedUntil().before(
 								new Date(System.currentTimeMillis()))) {
+
 					lockedBy = doc.getLockedBy();
 					returning = true;
 				}
