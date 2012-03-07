@@ -1,6 +1,7 @@
 package edu.caltech.cs141b.hw5.android;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,6 +15,9 @@ public class UnlockedDocView extends ListActivity {
 
 	// debugging
 	private static String TAG = "UnlockedDocView";
+
+	// the key that identifies the doc that is passed between activities
+	public static String intentDataKey = "doc";
 
 	// initial title + contents of new doc
 	private static String newDocTitle = "Enter the document title.";
@@ -30,7 +34,7 @@ public class UnlockedDocView extends ListActivity {
 		service = new CollabServiceWrapper();
 		displayLockedDoc(extractUnlockedDocKey());
 	}
-	
+
 	/**
 	 * Gets the unlocked doc key that was passed to this activity.
 	 * @return
@@ -44,8 +48,8 @@ public class UnlockedDocView extends ListActivity {
 
 		// extract the doc key 
 		if (extras != null)
-			currDocKey = extras.getString(ActivityStarter.intentDataKey);
-		
+			currDocKey = extras.getString(intentDataKey);
+
 		return currDocKey;
 	}
 
@@ -53,9 +57,9 @@ public class UnlockedDocView extends ListActivity {
 	 * Display the locked doc.
 	 */
 	public void displayLockedDoc(String currDocKey) {
-		
+
 		Log.i(TAG, "starting to display unlocked doc");
-		
+
 		// TODO
 	}
 
@@ -80,15 +84,20 @@ public class UnlockedDocView extends ListActivity {
 		// which button did the user press?
 		switch (item.getItemId()) 
 		{
-		
+
 		// TODO
-		
+
 		// new doc is pressed
 		case R.id.newDoc:
-			// start new locked doc view activity with new doc as arg
+			Log.i(TAG, "starting the locked doc activity");
+
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
-			ActivityStarter.startDocViewActivity(this, LockedDocView.class, newDoc.getKey());
+
+			// start new locked doc view activity with new doc key as arg
+			startActivity(new Intent(this, 
+					LockedDocView.class).putExtra(intentDataKey, 
+							newDoc.getKey()));
 			return true;
 
 			// get doc list is pressed

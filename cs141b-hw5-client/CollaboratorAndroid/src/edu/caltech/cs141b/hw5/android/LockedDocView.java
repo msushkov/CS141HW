@@ -13,6 +13,9 @@ public class LockedDocView extends ListActivity {
 
 	// debugging
 	private static String TAG = "LockedDocView";
+	
+	// the key that identifies the doc that is passed between activities
+	public static String intentDataKey = "doc";
 
 	// initial title + contents of new doc
 	private static String newDocTitle = "Enter the document title.";
@@ -45,7 +48,7 @@ public class LockedDocView extends ListActivity {
 
 		// extract the doc key
 		if (extras != null)
-			currDocKey = extras.getString(ActivityStarter.intentDataKey);
+			currDocKey = extras.getString(intentDataKey);
 		
 		return currDocKey;
 	}

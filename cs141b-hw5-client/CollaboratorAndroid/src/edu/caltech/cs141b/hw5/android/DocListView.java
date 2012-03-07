@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -27,6 +28,9 @@ public class DocListView extends ListActivity {
 
 	// debugging
 	private static String TAG = "DocListView";
+
+	// the key that identifies the doc that is passed between activities
+	public static String intentDataKey = "doc";
 
 	// initial title + contents of new doc
 	private static String newDocTitle = "Enter the document title.";
@@ -80,8 +84,9 @@ public class DocListView extends ListActivity {
 
 				// start the unlocked doc view activity to display
 				// this doc (use its id to make a datastore request)
-				ActivityStarter.startDocViewActivity(DocListView.this, 
-						UnlockedDocView.class, currDoc.getKey());
+				startActivity(new Intent(DocListView.this, 
+						UnlockedDocView.class).putExtra(intentDataKey, 
+								currDoc.getKey()));
 			}
 		});
 	}
@@ -108,11 +113,17 @@ public class DocListView extends ListActivity {
 		// new doc is pressed
 		case R.id.newDoc:
 			Log.i(TAG, "starting the locked doc activity");
-			// start new locked doc view activity with new doc as arg
+			
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
-			ActivityStarter.startDocViewActivity(this, 
-					LockedDocView.class, newDoc.getKey());
+			
+			// start new locked doc view activity with new doc key as arg
+			/*startActivity(new Intent(this, 
+					LockedDocView.class).putExtra(intentDataKey, 
+							newDoc.getKey()));*/
+			
+			startActivity(new Intent(this, LockedDocView.class));
+			
 			return true;
 
 			// works
