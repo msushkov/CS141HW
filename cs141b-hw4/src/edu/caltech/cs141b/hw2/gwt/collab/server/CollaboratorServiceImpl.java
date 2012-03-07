@@ -49,6 +49,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	// are static. We need this static field to allow ClearLockServlet to access
 	// some of the non static functions of this class.
 	private static CollaboratorServiceImpl server = new CollaboratorServiceImpl();
+	
 
 	/**
 	 * Cleans lock for an individual document
@@ -362,25 +363,16 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			pm.makePersistent(toSave);
 
+			// Add the dockey to the client as well
+			Client client = pm.getObjectById(Client.class, clientID);
+			client.rmDoc(docKey);
+			pm.makePersistent(client);
+
 			t.commit();
 		} finally {
 			// Do some cleanup
 			if (t.isActive()) {
 				t.rollback();
-			} else {
-				try {
-					t.begin();
-					Client client = pm.getObjectById(Client.class, clientID);
-					client.rmDoc(docKey);
-					pm.makePersistent(client);
-					t.commit();
-
-				} finally {
-					if (t.isActive()) {
-						t.rollback();
-					}
-				}
-
 			}
 
 			pm.close();
@@ -432,6 +424,14 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// already there)
 			pm.makePersistent(toSave);
 
+			// add to locked documents and add to client ID
+
+			Client client = pm.getObjectById(Client.class, clientID);
+			client.addDoc(docKey);
+			addLockedDoc(docKey);
+
+			pm.makePersistent(client);
+
 			t.commit();
 
 			// Finally, inform the client that the doc is locked and ready for
@@ -443,22 +443,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			if (t.isActive()) {
 				t.rollback();
 			}
-			// else on success add to locked documents and add to client ID
-			else {
-				addLockedDoc(docKey);
-				try {
-					t.begin();
-					Client client = pm.getObjectById(Client.class, clientID);
-					client.addDoc(docKey);
-					pm.makePersistent(client);
-					t.commit();
-				} finally {
-					if (t.isActive()) {
-						t.rollback();
-					}
-				}
-			}
-
 			pm.close();
 		}
 

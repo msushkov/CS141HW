@@ -7,16 +7,14 @@ import java.util.Random;
 
 import com.google.gwt.appengine.channel.client.Channel;
 import com.google.gwt.appengine.channel.client.ChannelFactory;
+import com.google.gwt.appengine.channel.client.ChannelFactory.ChannelCreatedCallback;
 import com.google.gwt.appengine.channel.client.SocketError;
 import com.google.gwt.appengine.channel.client.SocketListener;
-import com.google.gwt.appengine.channel.client.ChannelFactory.ChannelCreatedCallback;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -343,8 +341,8 @@ public class Collaborator extends Composite implements ClickHandler {
 						else {
 							// see if the doc is on the left tab panel
 							for (int i = 0; i < documentsLeftList.size(); i++) {
-								if (documentsLeftList.get(i).getKey().equals(
-										key)) {
+								if (documentsLeftList.get(i).getKey()
+										.equals(key)) {
 									tabId = i;
 									break;
 								}
@@ -400,9 +398,9 @@ public class Collaborator extends Composite implements ClickHandler {
 		lister.getDocumentList();
 		
 		Window.addWindowClosingHandler(new ClosingHandler() {
+
 			@Override
 			public void onWindowClosing(ClosingEvent event) {
-				// TODO Auto-generated method stub
 				System.out.println("closing");
 				DocLogout logout = new DocLogout(self);
 				logout.logout();
@@ -1343,7 +1341,7 @@ public class Collaborator extends Composite implements ClickHandler {
 		// stuff can still go on, and when that finishes (for this client only),
 		// then add the sim button so this client can enter the simulation again
 		disableButton(stopSimulateButton);
-		
+
 		statusUpdate("Stopping the simulation...");
 
 		// since simulation is set to false, once the thinking/hungry/eating
@@ -1527,7 +1525,7 @@ public class Collaborator extends Composite implements ClickHandler {
 			simulationStopping = false;
 
 			statusUpdate("Simulation done.");
-			
+
 			// refresh the client page
 			Window.Location.reload();
 		}

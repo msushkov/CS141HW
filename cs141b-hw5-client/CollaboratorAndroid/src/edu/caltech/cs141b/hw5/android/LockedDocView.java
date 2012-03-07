@@ -2,6 +2,7 @@ package edu.caltech.cs141b.hw5.android;
 
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,35 +25,37 @@ public class LockedDocView extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.d(TAG, "created the locked doc view activity");
 		service = new CollabServiceWrapper();
-		displayLockedDoc(extractLockedDoc());
+		displayLockedDoc(extractLockedDocKey());
 	}
 	
 	/**
-	 * Gets the locked doc that was passed to this activity.
+	 * Gets the locked doc key that was passed to this activity.
 	 * @return
 	 */
-	private LockedDocument extractLockedDoc()
+	private String extractLockedDocKey()
 	{
-		Bundle extras = getIntent().getExtras();
-		LockedDocument currDoc = null;
-		Bundle b = null;
-
-		// extract the bundle first (the bundle contains the doc)
-		if (extras != null)
-			b = (Bundle) extras.get(ActivityStarter.intentDataKey);
-
-		// now extract the doc from the bundle
-		if (b != null)
-			currDoc = (LockedDocument) b.get(ActivityStarter.intentDataKey);
+		Log.i(TAG, "starting to extract locked doc");
 		
-		return currDoc;
+		// get the doc key and make a datastore query to get this doc
+		
+		Bundle extras = getIntent().getExtras();
+		String currDocKey = null;
+
+		// extract the doc key
+		if (extras != null)
+			currDocKey = extras.getString(ActivityStarter.intentDataKey);
+		
+		return currDocKey;
 	}
 
 	/**
 	 * Display the locked doc.
 	 */
-	public void displayLockedDoc(LockedDocument currDoc) {
+	public void displayLockedDoc(String currDocKey) {
+		
+		Log.i(TAG, "starting to display locked doc");
 		
 		// TODO
 
@@ -83,10 +86,10 @@ public class LockedDocView extends ListActivity {
 		
 		// new doc is pressed
 		case R.id.newDoc:
-			// start new locked doc view activity with new doc as arg
+			// do this activity again with a new doc
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
-			ActivityStarter.startDocViewActivity(this, LockedDocView.class, newDoc);
+			displayLockedDoc(newDoc.getKey());
 			return true;
 
 			/*

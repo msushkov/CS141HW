@@ -2,6 +2,7 @@ package edu.caltech.cs141b.hw5.android;
 
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,35 +26,35 @@ public class UnlockedDocView extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.d(TAG, "created the unlocked doc view activity");
 		service = new CollabServiceWrapper();
-		displayLockedDoc(extractUnlockedDoc());
+		displayLockedDoc(extractUnlockedDocKey());
 	}
 	
 	/**
-	 * Gets the unlocked doc that was passed to this activity.
+	 * Gets the unlocked doc key that was passed to this activity.
 	 * @return
 	 */
-	private UnlockedDocument extractUnlockedDoc()
+	private String extractUnlockedDocKey()
 	{
+		Log.i(TAG, "starting to extract unlocked doc");
+
+		String currDocKey = null;
 		Bundle extras = getIntent().getExtras();
-		UnlockedDocument currDoc = null;
-		Bundle b = null;
 
-		// extract the bundle first (the bundle contains the doc)
+		// extract the doc key 
 		if (extras != null)
-			b = (Bundle) extras.get(ActivityStarter.intentDataKey);
-
-		// now extract the doc from the bundle
-		if (b != null)
-			currDoc = (UnlockedDocument) b.get(ActivityStarter.intentDataKey);
+			currDocKey = extras.getString(ActivityStarter.intentDataKey);
 		
-		return currDoc;
+		return currDocKey;
 	}
 
 	/**
 	 * Display the locked doc.
 	 */
-	public void displayLockedDoc(UnlockedDocument currDoc) {
+	public void displayLockedDoc(String currDocKey) {
+		
+		Log.i(TAG, "starting to display unlocked doc");
 		
 		// TODO
 	}
@@ -87,7 +88,7 @@ public class UnlockedDocView extends ListActivity {
 			// start new locked doc view activity with new doc as arg
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
-			ActivityStarter.startDocViewActivity(this, LockedDocView.class, newDoc);
+			ActivityStarter.startDocViewActivity(this, LockedDocView.class, newDoc.getKey());
 			return true;
 
 			// get doc list is pressed

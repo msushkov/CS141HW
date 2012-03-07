@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +39,7 @@ public class DocListView extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.d(TAG, "created the doc list view activity");
 		service = new CollabServiceWrapper();
 		getDocList();
 	}
@@ -46,15 +48,22 @@ public class DocListView extends ListActivity {
 	 * Get the document list from the server.
 	 */
 	public void getDocList() {
+		Log.i(TAG, "starting to get the doc list");
+
 		// get the docs from the server
 		List<DocumentMetadata> docs = service.getDocumentList();
 
-		// reverse list as to get new content on top
-		Collections.reverse(docs);
+		Log.i(TAG, "finished getting the doc list");
 
-		// set the model for the list view, uses toString() method to get names.
-		setListAdapter(new ArrayAdapter<DocumentMetadata>(this,
-				android.R.layout.simple_list_item_1, docs));
+		if (docs != null)
+		{
+			// reverse list to get new content on top
+			Collections.reverse(docs);
+
+			// set the model for the list view, uses toString() method to get names.
+			setListAdapter(new ArrayAdapter<DocumentMetadata>(this,
+					android.R.layout.simple_list_item_1, docs));
+		}
 
 		final ListView lv = getListView();
 		lv.setTextFilterEnabled(true);
@@ -63,15 +72,18 @@ public class DocListView extends ListActivity {
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
+				Log.i(TAG, "starting the unlocked doc activity");
+
 				// get the currently-selected doc
+				DocumentMetadata currDoc = (DocumentMetadata) 
+						lv.getItemAtPosition(position);
 
-				DocumentMetadata currDoc = (DocumentMetadata) lv
-						.getItemAtPosition(position);
-
-				ActivityStarter.startDocViewActivity(DocListView.this, UnlockedDocView.class, currDoc);
+				// start the unlocked doc view activity to display
+				// this doc (use its id to make a datastore request)
+				ActivityStarter.startDocViewActivity(DocListView.this, 
+						UnlockedDocView.class, currDoc.getKey());
 			}
 		});
-
 	}
 
 	/**
@@ -88,18 +100,22 @@ public class DocListView extends ListActivity {
 	 * create a new doc, or refresh the doc list.
 	 */
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {		
 		// which button did the user press?
 		switch (item.getItemId()) {
 
+		// FIX THIS
 		// new doc is pressed
 		case R.id.newDoc:
+			Log.i(TAG, "starting the locked doc activity");
 			// start new locked doc view activity with new doc as arg
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
-			ActivityStarter.startDocViewActivity(this, LockedDocView.class, newDoc);
+			ActivityStarter.startDocViewActivity(this, 
+					LockedDocView.class, newDoc.getKey());
 			return true;
 
+			// works
 			// refresh is pressed
 		case R.id.refreshList:
 			getDocList();
