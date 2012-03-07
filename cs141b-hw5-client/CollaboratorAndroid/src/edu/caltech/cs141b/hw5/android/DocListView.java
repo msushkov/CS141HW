@@ -6,9 +6,7 @@ import java.util.List;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,14 +14,13 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import edu.caltech.cs141b.hw5.android.data.DocumentMetadata;
-import edu.caltech.cs141b.hw5.android.data.InvalidRequest;
-import edu.caltech.cs141b.hw5.android.data.UnlockedDocument;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
 /**
  * Displays the doc list.
+ * 
  * @author msushkov
- *
+ * 
  */
 public class DocListView extends ListActivity {
 	// debugging
@@ -37,7 +34,7 @@ public class DocListView extends ListActivity {
 		super.onCreate(savedInstanceState);
 
 		service = new CollabServiceWrapper();
-		
+
 		getDocList();
 	}
 
@@ -63,20 +60,23 @@ public class DocListView extends ListActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// get the currently-selected doc
-				
+
 				DocumentMetadata currDoc = (DocumentMetadata) lv
 						.getItemAtPosition(position);
 
 				// TODO
 				// display the given doc - maybe open a new text view?
 				// displayDoc(currDoc);
-				
-				Intent unlockedDocIntent = new Intent(DocListView.this, UnlockedDocView.class);
+
+				Intent unlockedDocIntent = new Intent(DocListView.this,
+						UnlockedDocView.class);
 				Bundle b = new Bundle();
-				
-				//unlockedDocIntent.putExtra("doc", currDoc);
-				
-				//startActivity();
+
+
+				// unlockedDocIntent.putExtra("doc", currDoc);
+
+				// startActivity();
+
 			}
 		});
 
@@ -112,31 +112,30 @@ public class DocListView extends ListActivity {
 		getMenuInflater().inflate(R.menu.listmenu, menu);
 		return true;
 	}
-	
+
 	/**
 	 * Click handler for the menu buttons.
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// display the list menu
-		//setContentView(R.menu.listmenu);
-		
+		// setContentView(R.menu.listmenu);
+
 		// which button did the user press?
-		switch (item.getItemId()) 
-		{
-			// new doc is pressed
-			case R.id.newDoc:
-				// start new doc view activity
-				return true;
+		switch (item.getItemId()) {
+		// new doc is pressed
+		case R.id.newDoc:
+			// start new doc view activity
+			return true;
 
 			// refresh is pressed
-			case R.id.refreshList:
-				getDocList();
-				//startActivity(new Intent(this, DocListView.class));
-				return true;
-			
-			default:
-				return true;
+		case R.id.refreshList:
+			getDocList();
+			// startActivity(new Intent(this, DocListView.class));
+			return true;
+
+		default:
+			return true;
 		}
 	}
 }

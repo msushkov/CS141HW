@@ -1,20 +1,11 @@
 package edu.caltech.cs141b.hw5.android;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import edu.caltech.cs141b.hw5.android.data.DocumentMetadata;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
 public class LockedDocView extends ListActivity {
@@ -28,15 +19,14 @@ public class LockedDocView extends ListActivity {
 		service = new CollabServiceWrapper();
 
 		Bundle extras = getIntent().getExtras();
-		
+
 		displayUnlockedDoc();
 	}
 
 	/**
-	 * Display the 
+	 * Display the
 	 */
 	public void displayUnlockedDoc() {
-		
 
 		// Try lock and unlocking a document
 		// try {
@@ -71,28 +61,26 @@ public class LockedDocView extends ListActivity {
 		inflater.inflate(R.menu.listmenu, menu);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// display the list menu
-		setContentView(R.menu.listmenu);
-		
-		// which button did the user press?
-		switch (item.getItemId()) 
-		{
-			// new doc is pressed
-			case R.id.newDoc:
-				
-				return true;
+		setContentView(R.menu.lockedmenu);
 
-			case R.id.docList:
-				startActivity(new Intent(this, UnlockedDocView.class));
-				return true;
-			
-			default:
-				return true;
+		// which button did the user press?
+		switch (item.getItemId()) {
+		// new doc is pressed
+		case R.id.newDoc:
+
+			return true;
+
+		case R.id.docList:
+			startActivity(new Intent(this, UnlockedDocView.class));
+			return true;
+
+		default:
+			return true;
 		}
 
 	}
 }
-
