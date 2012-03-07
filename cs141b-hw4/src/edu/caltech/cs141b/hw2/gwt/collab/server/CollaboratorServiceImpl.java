@@ -54,7 +54,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 * cron job might lead to concurrent modification.
 	 */
 	public CollaboratorServiceImpl() {
-		System.out.println("RUNNING");
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = pm.newQuery(LockedDocuments.class);
@@ -80,7 +79,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				t.rollback();
 			}
 
-		} // Independently of existance close the query and persistancemanager
+		} // Independently of existence close the query and PersistanceManager
 		query.closeAll();
 		pm.close();
 	}
@@ -116,7 +115,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			}
 
 			if (returning) {
-				server.receiveToken(lockedBy, docKey);
+				receiveToken(lockedBy, docKey);
 			}
 			pm.close();
 
@@ -144,8 +143,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				Document doc = pm.getObjectById(Document.class, key);
 
 				// Unlock if lock expired
-				if (doc.getLockedUntil().before(
-						new Date(System.currentTimeMillis()))) {
+				if (doc.getLockedBy() != null
+						&& doc.getLockedUntil().before(
+								new Date(System.currentTimeMillis()))) {
 					lockedBy = doc.getLockedBy();
 					returning = true;
 				}
@@ -409,6 +409,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			if (newClientID != null) {
 				sendToken(newClientID, docKey);
 			}
+			// TODO: Check this out and make sure shit gets unlocked
 			// Otherwise remove the document from locked documents.
 			else {
 				rmLockedDoc(docKey);
@@ -483,6 +484,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 	}
 
+	// TODO: FIX THIS TO HANDLE NOT IN THE QUEUE
+	// TODO: Add the wrapper for lockeddocuments list
 	/**
 	 * Release the lock of the given document.
 	 * 
@@ -523,8 +526,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				pm.makePersistent(toSave);
 
 			} else {
-				// Otherwise, throw an exception
-				throw new LockExpired("You no longer have the lock");
+				if (!toSave.removeClient(clientID)) {
+					// Otherwise, throw an exception
+					throw new LockExpired("You no longer have the lock");
+				}
 			}
 
 			// ...Ending transaction

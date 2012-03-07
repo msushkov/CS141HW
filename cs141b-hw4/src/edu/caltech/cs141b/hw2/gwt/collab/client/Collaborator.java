@@ -400,12 +400,6 @@ public class Collaborator extends Composite implements ClickHandler {
 		lister.getDocumentList();
 		
 		Window.addWindowClosingHandler(new ClosingHandler() {
-			/*@Override
-			public void onClose(CloseEvent<Window> event) {
-				
-
-			}*/
-
 			@Override
 			public void onWindowClosing(ClosingEvent event) {
 				// TODO Auto-generated method stub
