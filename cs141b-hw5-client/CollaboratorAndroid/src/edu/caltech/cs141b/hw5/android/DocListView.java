@@ -86,7 +86,7 @@ public class DocListView extends ListActivity {
 				// this doc (use its id to make a datastore request)
 				startActivity(new Intent(DocListView.this,
 						UnlockedDocView.class).putExtra(intentDataKey,
-						currDoc.getKey()));
+								currDoc.getKey()));
 			}
 		});
 	}
@@ -109,7 +109,6 @@ public class DocListView extends ListActivity {
 		// which button did the user press?
 		switch (item.getItemId()) {
 
-		// FIX THIS
 		// new doc is pressed
 		case R.id.newDoc:
 			Log.i(TAG, "starting the locked doc activity");
@@ -117,18 +116,13 @@ public class DocListView extends ListActivity {
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
 
-			// start new locked doc view activity with new doc key as arg
-			/*
-			 * startActivity(new Intent(this,
-			 * LockedDocView.class).putExtra(intentDataKey, newDoc.getKey()));
-			 */
-
-			startActivity(new Intent(this, LockedDocView.class));
+			// start new locked doc view activity with new doc as arg
+			startActivity(new Intent(this,
+					LockedDocView.class).putExtra(intentDataKey, newDoc));
 
 			return true;
 
-			// works
-			// refresh is pressed
+		// refresh is pressed
 		case R.id.refreshList:
 			getDocList();
 			return true;
