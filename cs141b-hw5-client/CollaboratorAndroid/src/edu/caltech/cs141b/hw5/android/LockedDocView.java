@@ -72,7 +72,7 @@ public class LockedDocView extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.listmenu, menu);
+		inflater.inflate(R.menu.lockedmenu, menu);
 		return true;
 	}
 
