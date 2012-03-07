@@ -23,6 +23,8 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.ClosingEvent;
+import com.google.gwt.user.client.Window.ClosingHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -396,13 +398,20 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// refresh document list on login
 		lister.getDocumentList();
-
-		Window.addCloseHandler(new CloseHandler<Window>() {
-			@Override
+		
+		Window.addWindowClosingHandler(new ClosingHandler() {
+			/*@Override
 			public void onClose(CloseEvent<Window> event) {
+				
+
+			}*/
+
+			@Override
+			public void onWindowClosing(ClosingEvent event) {
+				// TODO Auto-generated method stub
+				System.out.println("closing");
 				DocLogout logout = new DocLogout(self);
 				logout.logout();
-
 			}
 		});
 	}

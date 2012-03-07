@@ -23,7 +23,9 @@ public class DocLogout implements AsyncCallback<Void> {
 	
 	public void logout() {
 		// remove this doc from all the request queues and return any tokens
+		System.out.println("logging out");
 		collaborator.collabService.logout(collaborator.clientID, this);
+		System.out.println("logged out");
 	}
 
 	@Override

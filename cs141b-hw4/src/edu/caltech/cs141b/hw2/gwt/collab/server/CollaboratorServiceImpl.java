@@ -27,7 +27,7 @@ import edu.caltech.cs141b.hw2.gwt.collab.shared.UnlockedDocument;
  */
 @SuppressWarnings("serial")
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
-CollaboratorService {
+		CollaboratorService {
 
 	// This is the time in seconds that clients can lock a document
 	private static final int LOCK_TIME = 30;
@@ -56,20 +56,21 @@ CollaboratorService {
 	public CollaboratorServiceImpl() {
 		System.out.println("RUNNING");
 
-		PersistenceManager pm = PMF.get().getPersistenceManager(); Query
-		query = pm.newQuery(LockedDocuments.class);
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query query = pm.newQuery(LockedDocuments.class);
 
 		@SuppressWarnings("unchecked")
-		List<LockedDocuments> lockedDocs = (List<LockedDocuments>) query.execute();
+		List<LockedDocuments> lockedDocs = (List<LockedDocuments>) query
+				.execute();
 
 		// Add the unique lockedDocument entity if not already there
-		if  (lockedDocs.size() < 1) {
+		if (lockedDocs.size() < 1) {
 			System.out.println("Creating new locked doc");
-			LockedDocuments lockedDocuments = new  LockedDocuments(); Transaction t = pm.currentTransaction();
+			LockedDocuments lockedDocuments = new LockedDocuments();
+			Transaction t = pm.currentTransaction();
 			try {
 				// Starting transaction...
 				t.begin();
-
 
 				// Save the unique entity
 				pm.makePersistent(lockedDocuments);
@@ -83,9 +84,6 @@ CollaboratorService {
 		query.closeAll();
 		pm.close();
 	}
-
-
-
 
 	/**
 	 * Cleans lock for an individual document
@@ -273,7 +271,8 @@ CollaboratorService {
 
 				// Check that the person trying to save has the lock and that
 				// the lock hasn't expired
-				if (lockedBy != null && lockedBy.equals(identity)
+				if (lockedBy != null
+						&& lockedBy.equals(identity)
 						&& lockedUntil.after(new Date(System
 								.currentTimeMillis()))) {
 					// If both are fulfilled, update and unlock the doc
@@ -308,14 +307,14 @@ CollaboratorService {
 		}
 	}
 
-
 	private void addLockedDoc(String docKey) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		Transaction t = pm.currentTransaction();
 		try {
 			t.begin();
-			LockedDocuments lockedDocs = pm.getObjectById(LockedDocuments.class, lockListKey);
+			LockedDocuments lockedDocs = pm.getObjectById(
+					LockedDocuments.class, lockListKey);
 			lockedDocs.addDocument(docKey);
 			pm.makePersistent(lockedDocs);
 			t.commit();
@@ -324,18 +323,18 @@ CollaboratorService {
 				t.rollback();
 			}
 
-			pm.close(); 
+			pm.close();
 		}
 	}
-	
-	
+
 	private void rmLockedDoc(String docKey) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		Transaction t = pm.currentTransaction();
 		try {
 			t.begin();
-			LockedDocuments lockedDocs = pm.getObjectById(LockedDocuments.class, lockListKey);
+			LockedDocuments lockedDocs = pm.getObjectById(
+					LockedDocuments.class, lockListKey);
 			lockedDocs.removeDocument(docKey);
 			pm.makePersistent(lockedDocs);
 			t.commit();
@@ -344,11 +343,9 @@ CollaboratorService {
 				t.rollback();
 			}
 
-			pm.close(); 
+			pm.close();
 		}
 	}
-	
-	
 
 	/**
 	 * Called whenever a client returns a token for an item. This function will
@@ -382,7 +379,6 @@ CollaboratorService {
 			// Set next client if there's a queue
 			newClientID = toSave.pollNextClient();
 
-
 			toSave.unlock();
 
 			pm.makePersistent(toSave);
@@ -394,11 +390,11 @@ CollaboratorService {
 				t.rollback();
 			} else {
 				try {
-				t.begin();
-				Client client = pm.getObjectById(Client.class, clientID);
-				client.rmDoc(docKey);
-				pm.makePersistent(client);
-				t.commit();
+					t.begin();
+					Client client = pm.getObjectById(Client.class, clientID);
+					client.rmDoc(docKey);
+					pm.makePersistent(client);
+					t.commit();
 
 				} finally {
 					if (t.isActive()) {
@@ -418,7 +414,6 @@ CollaboratorService {
 				rmLockedDoc(docKey);
 			}
 		}
-
 
 	}
 
@@ -608,8 +603,7 @@ CollaboratorService {
 		Client client = new Client(clientID);
 		pm.makePersistent(client);
 		pm.close();
-		
-		
+
 		return getChannelService().createChannel(clientID);
 	}
 
@@ -697,9 +691,14 @@ CollaboratorService {
 			pm.makePersistent(toSave);
 
 			t.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("lock queue error");
 		} finally {
+
 			// Do some cleanup
 			if (t.isActive()) {
+				System.out.println("lock queue rollback");
 				t.rollback();
 			}
 
@@ -721,28 +720,34 @@ CollaboratorService {
 	 */
 	@Override
 	public void logout(String clientID) {
+		System.out.println("logout");
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		// Read all document keys the client has not finished with (queue + use)
-		List<String> docKeys = pm.getObjectById(Client.class, clientID).getLockedDocs();
+		List<String> docKeys = pm.getObjectById(Client.class, clientID)
+				.getLockedDocs();
 		pm.close();
-		
-		System.out.println("lockqueue");
+
 		// Remove from all these entities
 		for (String docKey : docKeys) {
-			System.out.println(docKey);
 			leaveLockQueue(clientID, docKey);
 		}
-		
+
 		// Finally delete the client
 		pm = PMF.get().getPersistenceManager();
 		Transaction t = pm.currentTransaction();
 		try {
 			t.begin();
 			Client client = pm.getObjectById(Client.class, clientID);
+			System.out.println("deleting");
 			pm.deletePersistent(client);
 			t.commit();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.out.println("client error");
 		} finally {
+
 			if (t.isActive()) {
+				System.out.println("client rollback");
 				t.rollback();
 			}
 			pm.close();
