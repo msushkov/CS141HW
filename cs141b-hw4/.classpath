@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT (2)"/>
-	<classpathentry exported="true" kind="lib" path="/home/gustafa/cs141/cs141b-hw4/war/WEB-INF/lib/gwt-gae-channel-0.4-alpha.jar"/>
+	<classpathentry kind="lib" path="/Users/bryanjadot/Dropbox/Documents/CS141b/repo/cs141b-hw4/war/WEB-INF/lib/gwt-gae-channel-0.4-alpha.jar"/>
 	<classpathentry exported="true" kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

@@ -1,6 +1,8 @@
 package edu.caltech.cs141b.hw2.gwt.collab.server;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -12,14 +14,14 @@ public class LockedDocuments {
 	
 	// Only need to store key
 	@Persistent
-	List<String> lockedDocs;
+	Set<String> lockedDocs;
 	
 	
 	@PrimaryKey
 	String key = "lockedDocuments";
 	
 	public LockedDocuments() {
-		// No need to do anything as of now
+		lockedDocs = new HashSet();
 	}
 	
 	public void addDocument(String key) {
@@ -29,7 +31,7 @@ public class LockedDocuments {
 		}
 	}
 	
-	public List<String> getLockedDocs() {
+	public Set<String> getLockedDocs() {
 		return lockedDocs;
 	}
 	
