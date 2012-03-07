@@ -59,12 +59,12 @@ public class DocListView extends ListActivity {
 
 		Log.i(TAG, "finished getting the doc list");
 
-		if (docs != null)
-		{
+		if (docs != null) {
 			// reverse list to get new content on top
 			Collections.reverse(docs);
 
-			// set the model for the list view, uses toString() method to get names.
+			// set the model for the list view, uses toString() method to get
+			// names.
 			setListAdapter(new ArrayAdapter<DocumentMetadata>(this,
 					android.R.layout.simple_list_item_1, docs));
 		}
@@ -79,13 +79,13 @@ public class DocListView extends ListActivity {
 				Log.i(TAG, "starting the unlocked doc activity");
 
 				// get the currently-selected doc
-				DocumentMetadata currDoc = (DocumentMetadata) 
-						lv.getItemAtPosition(position);
+				DocumentMetadata currDoc = (DocumentMetadata) lv
+						.getItemAtPosition(position);
 
 				// start the unlocked doc view activity to display
 				// this doc (use its id to make a datastore request)
-				startActivity(new Intent(DocListView.this, 
-						UnlockedDocView.class).putExtra(intentDataKey, 
+				startActivity(new Intent(DocListView.this,
+						UnlockedDocView.class).putExtra(intentDataKey,
 								currDoc.getKey()));
 			}
 		});
@@ -101,33 +101,28 @@ public class DocListView extends ListActivity {
 	}
 
 	/**
-	 * Click handler for the menu buttons. Here the user has 2 options:
-	 * create a new doc, or refresh the doc list.
+	 * Click handler for the menu buttons. Here the user has 2 options: create a
+	 * new doc, or refresh the doc list.
 	 */
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {		
+	public boolean onOptionsItemSelected(MenuItem item) {
 		// which button did the user press?
 		switch (item.getItemId()) {
 
-		// FIX THIS
 		// new doc is pressed
 		case R.id.newDoc:
 			Log.i(TAG, "starting the locked doc activity");
-			
+
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
-			
-			// start new locked doc view activity with new doc key as arg
-			/*startActivity(new Intent(this, 
-					LockedDocView.class).putExtra(intentDataKey, 
-							newDoc.getKey()));*/
-			
-			startActivity(new Intent(this, LockedDocView.class));
-			
+
+			// start new locked doc view activity with new doc as arg
+			startActivity(new Intent(this,
+					LockedDocView.class).putExtra(intentDataKey, newDoc));
+
 			return true;
 
-			// works
-			// refresh is pressed
+		// refresh is pressed
 		case R.id.refreshList:
 			getDocList();
 			return true;

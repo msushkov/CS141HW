@@ -13,7 +13,12 @@ public final class R {
     public static final class drawable {
         public static final int dialog_full_dark=0x7f020000;
         public static final int ic_launcher=0x7f020001;
-        public static final int ic_menu_refresh=0x7f020002;
+        public static final int ic_menu_add=0x7f020002;
+        public static final int ic_menu_clear_playlist=0x7f020003;
+        public static final int ic_menu_edit=0x7f020004;
+        public static final int ic_menu_list=0x7f020005;
+        public static final int ic_menu_refresh=0x7f020006;
+        public static final int ic_menu_save=0x7f020007;
     }
     public static final class id {
         public static final int content=0x7f060001;
@@ -26,8 +31,9 @@ public final class R {
         public static final int title=0x7f060000;
     }
     public static final class layout {
-        public static final int listgui=0x7f030000;
+        public static final int lockeddocgui=0x7f030000;
         public static final int main=0x7f030001;
+        public static final int unlockeddocgui=0x7f030002;
     }
     public static final class menu {
         public static final int listmenu=0x7f050000;
