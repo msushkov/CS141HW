@@ -17,8 +17,12 @@ public final class R {
     }
     public static final class id {
         public static final int content=0x7f060001;
+        public static final int docList=0x7f060005;
+        public static final int lockDoc=0x7f060006;
         public static final int newDoc=0x7f060002;
+        public static final int refresh=0x7f060007;
         public static final int refreshList=0x7f060003;
+        public static final int saveDoc=0x7f060004;
         public static final int title=0x7f060000;
     }
     public static final class layout {
@@ -27,6 +31,8 @@ public final class R {
     }
     public static final class menu {
         public static final int listmenu=0x7f050000;
+        public static final int lockedmenu=0x7f050001;
+        public static final int unlockedmenu=0x7f050002;
     }
     public static final class string {
         public static final int Title=0x7f040002;
