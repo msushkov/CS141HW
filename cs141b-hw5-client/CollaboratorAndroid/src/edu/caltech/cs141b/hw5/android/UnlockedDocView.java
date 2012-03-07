@@ -1,6 +1,6 @@
 package edu.caltech.cs141b.hw5.android;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import edu.caltech.cs141b.hw5.android.data.LockedDocument;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
-public class UnlockedDocView extends ListActivity {
+public class UnlockedDocView extends Activity {
 
 	// debugging
 	private static String TAG = "UnlockedDocView";

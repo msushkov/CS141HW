@@ -1,6 +1,6 @@
 package edu.caltech.cs141b.hw5.android;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import edu.caltech.cs141b.hw5.android.data.LockedDocument;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
-public class LockedDocView extends ListActivity {
+public class LockedDocView extends Activity {
 
 	// debugging
 	private static String TAG = "LockedDocView";
@@ -30,7 +30,7 @@ public class LockedDocView extends ListActivity {
 		super.onCreate(savedInstanceState);
 		Log.d(TAG, "created the locked doc view activity");
 		service = new CollabServiceWrapper();
-		// displayLockedDoc(extractLockedDocKey());
+		displayLockedDoc(extractLockedDocKey());
 		setContentView(R.layout.lockeddocgui);
 
 	}
