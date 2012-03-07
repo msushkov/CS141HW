@@ -1,7 +1,6 @@
 package edu.caltech.cs141b.hw2.gwt.collab.server;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
