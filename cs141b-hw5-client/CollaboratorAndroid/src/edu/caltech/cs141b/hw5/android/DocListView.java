@@ -86,7 +86,7 @@ public class DocListView extends ListActivity {
 				// this doc (use its id to make a datastore request)
 				startActivity(new Intent(DocListView.this,
 						UnlockedDocView.class).putExtra(intentDataKey,
-								currDoc.getKey()));
+						currDoc.getKey()));
 			}
 		});
 	}
@@ -117,12 +117,12 @@ public class DocListView extends ListActivity {
 					newDocTitle, newDocContents);
 
 			// start new locked doc view activity with new doc as arg
-			startActivity(new Intent(this,
-					LockedDocView.class).putExtra(intentDataKey, newDoc));
+			startActivity(new Intent(this, LockedDocView.class).putExtra(
+					intentDataKey, newDoc));
 
 			return true;
 
-		// refresh is pressed
+			// refresh is pressed
 		case R.id.refreshList:
 			getDocList();
 			return true;

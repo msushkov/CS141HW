@@ -3,5 +3,5 @@
         <item android:id="@+id/newDoc" android:enabled="true" android:title="New Document" android:visible="true" android:icon="@drawable/ic_menu_add"></item>
         <item android:id="@+id/lockDoc" android:title="Lock Document" android:enabled="true" android:visible="true" android:icon="@drawable/ic_menu_edit"></item>
         <item android:id="@+id/docList" android:enabled="true" android:title="Doc list" android:visible="true" android:icon="@drawable/ic_menu_save"></item>
-        <item android:id="@+id/refresh" android:title="Refresh" android:icon="@drawable/ic_menu_refresh"></item>
+        <item android:id="@+id/refresh" android:title="Refresh" android:icon="@drawable/ic_menu_refresh" android:visible="true" android:enabled="true"></item>
     </menu>

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.EditText;
 import edu.caltech.cs141b.hw5.android.data.InvalidRequest;
 import edu.caltech.cs141b.hw5.android.data.LockUnavailable;
 import edu.caltech.cs141b.hw5.android.data.LockedDocument;
@@ -27,9 +28,13 @@ public class UnlockedDocView extends Activity {
 
 	// makes server calls
 	CollabServiceWrapper service;
-	
+
 	// the key of the current unlocked doc we are dealing with
 	private String currDocKey;
+
+	// textboxes
+	EditText titleBox;
+	EditText contentBox;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -39,11 +44,15 @@ public class UnlockedDocView extends Activity {
 		Log.d(TAG, "created the unlocked doc view activity");
 
 		service = new CollabServiceWrapper();
-		
+
+		setContentView(R.layout.unlockeddocgui);
+
+		titleBox = (EditText) findViewById(R.id.title);
+		contentBox = (EditText) findViewById(R.id.content);
+
 		extractUnlockedDocKey();
 		getUnlockedDoc();
-		
-		setContentView(R.layout.unlockeddocgui);
+
 	}
 
 	/**
@@ -74,10 +83,9 @@ public class UnlockedDocView extends Activity {
 		// make a server request to get this doc
 		try {
 			doc = service.getDocument(currDocKey);
-		} 
-		catch (InvalidRequest e) {
+		} catch (InvalidRequest e) {
 			Log.i(TAG, "Invalid request when getting doc.");
-			
+
 			// TODO
 			// pop up error msg to user and show the doc list
 			startActivity(new Intent(this, DocListView.class));
@@ -87,14 +95,22 @@ public class UnlockedDocView extends Activity {
 		if (doc != null)
 			displayUnlockedDoc(doc);
 	}
-	
+
 	/**
 	 * Displays the unlocked doc.
+	 * 
 	 * @param doc
 	 */
-	private void displayUnlockedDoc(UnlockedDocument doc)
-	{
+	private void displayUnlockedDoc(UnlockedDocument doc) {
 		// TODO: set the title and contents (without letting the user edit)
+
+		if (doc != null) {
+			Log.i(TAG, "doc != null");
+			titleBox.setText(doc.getTitle());
+			contentBox.setText(doc.getContents());
+		} else {
+			Log.i(TAG, "doc = null");
+		}
 	}
 
 	/**
@@ -117,7 +133,7 @@ public class UnlockedDocView extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// which button did the user press?
 		switch (item.getItemId()) {
-		
+
 		// create a new doc
 		case R.id.newDoc:
 			Log.i(TAG, "starting the locked doc activity");
@@ -128,15 +144,15 @@ public class UnlockedDocView extends Activity {
 			// start new locked doc view activity with new doc key as arg
 			startActivity(new Intent(this, LockedDocView.class).putExtra(
 					intentDataKey, newDoc.getKey()));
-			
+
 			return true;
 
-		// refresh the doc list
-		case R.id.docList: 
-			startActivity(new Intent(this, DocListView.class)); 
+			// refresh the doc list
+		case R.id.docList:
+			startActivity(new Intent(this, DocListView.class));
 			return true;
-		
-		// lock this doc
+
+			// lock this doc
 		case R.id.lockDoc:
 			lockDoc();
 			return true;
@@ -145,34 +161,30 @@ public class UnlockedDocView extends Activity {
 			return true;
 		}
 	}
-	
+
 	/**
 	 * Send the lock request to the server.
 	 */
-	public void lockDoc()
-	{
+	public void lockDoc() {
 		LockedDocument doc = null;
-		
-		try 
-		{
+
+		try {
 			doc = service.lockDocument(currDocKey);
-		} 
-		catch (LockUnavailable e) {
+		} catch (LockUnavailable e) {
 			Log.i(TAG, "Caught LockUnavailable when trying to lock the doc.");
-			
+
 			// TODO
 			// print error msg to user and show the unlocked doc again
-			
-		} 
-		catch (InvalidRequest e) {
+
+		} catch (InvalidRequest e) {
 			Log.i(TAG, "Caught InvalidRequest when tyring to lock doc.");
-			
+
 			// TODO
 			// print error msg to user and show the unlocked doc again
 		}
-		
+
 		// now that we got the lock for this doc, switch to locked view
-		startActivity(new Intent(this,
-				LockedDocView.class).putExtra(intentDataKey, doc));
+		startActivity(new Intent(this, LockedDocView.class).putExtra(
+				intentDataKey, doc));
 	}
 }
