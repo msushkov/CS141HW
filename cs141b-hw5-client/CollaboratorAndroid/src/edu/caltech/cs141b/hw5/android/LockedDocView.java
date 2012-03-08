@@ -61,8 +61,7 @@ public class LockedDocView extends Activity {
 		// displays currDoc
 		if (currDoc != null)
 			displayLockedDoc();
-		else
-		{
+		else {
 			Log.i(TAG, "Cannot display - doc is null.");
 
 			// inform the user that something went wrong
@@ -141,7 +140,8 @@ public class LockedDocView extends Activity {
 
 		// create a new doc
 		case R.id.newDoc:
-			// if we had a new doc open before, dont release the lock on it since
+			// if we had a new doc open before, dont release the lock on it
+			// since
 			// it hasnt been saved
 			if (!isNewDoc)
 			{
@@ -160,7 +160,8 @@ public class LockedDocView extends Activity {
 
 			// refresh the doc list
 		case R.id.docList:
-			// if we had a new doc open before, dont release the lock on it since
+			// if we had a new doc open before, dont release the lock on it
+			// since
 			// it hasnt been saved
 			if (!isNewDoc)
 			{
@@ -206,23 +207,21 @@ public class LockedDocView extends Activity {
 		// set the title and contents of the doc we are trying to save
 		// to be what is in the text boxes at this moment (whatever the
 		// user input)
-		if (currDoc != null)
-		{
+		if (currDoc != null) {
 			try {
 				// if the user made no changes to the doc
-				if (currDoc.getTitle().equals(titleBox.getText().toString()) && 
-						currDoc.getContents().equals(contentBox.getText().toString()))
-				{
+				if (currDoc.getTitle().equals(titleBox.getText().toString())
+						&& currDoc.getContents().equals(
+								contentBox.getText().toString())) {
 					Log.i(TAG, "no changes to the doc, so not saving");
 
 					// alert the user that we are not saving
 					Toast errorMsg = Toast.makeText(this,
-							"No document changes; not saving.", Toast.LENGTH_SHORT);
+							"No document changes; not saving.",
+							Toast.LENGTH_SHORT);
 					errorMsg.show();
-				}
-				else
-				{
-					// set the to-be-saved doc to have the msot 
+				} else {
+					// set the to-be-saved doc to have the msot
 					// recent title and contents
 					currDoc.setTitle(titleBox.getText().toString());
 					currDoc.setContents(contentBox.getText().toString());
@@ -253,15 +252,14 @@ public class LockedDocView extends Activity {
 
 	/**
 	 * Called when the saveDoc operation completes successfully.
+	 * 
 	 * @param doc
 	 */
-	private void saveComplete(UnlockedDocument doc)
-	{
+	private void saveComplete(UnlockedDocument doc) {
 		Log.i(TAG, "saved the doc");
 
 		// inform the user that we saved the doc
-		Toast msg = Toast.makeText(this, "Sucessfully saved the document.", 
-				Toast.LENGTH_SHORT);
+		Toast msg = Toast.makeText(this, "Document saved", Toast.LENGTH_SHORT);
 		msg.show();
 
 		// start a new unlockedDocView activity
@@ -275,8 +273,7 @@ public class LockedDocView extends Activity {
 	private void releaseLock() {
 		Log.i(TAG, "trying to release the lock");
 
-		if (currDoc != null)
-		{
+		if (currDoc != null) {
 			try {
 				service.releaseLock(currDoc);
 				Log.i(TAG, "released the lock");
@@ -289,7 +286,8 @@ public class LockedDocView extends Activity {
 			catch (LockExpired e) {
 				// alert the user that the release failed
 				Toast errorMsg = Toast.makeText(this,
-						"Lock release failed - lock expired.", Toast.LENGTH_SHORT);
+						"Lock release failed - lock expired.",
+						Toast.LENGTH_SHORT);
 				errorMsg.show();
 
 				Log.i(TAG, "Caught LockExpired when trying to release lock.");
