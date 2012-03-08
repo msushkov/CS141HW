@@ -30,7 +30,7 @@ public class DocListView extends ListActivity {
 	private static String TAG = "DocListView";
 
 	// the key that identifies the doc that is passed between activities
-	public static String intentDataKey = "doc";
+	private static String intentDataKey = "doc";
 
 	// initial title + contents of new doc
 	private static String newDocTitle = "Enter the document title.";
@@ -68,6 +68,8 @@ public class DocListView extends ListActivity {
 			setListAdapter(new ArrayAdapter<DocumentMetadata>(this,
 					android.R.layout.simple_list_item_1, docs));
 		}
+		else
+			Log.i(TAG, "doc list is null");
 
 		final ListView lv = getListView();
 		lv.setTextFilterEnabled(true);
@@ -119,10 +121,9 @@ public class DocListView extends ListActivity {
 			// start new locked doc view activity with new doc as arg
 			startActivity(new Intent(this, LockedDocView.class).putExtra(
 					intentDataKey, newDoc));
-
 			return true;
 
-			// refresh is pressed
+		// refresh is pressed
 		case R.id.refreshList:
 			getDocList();
 			return true;
