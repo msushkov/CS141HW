@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 import edu.caltech.cs141b.hw5.android.data.InvalidRequest;
 import edu.caltech.cs141b.hw5.android.data.LockExpired;
 import edu.caltech.cs141b.hw5.android.data.LockedDocument;
@@ -20,21 +21,21 @@ public class LockedDocView extends Activity {
 	private static String TAG = "LockedDocView";
 
 	// the key that identifies the doc that is passed between activities
-	public static String intentDataKey = "doc";
+	private static String intentDataKey = "doc";
 
 	// initial title + contents of new doc
 	private static String newDocTitle = "Enter the document title.";
 	private static String newDocContents = "Enter the document contents.";
 
 	// makes server calls
-	CollabServiceWrapper service;
+	private CollabServiceWrapper service;
 
 	// the current locked doc we are dealing with
 	private LockedDocument currDoc;
 
 	// textboxes
-	EditText titleBox;
-	EditText contentBox;
+	private EditText titleBox;
+	private EditText contentBox;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -49,10 +50,11 @@ public class LockedDocView extends Activity {
 		titleBox = (EditText) findViewById(R.id.title);
 		contentBox = (EditText) findViewById(R.id.content);
 
+		// sets the currDoc class variable
 		extractLockedDoc();
 
+		// displays currDoc
 		displayLockedDoc();
-
 	}
 
 	/**
@@ -78,19 +80,20 @@ public class LockedDocView extends Activity {
 	/**
 	 * Display the locked doc.
 	 */
-	public void displayLockedDoc() {
+	private void displayLockedDoc() {
 
 		Log.i(TAG, "starting to display locked doc");
+		
 		if (currDoc != null) {
+			// display the title and contents 
 			titleBox.setText(currDoc.getTitle());
 			contentBox.setText(currDoc.getContents());
+			
 			Log.i(TAG, "currdoc != null");
 			Log.i(TAG, currDoc.getTitle());
-		} else {
+		} 
+		else
 			Log.i(TAG, "currdoc = null");
-		}
-		// TODO: display title and contents and let the user edit it
-
 	}
 
 	/**
@@ -115,21 +118,30 @@ public class LockedDocView extends Activity {
 
 		// create a new doc
 		case R.id.newDoc:
+			// release the lock since we are closing the current doc for which 
+			// we likely hold the lock and are starting a new one
+			releaseLock();
+			
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
 			this.currDoc = newDoc;
 
 			// do this activity again with a new doc
 			displayLockedDoc();
-
 			return true;
 
-			// refresh the doc list
+		// refresh the doc list
 		case R.id.docList:
+			// release the lock since we are closing a doc for which 
+			// we likely hold the lock
+			releaseLock();
+			
+			// once we release the lock, go to the list view since this is what 
+			// the user requested
 			startActivity(new Intent(this, DocListView.class));
 			return true;
 
-			// save this doc
+		// save this doc
 		case R.id.saveDoc:
 			saveDoc();
 			return true;
@@ -142,15 +154,31 @@ public class LockedDocView extends Activity {
 	/**
 	 * Saves the current doc.
 	 */
-	public void saveDoc() {
+	private void saveDoc() {
 		UnlockedDocument doc = null;
+		
+		// set the title and contents of the doc we are trying to save
+		// to be what is in the text boxes at this moment (whatever the
+		// user input)
+		currDoc.setTitle(titleBox.getText().toString());
+		currDoc.setContents(contentBox.getText().toString());
 
 		try {
 			doc = service.saveDocument(currDoc);
 		} catch (LockExpired e) {
+			// alert the user that the save failed
+			Toast errorMsg = Toast.makeText(this, 
+					"Save failed - lock was expired.", Toast.LENGTH_SHORT);
+			errorMsg.show();
+			
 			Log.i(TAG, "Caught LockExpired when trying to save doc.");
 			displayLockedDoc();
 		} catch (InvalidRequest e) {
+			// alert the user that the save failed
+			Toast errorMsg = Toast.makeText(this, 
+					"Save failed - invalid request.", Toast.LENGTH_SHORT);
+			errorMsg.show();
+			
 			Log.i(TAG, "Caught InvalidRequest when trying to save doc.");
 			displayLockedDoc();
 		}
@@ -158,5 +186,32 @@ public class LockedDocView extends Activity {
 		// start a new unlockedDocView activity
 		startActivity(new Intent(this, UnlockedDocView.class).putExtra(
 				intentDataKey, doc.getKey()));
+	}
+	
+	/**
+	 * Release the lock for the current doc.
+	 */
+	private void releaseLock()
+	{
+		try 
+		{
+			service.releaseLock(currDoc);
+		} 
+		catch (LockExpired e) {
+			// alert the user that the release failed
+			Toast errorMsg = Toast.makeText(this, 
+					"Lock release failed - lock expired.", Toast.LENGTH_SHORT);
+			errorMsg.show();
+
+			Log.i(TAG, "Caught LockExpired when trying to release lock.");
+		} 
+		catch (InvalidRequest e) {
+			// alert the user that the release failed
+			Toast errorMsg = Toast.makeText(this, 
+					"Lock release failed - invalid request.", Toast.LENGTH_SHORT);
+			errorMsg.show();
+
+			Log.i(TAG, "Caught InvalidRequest when trying to release lock.");
+		}
 	}
 }
