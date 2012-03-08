@@ -413,6 +413,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		Document toSave;
 		Date endTime;
 
+		// TODO: REMOVE
+		// Client client = pm.getObjectById(Client.class, clientID);
+
 		Transaction t = pm.currentTransaction();
 		try {
 			// Starting transaction...
@@ -428,16 +431,17 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// Add key to locked documents (will only get added if it isn't
 			// already there)
 			pm.makePersistent(toSave);
-			t.commit();
-			
-			t = pm.currentTransaction();
+			// t.commit();
+			//
+			// t = pm.currentTransaction();
 			// add to locked documents and add to client ID
-			t.begin();
-			Client client = pm.getObjectById(Client.class, clientID);
-			client.addDoc(docKey);
-			addLockedDoc(docKey);
+			// t.begin();
 
-			pm.makePersistent(client);
+			// TODO: REMOVE
+
+			// client.addDoc(docKey);
+			// addLockedDoc(docKey);
+			// pm.makePersistent(client);
 
 			t.commit();
 
@@ -524,20 +528,20 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 *      (java.lang.String)
 	 */
 	@Override
-	public void lockDocument(String clientID, String documentKey) {
+	public void lockDocument(String clientID, String docKey) {
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Document toSave = null;
-
+		Client client = pm.getObjectById(Client.class, clientID);
 		Transaction t = pm.currentTransaction();
 
 		try {
 			// Starting transaction...
 			t.begin();
 			// Create the key
-			Key key = KeyFactory.stringToKey(documentKey);
+			Key key = KeyFactory.stringToKey(docKey);
 
 			// Get the document corresponding to the key
 			toSave = pm.getObjectById(Document.class, key);
@@ -546,6 +550,12 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				toSave.addToWaitingList(clientID);
 			}
 
+			// SHOULD BE THERE
+			client.addDoc(docKey);
+			addLockedDoc(docKey);
+
+			// SHOULD BE THERE
+			pm.makePersistent(client);
 			pm.makePersistent(toSave);
 
 			t.commit();
@@ -560,7 +570,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// UGH I have to put this here b/c sendToken can't go in a
 			// transaction >.> I'm sorry...
 			if (!toSave.isLocked()) {
-				sendToken(clientID, documentKey);
+				sendToken(clientID, docKey);
 			}
 		}
 	}
