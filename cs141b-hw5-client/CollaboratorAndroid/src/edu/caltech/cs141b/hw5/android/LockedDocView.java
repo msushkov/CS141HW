@@ -253,18 +253,33 @@ public class LockedDocView extends Activity {
 	 * @param doc
 	 */
 	private void saveComplete(UnlockedDocument doc) {
-		Log.i(TAG, "saved the doc");
+		if (doc == null) 
+		{
+			Log.i(TAG, "Error - save could not complete (server returned null).");
 
-		// inform the user that we saved the doc
-		Toast msg = Toast.makeText(this, "Document saved", Toast.LENGTH_SHORT);
-		msg.show();
+			// inform the user that the save failed
+			Toast msg = Toast.makeText(this, "Error - save could not complete " +
+					"(wrapper returned null).", Toast.LENGTH_SHORT);
+			msg.show();
 
-		if (doc == null) {
-			Log.i(TAG, "ZOMG WE HAZ NULL DOC!");
+			// start a new unlockedDocView activity that will display the doc that 
+			// we had before since the save operation failed
+			startActivity(new Intent(this, UnlockedDocView.class).putExtra(
+					intentDataKey, currDoc.getKey()));
 		}
-		// start a new unlockedDocView activity
-		startActivity(new Intent(this, UnlockedDocView.class).putExtra(
-				intentDataKey, doc.getKey()));
+		else
+		{
+			Log.i(TAG, "saved the doc");
+
+			// inform the user that we saved the doc
+			Toast msg = Toast.makeText(this, "Document saved", Toast.LENGTH_SHORT);
+			msg.show();
+
+			// start a new unlockedDocView activity that will display the doc 
+			// that was saved
+			startActivity(new Intent(this, UnlockedDocView.class).putExtra(
+					intentDataKey, doc.getKey()));
+		}
 	}
 
 	/**
