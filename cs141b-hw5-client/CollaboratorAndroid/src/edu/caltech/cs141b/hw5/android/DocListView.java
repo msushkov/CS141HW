@@ -33,8 +33,8 @@ public class DocListView extends ListActivity {
 	private static String intentDataKey = "doc";
 
 	// initial title + contents of new doc
-	private static String newDocTitle = "Enter the document title.";
-	private static String newDocContents = "Enter the document contents.";
+	private static String newDocTitle = "";
+	private static String newDocContents = "";
 
 	// makes server calls
 	private CollabServiceWrapper service;
@@ -81,8 +81,8 @@ public class DocListView extends ListActivity {
 				Log.i(TAG, "starting the unlocked doc activity");
 
 				// get the currently-selected doc
-				DocumentMetadata currDoc = (DocumentMetadata) lv
-						.getItemAtPosition(position);
+				DocumentMetadata currDoc = (DocumentMetadata) 
+						lv.getItemAtPosition(position);
 
 				// start the unlocked doc view activity to display
 				// this doc (use its id to make a datastore request)

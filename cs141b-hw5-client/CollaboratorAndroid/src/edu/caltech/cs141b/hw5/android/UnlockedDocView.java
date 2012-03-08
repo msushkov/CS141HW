@@ -41,7 +41,6 @@ public class UnlockedDocView extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		Log.d(TAG, "created the unlocked doc view activity");
 
 		service = new CollabServiceWrapper();
@@ -98,6 +97,8 @@ public class UnlockedDocView extends Activity {
 			// show the doc list on failure of the request
 			startActivity(new Intent(this, DocListView.class));
 		}
+		
+		Log.i(TAG, "got the unlocked doc from the server");
 
 		// display the doc
 		if (doc != null)
@@ -115,7 +116,6 @@ public class UnlockedDocView extends Activity {
 		Log.i(TAG, "displaying the unlocked doc");
 
 		if (doc != null) {
-			Log.i(TAG, "doc != null");
 			titleBox.setText(doc.getTitle());
 			contentBox.setText(doc.getContents());
 		} else
@@ -174,6 +174,8 @@ public class UnlockedDocView extends Activity {
 	 * Send the lock request to the server.
 	 */
 	public void lockDoc() {
+		Log.i(TAG, "starting to lock the doc");
+		
 		LockedDocument doc = null;
 
 		try {
@@ -202,6 +204,8 @@ public class UnlockedDocView extends Activity {
 			getUnlockedDoc();
 		}
 
+		Log.i(TAG, "locked the doc");
+		
 		// now that we got the lock for this doc, switch to locked view
 		startActivity(new Intent(this, LockedDocView.class).putExtra(
 				intentDataKey, doc));

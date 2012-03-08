@@ -97,6 +97,9 @@ public class LockedDocView extends Activity {
 			titleBox.setText(currDoc.getTitle());
 			contentBox.setText(currDoc.getContents());
 
+			// set the cursor to the end of the title text box
+			titleBox.setSelection(titleBox.getText().length());
+
 			Log.i(TAG, "currdoc != null");
 			Log.i(TAG, currDoc.getTitle());
 		} else
@@ -128,8 +131,11 @@ public class LockedDocView extends Activity {
 			// release the lock since we are closing the current doc for which
 			// we likely hold the lock and are starting a new one
 
-			// TODO FIX
-			// releaseLock();
+			// if we had a new doc open before, dont
+			// release the lock on the first new doc. only release the lock
+			// if the curr doc is not a new doc
+			if (isNewDoc())
+				releaseLock();
 
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
@@ -143,7 +149,12 @@ public class LockedDocView extends Activity {
 		case R.id.docList:
 			// release the lock since we are closing a doc for which
 			// we likely hold the lock
-			releaseLock();
+
+			// if we had a new doc open before, dont
+			// release the lock on the first new doc. only release the lock
+			// if the curr doc is not a new doc
+			if (isNewDoc())
+				releaseLock();
 
 			// once we release the lock, go to the list view since this is what
 			// the user requested
@@ -158,6 +169,16 @@ public class LockedDocView extends Activity {
 		default:
 			return true;
 		}
+	}
+
+	/**
+	 * Checks if currDoc is a new doc.
+	 * @return
+	 */
+	private boolean isNewDoc()
+	{
+		return (currDoc.getKey() != null && currDoc.getContents().equals(newDocTitle) &&
+				currDoc.getTitle().equals(newDocContents));
 	}
 
 	/**
@@ -201,8 +222,11 @@ public class LockedDocView extends Activity {
 	 * Release the lock for the current doc.
 	 */
 	private void releaseLock() {
+		Log.i(TAG, "trying to release the lock");
+
 		try {
 			service.releaseLock(currDoc);
+			Log.i(TAG, "released the lock");
 		} catch (LockExpired e) {
 			// alert the user that the release failed
 			Toast errorMsg = Toast.makeText(this,
