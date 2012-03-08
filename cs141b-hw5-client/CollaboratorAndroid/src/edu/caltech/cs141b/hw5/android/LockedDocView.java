@@ -1,6 +1,7 @@
 package edu.caltech.cs141b.hw5.android;
 
 import android.app.Activity;
+import android.app.PendingIntent.OnFinished;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,6 +34,9 @@ public class LockedDocView extends Activity {
 
 	// the current locked doc we are dealing with
 	private LockedDocument currDoc;
+	
+	//is the current doc a new doc?
+	private boolean isNewDoc;
 
 	// textboxes
 	private EditText titleBox;
@@ -88,6 +92,11 @@ public class LockedDocView extends Activity {
 			doc = (LockedDocument) extras.get(intentDataKey);
 
 		this.currDoc = doc;
+		
+		// is this doc a new doc? 
+		if (doc != null)
+			isNewDoc = doc.getKey() != null && doc.getContents().equals(newDocTitle) &&
+				doc.getTitle().equals(newDocContents);
 
 		Log.i(TAG, "extracted locked doc");
 	}
@@ -134,7 +143,7 @@ public class LockedDocView extends Activity {
 		case R.id.newDoc:
 			// if we had a new doc open before, dont release the lock on it since
 			// it hasnt been saved
-			if (!isNewDoc())
+			if (!isNewDoc)
 			{
 				// release lock since we are closing the current doc for which
 				// we likely hold the lock and are starting a new one
@@ -153,7 +162,7 @@ public class LockedDocView extends Activity {
 		case R.id.docList:
 			// if we had a new doc open before, dont release the lock on it since
 			// it hasnt been saved
-			if (!isNewDoc())
+			if (!isNewDoc)
 			{
 				// release lock since we are closing the current doc for which
 				// we likely hold the lock and are starting a new one
@@ -174,18 +183,18 @@ public class LockedDocView extends Activity {
 			return true;
 		}
 	}
-
+	
 	/**
-	 * Checks if currDoc is a new doc.
-	 * @return
+	 * Called when the user exits this view.
 	 */
-	private boolean isNewDoc()
-	{
-		if (currDoc != null)
-			return (currDoc.getKey() != null && currDoc.getContents().equals(newDocTitle) &&
-			currDoc.getTitle().equals(newDocContents));
-		else
-			return false;
+	@Override
+	public void finish() {
+		// user is leaving this view, so release the lock 
+		// of the current doc if it is not a new doc
+		if (!isNewDoc)
+			releaseLock();
+		
+		super.finish();
 	}
 
 	/**
@@ -271,7 +280,13 @@ public class LockedDocView extends Activity {
 			try {
 				service.releaseLock(currDoc);
 				Log.i(TAG, "released the lock");
-			} catch (LockExpired e) {
+				
+				// inform the user of the release
+				Toast errorMsg = Toast.makeText(this,
+						"Lock released.", Toast.LENGTH_SHORT);
+				errorMsg.show();
+			} 
+			catch (LockExpired e) {
 				// alert the user that the release failed
 				Toast errorMsg = Toast.makeText(this,
 						"Lock release failed - lock expired.", Toast.LENGTH_SHORT);
