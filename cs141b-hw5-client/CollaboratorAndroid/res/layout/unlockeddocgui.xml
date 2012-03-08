@@ -12,6 +12,7 @@
         android:editable="false"
         android:freezesText="true"
         android:inputType="none"
+        android:singleLine="true"
         android:textSize="30dp" />
 
     <EditText
@@ -22,7 +23,8 @@
         android:editable="false"
         android:freezesText="true"
         android:gravity="top"
-        android:inputType="none" >
+        android:inputType="none"
+        android:singleLine="false" >
 
         <requestFocus />
     </EditText>

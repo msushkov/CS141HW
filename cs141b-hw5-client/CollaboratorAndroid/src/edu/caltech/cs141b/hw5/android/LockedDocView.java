@@ -16,6 +16,7 @@ import edu.caltech.cs141b.hw5.android.data.UnlockedDocument;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
 public class LockedDocView extends Activity {
+	// implements OnClickListener, OnFocusChangeListener {
 
 	// debugging
 	private static String TAG = "LockedDocView";
@@ -24,8 +25,8 @@ public class LockedDocView extends Activity {
 	private static String intentDataKey = "doc";
 
 	// initial title + contents of new doc
-	private static String newDocTitle = "Enter the document title.";
-	private static String newDocContents = "Enter the document contents.";
+	private static String newDocTitle = "";
+	private static String newDocContents = "";
 
 	// makes server calls
 	private CollabServiceWrapper service;
@@ -36,6 +37,8 @@ public class LockedDocView extends Activity {
 	// textboxes
 	private EditText titleBox;
 	private EditText contentBox;
+
+	boolean newDocument = false;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -49,6 +52,11 @@ public class LockedDocView extends Activity {
 		setContentView(R.layout.lockeddocgui);
 		titleBox = (EditText) findViewById(R.id.title);
 		contentBox = (EditText) findViewById(R.id.content);
+
+		// titleBox.setOnClickListener(this);
+		// contentBox.setOnClickListener(this);
+		// titleBox.setOnFocusChangeListener(this);
+		// contentBox.setOnFocusChangeListener(this);
 
 		// sets the currDoc class variable
 		extractLockedDoc();
@@ -83,16 +91,15 @@ public class LockedDocView extends Activity {
 	private void displayLockedDoc() {
 
 		Log.i(TAG, "starting to display locked doc");
-		
+
 		if (currDoc != null) {
-			// display the title and contents 
+			// display the title and contents
 			titleBox.setText(currDoc.getTitle());
 			contentBox.setText(currDoc.getContents());
-			
+
 			Log.i(TAG, "currdoc != null");
 			Log.i(TAG, currDoc.getTitle());
-		} 
-		else
+		} else
 			Log.i(TAG, "currdoc = null");
 	}
 
@@ -118,10 +125,12 @@ public class LockedDocView extends Activity {
 
 		// create a new doc
 		case R.id.newDoc:
-			// release the lock since we are closing the current doc for which 
+			// release the lock since we are closing the current doc for which
 			// we likely hold the lock and are starting a new one
-			releaseLock();
-			
+
+			// TODO FIX
+			// releaseLock();
+
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
 			this.currDoc = newDoc;
@@ -130,18 +139,18 @@ public class LockedDocView extends Activity {
 			displayLockedDoc();
 			return true;
 
-		// refresh the doc list
+			// refresh the doc list
 		case R.id.docList:
-			// release the lock since we are closing a doc for which 
+			// release the lock since we are closing a doc for which
 			// we likely hold the lock
 			releaseLock();
-			
-			// once we release the lock, go to the list view since this is what 
+
+			// once we release the lock, go to the list view since this is what
 			// the user requested
 			startActivity(new Intent(this, DocListView.class));
 			return true;
 
-		// save this doc
+			// save this doc
 		case R.id.saveDoc:
 			saveDoc();
 			return true;
@@ -156,7 +165,7 @@ public class LockedDocView extends Activity {
 	 */
 	private void saveDoc() {
 		UnlockedDocument doc = null;
-		
+
 		// set the title and contents of the doc we are trying to save
 		// to be what is in the text boxes at this moment (whatever the
 		// user input)
@@ -167,18 +176,18 @@ public class LockedDocView extends Activity {
 			doc = service.saveDocument(currDoc);
 		} catch (LockExpired e) {
 			// alert the user that the save failed
-			Toast errorMsg = Toast.makeText(this, 
+			Toast errorMsg = Toast.makeText(this,
 					"Save failed - lock was expired.", Toast.LENGTH_SHORT);
 			errorMsg.show();
-			
+
 			Log.i(TAG, "Caught LockExpired when trying to save doc.");
 			displayLockedDoc();
 		} catch (InvalidRequest e) {
 			// alert the user that the save failed
-			Toast errorMsg = Toast.makeText(this, 
+			Toast errorMsg = Toast.makeText(this,
 					"Save failed - invalid request.", Toast.LENGTH_SHORT);
 			errorMsg.show();
-			
+
 			Log.i(TAG, "Caught InvalidRequest when trying to save doc.");
 			displayLockedDoc();
 		}
@@ -187,31 +196,77 @@ public class LockedDocView extends Activity {
 		startActivity(new Intent(this, UnlockedDocView.class).putExtra(
 				intentDataKey, doc.getKey()));
 	}
-	
+
 	/**
 	 * Release the lock for the current doc.
 	 */
-	private void releaseLock()
-	{
-		try 
-		{
+	private void releaseLock() {
+		try {
 			service.releaseLock(currDoc);
-		} 
-		catch (LockExpired e) {
+		} catch (LockExpired e) {
 			// alert the user that the release failed
-			Toast errorMsg = Toast.makeText(this, 
+			Toast errorMsg = Toast.makeText(this,
 					"Lock release failed - lock expired.", Toast.LENGTH_SHORT);
 			errorMsg.show();
 
 			Log.i(TAG, "Caught LockExpired when trying to release lock.");
-		} 
-		catch (InvalidRequest e) {
+		} catch (InvalidRequest e) {
 			// alert the user that the release failed
-			Toast errorMsg = Toast.makeText(this, 
-					"Lock release failed - invalid request.", Toast.LENGTH_SHORT);
+			Toast errorMsg = Toast.makeText(this,
+					"Lock release failed - invalid request.",
+					Toast.LENGTH_SHORT);
 			errorMsg.show();
 
 			Log.i(TAG, "Caught InvalidRequest when trying to release lock.");
 		}
 	}
+
+	// @Override
+	// public void onClick(View v) {
+	//
+	// switch (v.getId()) {
+	// case R.id.title:
+	// Log.i(TAG, "Title pressed");
+	//
+	// if (titleBox.getText().toString().equals(newDocTitle)) {
+	// titleBox.setText("");
+	//
+	// }
+	// break;
+	// case R.id.content:
+	// Log.i(TAG, "Content pressed");
+	// if (contentBox.getText().toString().equals(newDocContents)) {
+	// contentBox.setText("");
+	// }
+	// break;
+	// default:
+	// break;
+	// }
+	// }
+	//
+	// @Override
+	// public void onFocusChange(View v, boolean hasFocus) {
+	// // if (hasFocus) {
+	// // Log.i(TAG, "focusChange");
+	// // switch (v.getId()) {
+	// // case R.id.title:
+	// // Log.i(TAG, "Title pressed");
+	// //
+	// // if (titleBox.getText().toString().equals(newDocTitle)) {
+	// // titleBox.setText("");
+	// //
+	// // }
+	// // break;
+	// // case R.id.content:
+	// // Log.i(TAG, "Content pressed");
+	// // if (contentBox.getText().toString().equals(newDocContents)) {
+	// // contentBox.setText("");
+	// // }
+	// // break;
+	// // default:
+	// // break;
+	// // }
+	// // }
+	// }
+
 }

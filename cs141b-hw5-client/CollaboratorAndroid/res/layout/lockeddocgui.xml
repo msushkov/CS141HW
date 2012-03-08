@@ -4,11 +4,18 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:layout_width="0px"
+    android:layout_height="0px"/>
+
+
 
     <EditText
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:singleLine="true"
         android:textSize="30dp" />
 
     <EditText
@@ -17,9 +24,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.77"
         android:gravity="top"
-        android:inputType="textMultiLine" >
-
-        <requestFocus />
+        android:inputType="textMultiLine"
+        android:singleLine="false" >
     </EditText>
 
 </LinearLayout>

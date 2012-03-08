@@ -24,8 +24,8 @@ public class UnlockedDocView extends Activity {
 	private static String intentDataKey = "doc";
 
 	// initial title + contents of new doc
-	private static String newDocTitle = "Enter the document title.";
-	private static String newDocContents = "Enter the document contents.";
+	private static String newDocTitle = "";
+	private static String newDocContents = "";
 
 	// makes server calls
 	private CollabServiceWrapper service;
@@ -53,7 +53,7 @@ public class UnlockedDocView extends Activity {
 
 		// get the current doc's key (passed from another activity)
 		extractUnlockedDocKey();
-		
+
 		// get the unlocked doc with the current key from the server
 		getUnlockedDoc();
 	}
@@ -90,10 +90,11 @@ public class UnlockedDocView extends Activity {
 			Log.i(TAG, "Invalid request when getting doc.");
 
 			// alert the user that the get doc operation failed
-			Toast errorMsg = Toast.makeText(this, 
-					"Getting the doc failed - invalid request.", Toast.LENGTH_SHORT);
+			Toast errorMsg = Toast.makeText(this,
+					"Getting the doc failed - invalid request.",
+					Toast.LENGTH_SHORT);
 			errorMsg.show();
-			
+
 			// show the doc list on failure of the request
 			startActivity(new Intent(this, DocListView.class));
 		}
@@ -102,7 +103,7 @@ public class UnlockedDocView extends Activity {
 		if (doc != null)
 			displayUnlockedDoc(doc);
 		else
-			Log.i(TAG, "Server returned a null doc.");		
+			Log.i(TAG, "Server returned a null doc.");
 	}
 
 	/**
@@ -117,8 +118,7 @@ public class UnlockedDocView extends Activity {
 			Log.i(TAG, "doc != null");
 			titleBox.setText(doc.getTitle());
 			contentBox.setText(doc.getContents());
-		} 
-		else 
+		} else
 			Log.i(TAG, "doc = null");
 	}
 
@@ -155,12 +155,12 @@ public class UnlockedDocView extends Activity {
 					intentDataKey, newDoc.getKey()));
 			return true;
 
-		// refresh the doc list
+			// refresh the doc list
 		case R.id.docList:
 			startActivity(new Intent(this, DocListView.class));
 			return true;
 
-		// lock this doc
+			// lock this doc
 		case R.id.lockDoc:
 			lockDoc();
 			return true;
@@ -176,29 +176,28 @@ public class UnlockedDocView extends Activity {
 	public void lockDoc() {
 		LockedDocument doc = null;
 
-		try 
-		{
+		try {
 			doc = service.lockDocument(currDocKey);
-		} 
-		catch (LockUnavailable e) {
+		} catch (LockUnavailable e) {
 			Log.i(TAG, "Caught LockUnavailable when trying to lock the doc.");
-			
+
 			// alert the user that the lock doc operation failed
-			Toast errorMsg = Toast.makeText(this, 
-					"Getting the lock failed - lock unavailable.", Toast.LENGTH_SHORT);
+			Toast errorMsg = Toast.makeText(this,
+					"Getting the lock failed - lock unavailable.",
+					Toast.LENGTH_SHORT);
 			errorMsg.show();
-			
+
 			// show the unlocked doc again
 			getUnlockedDoc();
-		} 
-		catch (InvalidRequest e) {
+		} catch (InvalidRequest e) {
 			Log.i(TAG, "Caught InvalidRequest when tyring to lock doc.");
-			
+
 			// alert the user that the lock doc operation failed
-			Toast errorMsg = Toast.makeText(this, 
-					"Getting the lock failed - invalid request.", Toast.LENGTH_SHORT);
+			Toast errorMsg = Toast.makeText(this,
+					"Getting the lock failed - invalid request.",
+					Toast.LENGTH_SHORT);
 			errorMsg.show();
-			
+
 			// show the unlocked doc again
 			getUnlockedDoc();
 		}
