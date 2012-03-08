@@ -38,8 +38,6 @@ public class LockedDocView extends Activity {
 	private EditText titleBox;
 	private EditText contentBox;
 
-	boolean newDocument = false;
-
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -53,16 +51,25 @@ public class LockedDocView extends Activity {
 		titleBox = (EditText) findViewById(R.id.title);
 		contentBox = (EditText) findViewById(R.id.content);
 
-		// titleBox.setOnClickListener(this);
-		// contentBox.setOnClickListener(this);
-		// titleBox.setOnFocusChangeListener(this);
-		// contentBox.setOnFocusChangeListener(this);
-
 		// sets the currDoc class variable
 		extractLockedDoc();
 
 		// displays currDoc
-		displayLockedDoc();
+		if (currDoc != null)
+			displayLockedDoc();
+		else
+		{
+			Log.i(TAG, "Cannot display - doc is null.");
+
+			// inform the user that something went wrong
+			Toast errorMsg = Toast.makeText(this,
+					"Something went wrong - document is null.",
+					Toast.LENGTH_SHORT);
+			errorMsg.show();
+
+			// go back to list view
+			startActivity(new Intent(this, DocListView.class));
+		}
 	}
 
 	/**
@@ -89,21 +96,18 @@ public class LockedDocView extends Activity {
 	 * Display the locked doc.
 	 */
 	private void displayLockedDoc() {
+		// assumes currDoc is non-null
 
 		Log.i(TAG, "starting to display locked doc");
 
-		if (currDoc != null) {
-			// display the title and contents
-			titleBox.setText(currDoc.getTitle());
-			contentBox.setText(currDoc.getContents());
+		// display the title and contents
+		titleBox.setText(currDoc.getTitle());
+		contentBox.setText(currDoc.getContents());
 
-			// set the cursor to the end of the title text box
-			titleBox.setSelection(titleBox.getText().length());
+		// set the cursor to the end of the title text box
+		titleBox.setSelection(titleBox.getText().length());
 
-			Log.i(TAG, "currdoc != null");
-			Log.i(TAG, currDoc.getTitle());
-		} else
-			Log.i(TAG, "currdoc = null");
+		Log.i(TAG, currDoc.getTitle());
 	}
 
 	/**
@@ -128,14 +132,14 @@ public class LockedDocView extends Activity {
 
 		// create a new doc
 		case R.id.newDoc:
-			// release the lock since we are closing the current doc for which
-			// we likely hold the lock and are starting a new one
-
-			// if we had a new doc open before, dont
-			// release the lock on the first new doc. only release the lock
-			// if the curr doc is not a new doc
-			if (isNewDoc())
+			// if we had a new doc open before, dont release the lock on it since
+			// it hasnt been saved
+			if (!isNewDoc())
+			{
+				// release lock since we are closing the current doc for which
+				// we likely hold the lock and are starting a new one
 				releaseLock();
+			}
 
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
@@ -147,14 +151,14 @@ public class LockedDocView extends Activity {
 
 			// refresh the doc list
 		case R.id.docList:
-			// release the lock since we are closing a doc for which
-			// we likely hold the lock
-
-			// if we had a new doc open before, dont
-			// release the lock on the first new doc. only release the lock
-			// if the curr doc is not a new doc
-			if (isNewDoc())
+			// if we had a new doc open before, dont release the lock on it since
+			// it hasnt been saved
+			if (!isNewDoc())
+			{
+				// release lock since we are closing the current doc for which
+				// we likely hold the lock and are starting a new one
 				releaseLock();
+			}
 
 			// once we release the lock, go to the list view since this is what
 			// the user requested
@@ -177,8 +181,11 @@ public class LockedDocView extends Activity {
 	 */
 	private boolean isNewDoc()
 	{
-		return (currDoc.getKey() != null && currDoc.getContents().equals(newDocTitle) &&
-				currDoc.getTitle().equals(newDocContents));
+		if (currDoc != null)
+			return (currDoc.getKey() != null && currDoc.getContents().equals(newDocTitle) &&
+			currDoc.getTitle().equals(newDocContents));
+		else
+			return false;
 	}
 
 	/**
@@ -190,28 +197,63 @@ public class LockedDocView extends Activity {
 		// set the title and contents of the doc we are trying to save
 		// to be what is in the text boxes at this moment (whatever the
 		// user input)
-		currDoc.setTitle(titleBox.getText().toString());
-		currDoc.setContents(contentBox.getText().toString());
+		if (currDoc != null)
+		{
+			try {
+				// if the user made no changes to the doc
+				if (currDoc.getTitle().equals(titleBox.getText().toString()) && 
+						currDoc.getContents().equals(contentBox.getText().toString()))
+				{
+					Log.i(TAG, "no changes to the doc, so not saving");
 
-		try {
-			doc = service.saveDocument(currDoc);
-		} catch (LockExpired e) {
-			// alert the user that the save failed
-			Toast errorMsg = Toast.makeText(this,
-					"Save failed - lock was expired.", Toast.LENGTH_SHORT);
-			errorMsg.show();
+					// alert the user that we are not saving
+					Toast errorMsg = Toast.makeText(this,
+							"No document changes; not saving.", Toast.LENGTH_SHORT);
+					errorMsg.show();
+				}
+				else
+				{
+					// set the to-be-saved doc to have the msot 
+					// recent title and contents
+					currDoc.setTitle(titleBox.getText().toString());
+					currDoc.setContents(contentBox.getText().toString());
 
-			Log.i(TAG, "Caught LockExpired when trying to save doc.");
-			displayLockedDoc();
-		} catch (InvalidRequest e) {
-			// alert the user that the save failed
-			Toast errorMsg = Toast.makeText(this,
-					"Save failed - invalid request.", Toast.LENGTH_SHORT);
-			errorMsg.show();
+					doc = service.saveDocument(currDoc);
 
-			Log.i(TAG, "Caught InvalidRequest when trying to save doc.");
-			displayLockedDoc();
+					saveComplete(doc);
+				}
+			} catch (LockExpired e) {
+				// alert the user that the save failed
+				Toast errorMsg = Toast.makeText(this,
+						"Save failed - lock was expired.", Toast.LENGTH_SHORT);
+				errorMsg.show();
+
+				Log.i(TAG, "Caught LockExpired when trying to save doc.");
+				displayLockedDoc();
+			} catch (InvalidRequest e) {
+				// alert the user that the save failed
+				Toast errorMsg = Toast.makeText(this,
+						"Save failed - invalid request.", Toast.LENGTH_SHORT);
+				errorMsg.show();
+
+				Log.i(TAG, "Caught InvalidRequest when trying to save doc.");
+				displayLockedDoc();
+			}
 		}
+	}
+
+	/**
+	 * Called when the saveDoc operation completes successfully.
+	 * @param doc
+	 */
+	private void saveComplete(UnlockedDocument doc)
+	{
+		Log.i(TAG, "saved the doc");
+
+		// inform the user that we saved the doc
+		Toast msg = Toast.makeText(this, "Sucessfully saved the document.", 
+				Toast.LENGTH_SHORT);
+		msg.show();
 
 		// start a new unlockedDocView activity
 		startActivity(new Intent(this, UnlockedDocView.class).putExtra(
@@ -224,73 +266,27 @@ public class LockedDocView extends Activity {
 	private void releaseLock() {
 		Log.i(TAG, "trying to release the lock");
 
-		try {
-			service.releaseLock(currDoc);
-			Log.i(TAG, "released the lock");
-		} catch (LockExpired e) {
-			// alert the user that the release failed
-			Toast errorMsg = Toast.makeText(this,
-					"Lock release failed - lock expired.", Toast.LENGTH_SHORT);
-			errorMsg.show();
+		if (currDoc != null)
+		{
+			try {
+				service.releaseLock(currDoc);
+				Log.i(TAG, "released the lock");
+			} catch (LockExpired e) {
+				// alert the user that the release failed
+				Toast errorMsg = Toast.makeText(this,
+						"Lock release failed - lock expired.", Toast.LENGTH_SHORT);
+				errorMsg.show();
 
-			Log.i(TAG, "Caught LockExpired when trying to release lock.");
-		} catch (InvalidRequest e) {
-			// alert the user that the release failed
-			Toast errorMsg = Toast.makeText(this,
-					"Lock release failed - invalid request.",
-					Toast.LENGTH_SHORT);
-			errorMsg.show();
+				Log.i(TAG, "Caught LockExpired when trying to release lock.");
+			} catch (InvalidRequest e) {
+				// alert the user that the release failed
+				Toast errorMsg = Toast.makeText(this,
+						"Lock release failed - invalid request.",
+						Toast.LENGTH_SHORT);
+				errorMsg.show();
 
-			Log.i(TAG, "Caught InvalidRequest when trying to release lock.");
+				Log.i(TAG, "Caught InvalidRequest when trying to release lock.");
+			}
 		}
 	}
-
-	// @Override
-	// public void onClick(View v) {
-	//
-	// switch (v.getId()) {
-	// case R.id.title:
-	// Log.i(TAG, "Title pressed");
-	//
-	// if (titleBox.getText().toString().equals(newDocTitle)) {
-	// titleBox.setText("");
-	//
-	// }
-	// break;
-	// case R.id.content:
-	// Log.i(TAG, "Content pressed");
-	// if (contentBox.getText().toString().equals(newDocContents)) {
-	// contentBox.setText("");
-	// }
-	// break;
-	// default:
-	// break;
-	// }
-	// }
-	//
-	// @Override
-	// public void onFocusChange(View v, boolean hasFocus) {
-	// // if (hasFocus) {
-	// // Log.i(TAG, "focusChange");
-	// // switch (v.getId()) {
-	// // case R.id.title:
-	// // Log.i(TAG, "Title pressed");
-	// //
-	// // if (titleBox.getText().toString().equals(newDocTitle)) {
-	// // titleBox.setText("");
-	// //
-	// // }
-	// // break;
-	// // case R.id.content:
-	// // Log.i(TAG, "Content pressed");
-	// // if (contentBox.getText().toString().equals(newDocContents)) {
-	// // contentBox.setText("");
-	// // }
-	// // break;
-	// // default:
-	// // break;
-	// // }
-	// // }
-	// }
-
 }

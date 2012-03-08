@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 import edu.caltech.cs141b.hw5.android.data.DocumentMetadata;
 import edu.caltech.cs141b.hw5.android.data.LockedDocument;
 import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
@@ -69,7 +70,18 @@ public class DocListView extends ListActivity {
 					android.R.layout.simple_list_item_1, docs));
 		}
 		else
+		{
 			Log.i(TAG, "doc list is null");
+			
+			// inform the user that the doc list is null
+			Toast msg = Toast.makeText(this, "Error - server returned a null document list.", 
+					Toast.LENGTH_SHORT);
+			msg.show();
+			
+			// try again
+			getDocList();
+			return;
+		}
 
 		final ListView lv = getListView();
 		lv.setTextFilterEnabled(true);
