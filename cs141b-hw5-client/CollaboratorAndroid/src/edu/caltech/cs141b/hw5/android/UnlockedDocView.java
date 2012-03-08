@@ -56,14 +56,12 @@ public class UnlockedDocView extends Activity {
 		// get the unlocked doc with the current key from the server
 		if (currDocKey != null)
 			getUnlockedDoc();
-		else
-		{
+		else {
 			Log.i(TAG, "doc key is null.");
 
 			// inform the user that something went wrong
 			Toast errorMsg = Toast.makeText(this,
-					"Error - document key is null.",
-					Toast.LENGTH_SHORT);
+					"Error - document key is null.", Toast.LENGTH_SHORT);
 			errorMsg.show();
 
 			// go back to list view
@@ -116,8 +114,7 @@ public class UnlockedDocView extends Activity {
 		// display the doc
 		if (doc != null)
 			displayUnlockedDoc(doc);
-		else
-		{
+		else {
 			Log.i(TAG, "Error - server returned a null doc.");
 
 			// inform the user that something went wrong
@@ -204,8 +201,7 @@ public class UnlockedDocView extends Activity {
 			Log.i(TAG, "locked the doc");
 
 			lockComplete(doc);
-		}
-		catch (LockUnavailable e) {
+		} catch (LockUnavailable e) {
 			Log.i(TAG, "Caught LockUnavailable when trying to lock the doc.");
 
 			// alert the user that the lock doc operation failed
@@ -232,13 +228,12 @@ public class UnlockedDocView extends Activity {
 
 	/**
 	 * Called when the lockDoc operation successfully finishes.
+	 * 
 	 * @param doc
 	 */
-	private void lockComplete(LockedDocument doc)
-	{
+	private void lockComplete(LockedDocument doc) {
 		// inform the user that we locked the doc
-		Toast msg = Toast.makeText(this, "Sucessfully locked the document.", 
-				Toast.LENGTH_SHORT);
+		Toast msg = Toast.makeText(this, "Document locked", Toast.LENGTH_SHORT);
 		msg.show();
 
 		// now that we got the lock for this doc, switch to locked view
