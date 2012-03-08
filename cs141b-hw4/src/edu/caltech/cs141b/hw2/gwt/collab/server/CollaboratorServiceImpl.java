@@ -500,10 +500,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				pm.makePersistent(toSave);
 
 			} else {
-				if (!toSave.removeClient(clientID)) {
-					// Otherwise, throw an exception
-					throw new LockExpired("You no longer have the lock");
-				}
+				// Otherwise, throw an exception
+				throw new LockExpired("You no longer have the lock");
+
 			}
 
 			// ...Ending transaction

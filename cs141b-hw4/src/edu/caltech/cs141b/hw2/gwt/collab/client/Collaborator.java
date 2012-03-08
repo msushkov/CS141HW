@@ -396,7 +396,7 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// refresh document list on login
 		lister.getDocumentList();
-		
+
 		Window.addWindowClosingHandler(new ClosingHandler() {
 
 			@Override
@@ -1072,9 +1072,12 @@ public class Collaborator extends Composite implements ClickHandler {
 
 		// remove this client from the server's waiting queue associated
 		// with this doc
-		if (currDoc.getKey() != null && currDoc instanceof LockedDocument) {
-			closer.removeFromServerQueue(currDoc.getKey());
-			releaser.releaseLock((LockedDocument) currDoc);
+		if (currDoc.getKey() != null) {
+			if (currDoc instanceof LockedDocument) {
+				releaser.releaseLock((LockedDocument) currDoc);
+			} else if (currDoc instanceof UnlockedDocument) {
+				closer.removeFromServerQueue(currDoc.getKey());
+			}
 		}
 
 		// do some cleanup

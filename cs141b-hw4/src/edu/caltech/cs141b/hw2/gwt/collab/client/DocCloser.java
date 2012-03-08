@@ -37,7 +37,8 @@ public class DocCloser implements AsyncCallback<Void> {
 
 	@Override
 	public void onSuccess(Void result) {
-		// Do nothing...
+		collaborator.statusUpdate("Removed from queue");
+		
 	}
 
 }
