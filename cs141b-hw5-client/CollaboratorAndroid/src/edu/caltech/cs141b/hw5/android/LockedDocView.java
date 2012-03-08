@@ -259,6 +259,9 @@ public class LockedDocView extends Activity {
 		Toast msg = Toast.makeText(this, "Document saved", Toast.LENGTH_SHORT);
 		msg.show();
 
+		if (doc == null) {
+			Log.i(TAG, "ZOMG WE HAZ NULL DOC!");
+		}
 		// start a new unlockedDocView activity
 		startActivity(new Intent(this, UnlockedDocView.class).putExtra(
 				intentDataKey, doc.getKey()));
