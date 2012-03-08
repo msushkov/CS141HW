@@ -15,6 +15,8 @@
         android:singleLine="true"
         android:textSize="30dp" />
 
+    <requestFocus />
+
     <EditText
         android:id="@+id/content"
         android:layout_width="match_parent"
@@ -25,8 +27,6 @@
         android:gravity="top"
         android:inputType="none"
         android:singleLine="false" >
-
-        <requestFocus />
     </EditText>
 
 </LinearLayout>
