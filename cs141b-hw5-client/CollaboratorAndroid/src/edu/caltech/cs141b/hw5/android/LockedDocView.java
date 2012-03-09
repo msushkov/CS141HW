@@ -328,4 +328,12 @@ public class LockedDocView extends Activity {
 			}
 		}
 	}
+
+	@Override
+	public void onBackPressed() {
+		// if the back button is pressed quit the lock view -> unlocked view.
+		finish();
+		super.onBackPressed();
+	}
+
 }
