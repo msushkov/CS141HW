@@ -227,34 +227,36 @@ public class LockedDocView extends Activity {
 					else {
 						Log.i(TAG,
 								"Error - save could not complete (server returned null).");
+						throw new LockExpired();
 
-						// inform the user that the save failed
-						Toast msg = Toast.makeText(this,
-								"Save failed. Lock expired", Toast.LENGTH_LONG);
-						msg.show();
-
-						// start a new unlockedDocView activity that will
-						// display the doc that
-						// we had before since the save operation failed
-
-						String docKey = currDoc.getKey();
-
-						// set currDoc to null as to not release the lock when
-						// this activity terminates
-						saveFailed = true;
-						startActivity(new Intent(this, UnlockedDocView.class)
-								.putExtra(intentDataKey, docKey));
 					}
 
 				}
 			} catch (LockExpired e) {
+				Log.i(TAG, "Caught LockExpired when trying to save doc.");
+
 				// alert the user that the save failed
 				Toast errorMsg = Toast.makeText(this,
 						"Save failed - lock was expired.", Toast.LENGTH_SHORT);
 				errorMsg.show();
 
-				Log.i(TAG, "Caught LockExpired when trying to save doc.");
-				displayLockedDoc();
+				// inform the user that the save failed
+				Toast msg = Toast.makeText(this, "Save failed. Lock expired",
+						Toast.LENGTH_LONG);
+				msg.show();
+
+				// start a new unlockedDocView activity that will
+				// display the doc that
+				// we had before since the save operation failed
+
+				String docKey = currDoc.getKey();
+
+				// set currDoc to null as to not release the lock when
+				// this activity terminates
+				saveFailed = true;
+				startActivity(new Intent(this, UnlockedDocView.class).putExtra(
+						intentDataKey, docKey));
+
 			} catch (InvalidRequest e) {
 				// alert the user that the save failed
 				Toast errorMsg = Toast.makeText(this,
