@@ -182,6 +182,11 @@ public class UnlockedDocView extends Activity {
 		case R.id.lockDoc:
 			lockDoc();
 			return true;
+			
+			// refresh this doc
+		case R.id.refresh:
+			getUnlockedDoc();
+			return true;
 
 		default:
 			return true;
