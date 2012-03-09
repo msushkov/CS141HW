@@ -38,6 +38,8 @@ public class LockedDocView extends Activity {
 	private EditText titleBox;
 	private EditText contentBox;
 
+	private boolean saveFailed = false;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -181,7 +183,7 @@ public class LockedDocView extends Activity {
 		Log.i(TAG, "quitting!");
 		// user is leaving this view, so release the lock
 		// of the current doc if it is not a new doc
-		if (currDoc.getKey() != null) {
+		if (!saveFailed && currDoc.getKey() != null) {
 			Log.i(TAG, "doc here should not be a new doc");
 			releaseLock();
 		}
@@ -219,7 +221,31 @@ public class LockedDocView extends Activity {
 
 					doc = service.saveDocument(currDoc);
 
-					saveComplete(doc);
+					// save if successful
+					if (doc != null)
+						saveComplete(doc);
+					else {
+						Log.i(TAG,
+								"Error - save could not complete (server returned null).");
+
+						// inform the user that the save failed
+						Toast msg = Toast.makeText(this,
+								"Save failed. Lock expired", Toast.LENGTH_LONG);
+						msg.show();
+
+						// start a new unlockedDocView activity that will
+						// display the doc that
+						// we had before since the save operation failed
+
+						String docKey = currDoc.getKey();
+
+						// set currDoc to null as to not release the lock when
+						// this activity terminates
+						saveFailed = true;
+						startActivity(new Intent(this, UnlockedDocView.class)
+								.putExtra(intentDataKey, docKey));
+					}
+
 				}
 			} catch (LockExpired e) {
 				// alert the user that the save failed
@@ -253,33 +279,17 @@ public class LockedDocView extends Activity {
 	 * @param doc
 	 */
 	private void saveComplete(UnlockedDocument doc) {
-		if (doc == null) 
-		{
-			Log.i(TAG, "Error - save could not complete (server returned null).");
+		Log.i(TAG, "saved the doc");
 
-			// inform the user that the save failed
-			Toast msg = Toast.makeText(this, "Error - save could not complete " +
-					"(wrapper returned null).", Toast.LENGTH_SHORT);
-			msg.show();
+		// inform the user that we saved the doc
+		Toast msg = Toast.makeText(this, "Document saved", Toast.LENGTH_SHORT);
+		msg.show();
 
-			// start a new unlockedDocView activity that will display the doc that 
-			// we had before since the save operation failed
-			startActivity(new Intent(this, UnlockedDocView.class).putExtra(
-					intentDataKey, currDoc.getKey()));
-		}
-		else
-		{
-			Log.i(TAG, "saved the doc");
+		// start a new unlockedDocView activity that will display the doc
+		// that was saved
+		startActivity(new Intent(this, UnlockedDocView.class).putExtra(
+				intentDataKey, doc.getKey()));
 
-			// inform the user that we saved the doc
-			Toast msg = Toast.makeText(this, "Document saved", Toast.LENGTH_SHORT);
-			msg.show();
-
-			// start a new unlockedDocView activity that will display the doc 
-			// that was saved
-			startActivity(new Intent(this, UnlockedDocView.class).putExtra(
-					intentDataKey, doc.getKey()));
-		}
 	}
 
 	/**
