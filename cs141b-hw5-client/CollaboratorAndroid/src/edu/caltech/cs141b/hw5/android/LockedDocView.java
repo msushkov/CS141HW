@@ -38,6 +38,8 @@ public class LockedDocView extends Activity {
 	private EditText titleBox;
 	private EditText contentBox;
 
+	private boolean srcBack = false;
+
 	private boolean saveFailed = false;
 
 	/** Called when the activity is first created. */
@@ -271,7 +273,9 @@ public class LockedDocView extends Activity {
 
 	@Override
 	protected void onPause() {
-		finish();
+		if (!srcBack) {
+			finish();
+		}
 		super.onPause();
 	}
 
@@ -329,10 +333,9 @@ public class LockedDocView extends Activity {
 		}
 	}
 
-	@Override
+	// @Override
 	public void onBackPressed() {
-		// if the back button is pressed quit the lock view -> unlocked view.
-		finish();
+		srcBack = true;
 		super.onBackPressed();
 	}
 
