@@ -65,7 +65,7 @@ public class UnlockedDocView extends Activity {
 			errorMsg.show();
 
 			// go back to list view
-			startActivity(new Intent(this, CollaboratorAndroidActivity.class));
+			startActivity(new Intent(this, DocListView.class));
 		}
 	}
 
@@ -108,7 +108,7 @@ public class UnlockedDocView extends Activity {
 			errorMsg.show();
 
 			// show the doc list on failure of the request
-			startActivity(new Intent(this, CollaboratorAndroidActivity.class));
+			startActivity(new Intent(this, DocListView.class));
 		}
 
 		// display the doc
@@ -124,7 +124,7 @@ public class UnlockedDocView extends Activity {
 			errorMsg.show();
 
 			// go back to list view
-			startActivity(new Intent(this, CollaboratorAndroidActivity.class));
+			startActivity(new Intent(this, DocListView.class));
 		}
 	}
 
@@ -175,14 +175,14 @@ public class UnlockedDocView extends Activity {
 
 			// refresh the doc list
 		case R.id.docList:
-			startActivity(new Intent(this, CollaboratorAndroidActivity.class));
+			startActivity(new Intent(this, DocListView.class));
 			return true;
 
 			// lock this doc
 		case R.id.lockDoc:
 			lockDoc();
 			return true;
-			
+
 			// refresh this doc
 		case R.id.refresh:
 			getUnlockedDoc();
@@ -246,11 +246,11 @@ public class UnlockedDocView extends Activity {
 				intentDataKey, doc));
 	}
 
-	@Override
-	public void onBackPressed() {
-		// go back to list view
-		startActivity(new Intent(this, CollaboratorAndroidActivity.class));
-		super.onBackPressed();
-	}
+	// @Override
+	// public void onBackPressed() {
+	// // go back to list view
+	// startActivity(new Intent(this, DocListView.class));
+	// super.onBackPressed();
+	// }
 
 }

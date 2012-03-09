@@ -69,7 +69,7 @@ public class LockedDocView extends Activity {
 			errorMsg.show();
 
 			// go back to list view
-			startActivity(new Intent(this, CollaboratorAndroidActivity.class));
+			startActivity(new Intent(this, DocListView.class));
 		}
 	}
 
@@ -162,7 +162,7 @@ public class LockedDocView extends Activity {
 
 			// once we release the lock, go to the list view since this is what
 			// the user requested
-			startActivity(new Intent(this, CollaboratorAndroidActivity.class));
+			startActivity(new Intent(this, DocListView.class));
 			return true;
 
 			// save this doc
