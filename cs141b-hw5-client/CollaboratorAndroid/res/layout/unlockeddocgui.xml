@@ -13,7 +13,8 @@
         android:freezesText="true"
         android:inputType="none"
         android:singleLine="true"
-        android:textSize="30dp" />
+        android:textSize="30dp"
+        android:enabled="false" />
 
     <requestFocus />
 
@@ -26,7 +27,8 @@
         android:freezesText="true"
         android:gravity="top"
         android:inputType="none"
-        android:singleLine="false" >
+        android:singleLine="false"
+        android:enabled="false" >
     </EditText>
 
 </LinearLayout>
