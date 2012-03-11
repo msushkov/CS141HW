@@ -1,8 +1,13 @@
 package edu.caltech.cs141b.hw5.android;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +22,9 @@ import edu.caltech.cs141b.hw5.android.proto.CollabServiceWrapper;
 
 public class LockedDocView extends Activity {
 	// implements OnClickListener, OnFocusChangeListener {
+
+	// Time in ms a lock has
+	private final static int LOCK_TIME = 30000;
 
 	// debugging
 	private static String TAG = "LockedDocView";
@@ -38,6 +46,9 @@ public class LockedDocView extends Activity {
 	private EditText titleBox;
 	private EditText contentBox;
 
+	private Timer lockedTimer = new Timer();
+
+	// Boolean indicating if the button pressed was back
 	private boolean srcBack = false;
 
 	private boolean saveFailed = false;
@@ -46,7 +57,6 @@ public class LockedDocView extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		Log.d(TAG, "created the locked doc view activity");
 
 		service = new CollabServiceWrapper();
@@ -59,9 +69,28 @@ public class LockedDocView extends Activity {
 		extractLockedDoc();
 
 		// displays currDoc
-		if (currDoc != null)
+		if (currDoc != null) {
 			displayLockedDoc();
-		else {
+
+			lockedTimer.schedule(new TimerTask() {
+				private Handler updateUI = new Handler() {
+					@Override
+					public void dispatchMessage(Message msg) {
+						super.dispatchMessage(msg);
+						displayExpired();
+					}
+				};
+
+				public void run() {
+					try {
+						updateUI.sendEmptyMessage(0);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}, LOCK_TIME);
+
+		} else {
 			Log.i(TAG, "Cannot display - doc is null.");
 
 			// inform the user that something went wrong
@@ -93,6 +122,13 @@ public class LockedDocView extends Activity {
 		this.currDoc = doc;
 
 		Log.i(TAG, "extracted locked doc");
+	}
+
+	private void displayExpired() {
+		// expired toast
+		Toast expiredMsg = Toast.makeText(LockedDocView.this, "Lock expired!",
+				Toast.LENGTH_SHORT);
+		expiredMsg.show();
 	}
 
 	/**
@@ -183,6 +219,9 @@ public class LockedDocView extends Activity {
 	@Override
 	public void finish() {
 		Log.i(TAG, "quitting!");
+		// Cancel the lock expired toast
+		lockedTimer.cancel();
+
 		// user is leaving this view, so release the lock
 		// of the current doc if it is not a new doc
 		if (!saveFailed && currDoc.getKey() != null) {
@@ -333,7 +372,7 @@ public class LockedDocView extends Activity {
 		}
 	}
 
-	// @Override
+	@Override
 	public void onBackPressed() {
 		srcBack = true;
 		super.onBackPressed();

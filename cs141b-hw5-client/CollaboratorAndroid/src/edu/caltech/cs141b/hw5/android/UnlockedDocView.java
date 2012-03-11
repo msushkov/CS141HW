@@ -246,11 +246,11 @@ public class UnlockedDocView extends Activity {
 				intentDataKey, doc));
 	}
 
-	// @Override
-	// public void onBackPressed() {
-	// // go back to list view
-	// startActivity(new Intent(this, DocListView.class));
-	// super.onBackPressed();
-	// }
+	@Override
+	public void onBackPressed() {
+		// go back to list view
+		startActivity(new Intent(this, DocListView.class));
+		super.onBackPressed();
+	}
 
 }
