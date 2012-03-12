@@ -16,7 +16,6 @@
         android:textSize="30dp"
         android:enabled="false" />
 
-    <requestFocus />
 
     <EditText
         android:id="@+id/content"

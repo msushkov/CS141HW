@@ -117,9 +117,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				}
 			}
 
-			// Lock the document for 30 seconds for the user whose IP was
+			// Lock the document for 120 seconds for the user whose IP was
 			// provided
-			toSave.lock(new Date(System.currentTimeMillis() + 90000L), ip);
+			toSave.lock(new Date(System.currentTimeMillis() + 120000L), ip);
 
 			// Write this to the Datastore
 			pm.makePersistent(toSave);
