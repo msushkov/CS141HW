@@ -87,6 +87,9 @@ public class LockedDocView extends Activity {
 			// do not start a timer if we have a new doc
 			if (!isNewDoc)
 			{
+				Toast.makeText(this, "Can edit the doc for the next " + LOCK_TIME / 1000 + 
+						" seconds.", Toast.LENGTH_SHORT).show();
+				
 				lockedTimer.schedule(new TimerTask() {
 					private Handler updateUI = new Handler() {
 						@Override
