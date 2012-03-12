@@ -190,13 +190,16 @@ public class LockedDocView extends Activity {
 		// which button did the user press?
 		switch (item.getItemId()) {
 		// create a new doc
-		case R.id.newDoc:
+		case R.id.newDoc:		
 			// if we had a new doc open before, dont release the lock on it
 			// since it hasnt been saved
 			if (currDoc.getKey() != null) {
 				// release lock since we are closing the current doc for which
 				// we likely hold the lock and are starting a new one
 				releaseLock();
+				
+				// cancel the timer
+				lockedTimer.cancel();
 			}
 
 			LockedDocument newDoc = new LockedDocument(null, null, null,
@@ -290,7 +293,7 @@ public class LockedDocView extends Activity {
 				Log.i(TAG, "Caught LockExpired when trying to save doc.");
 
 				// inform the user that the save failed
-				Toast msg = Toast.makeText(this, "Save failed. Lock expired",
+				Toast msg = Toast.makeText(this, "Save failed - lock expired.",
 						Toast.LENGTH_LONG);
 				msg.show();
 
