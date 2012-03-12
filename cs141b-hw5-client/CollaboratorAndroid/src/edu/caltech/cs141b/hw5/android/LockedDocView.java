@@ -32,6 +32,10 @@ public class LockedDocView extends Activity {
 	// the key that identifies the doc that is passed between activities
 	private static String intentDataKey = "doc";
 
+	// the key that identifies the isStartup boolean that is passed
+	// to the list view activity
+	private static String boolKey = "isStartup";
+
 	// initial title + contents of new doc
 	private static String newDocTitle = "";
 	private static String newDocContents = "";
@@ -99,8 +103,10 @@ public class LockedDocView extends Activity {
 					Toast.LENGTH_SHORT);
 			errorMsg.show();
 
-			// go back to list view
-			startActivity(new Intent(this, DocListView.class));
+			// go back to list view (pass it false to show that this is not
+			// startup)
+			startActivity((new Intent(this, DocListView.class)).
+					putExtra(boolKey, false));
 		}
 	}
 
@@ -199,8 +205,9 @@ public class LockedDocView extends Activity {
 			}
 
 			// once we release the lock, go to the list view since this is what
-			// the user requested
-			startActivity(new Intent(this, DocListView.class));
+			// the user requested (pass it false to say that this is not startup
+			startActivity((new Intent(this, DocListView.class)).
+					putExtra(boolKey, false));
 			return true;
 
 			// save this doc

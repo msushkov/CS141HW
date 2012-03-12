@@ -23,6 +23,10 @@ public class UnlockedDocView extends Activity {
 	// the key that identifies the doc that is passed between activities
 	private static String intentDataKey = "doc";
 
+	// the key that identifies the isStartup boolean that is passed
+	// to the list view activity
+	private static String boolKey = "isStartup";
+
 	// initial title + contents of new doc
 	private static String newDocTitle = "";
 	private static String newDocContents = "";
@@ -64,8 +68,10 @@ public class UnlockedDocView extends Activity {
 					"Error - document key is null.", Toast.LENGTH_SHORT);
 			errorMsg.show();
 
-			// go back to list view
-			startActivity(new Intent(this, DocListView.class));
+			// go back to list view (pass it false to show that this is not
+			// startup)
+			startActivity((new Intent(this, DocListView.class)).
+					putExtra(boolKey, false));
 		}
 	}
 
@@ -108,7 +114,9 @@ public class UnlockedDocView extends Activity {
 			errorMsg.show();
 
 			// show the doc list on failure of the request
-			startActivity(new Intent(this, DocListView.class));
+			// (pass it false to show that this is not startup)
+			startActivity((new Intent(this, DocListView.class)).
+					putExtra(boolKey, false));
 		}
 
 		// display the doc
@@ -124,7 +132,9 @@ public class UnlockedDocView extends Activity {
 			errorMsg.show();
 
 			// go back to list view
-			startActivity(new Intent(this, DocListView.class));
+			// (pass it false to show that this is not startup)
+			startActivity((new Intent(this, DocListView.class)).
+					putExtra(boolKey, false));
 		}
 	}
 
@@ -175,7 +185,9 @@ public class UnlockedDocView extends Activity {
 
 			// refresh the doc list
 		case R.id.docList:
-			startActivity(new Intent(this, DocListView.class));
+			// (pass it false to show that this is not startup)
+			startActivity((new Intent(this, DocListView.class)).
+					putExtra(boolKey, false));
 			return true;
 
 			// lock this doc
@@ -249,7 +261,9 @@ public class UnlockedDocView extends Activity {
 	@Override
 	public void onBackPressed() {
 		// go back to list view
-		startActivity(new Intent(this, DocListView.class));
+		// (pass it false to say that this is not startup)
+		startActivity((new Intent(this, DocListView.class)).
+				putExtra(boolKey, false));
 		super.onBackPressed();
 	}
 

@@ -33,6 +33,10 @@ public class DocListView extends ListActivity {
 	// the key that identifies the doc that is passed between activities
 	private static String intentDataKey = "doc";
 
+	// the key that identifies the isStartup boolean that is passed
+	// to the list view activity
+	private static String boolKey = "isStartup";
+
 	// initial title + contents of new doc
 	private static String newDocTitle = "";
 	private static String newDocContents = "";
@@ -45,6 +49,20 @@ public class DocListView extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.d(TAG, "created the doc list view activity");
+
+		// is this the very
+		boolean isStartup = true;
+		Bundle extras = getIntent().getExtras();
+
+		if (extras == null || extras.getBoolean(boolKey))
+		{
+			// display message to the user saying to press menu key 
+			// inform the user that something went wrong
+			Toast msg = Toast.makeText(this, "Press MENU for more features!",
+					Toast.LENGTH_LONG);
+			msg.show();
+		}
+
 		service = new CollabServiceWrapper();
 		getDocList();
 	}
@@ -72,12 +90,12 @@ public class DocListView extends ListActivity {
 		else
 		{
 			Log.i(TAG, "doc list is null");
-			
+
 			// inform the user that the doc list is null
 			Toast msg = Toast.makeText(this, "Error - server returned a null document list.", 
 					Toast.LENGTH_SHORT);
 			msg.show();
-			
+
 			// try again
 			getDocList();
 			return;
@@ -100,7 +118,7 @@ public class DocListView extends ListActivity {
 				// this doc (use its id to make a datastore request)
 				startActivity(new Intent(DocListView.this,
 						UnlockedDocView.class).putExtra(intentDataKey,
-						currDoc.getKey()));
+								currDoc.getKey()));
 			}
 		});
 	}
@@ -135,7 +153,7 @@ public class DocListView extends ListActivity {
 					intentDataKey, newDoc));
 			return true;
 
-		// refresh is pressed
+			// refresh is pressed
 		case R.id.refreshList:
 			getDocList();
 			return true;
