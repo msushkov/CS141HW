@@ -56,11 +56,14 @@ public class LockedDocView extends Activity {
 	// Boolean indicating if the button pressed was back
 	private boolean srcBack = false;
 
-	// Indicates it save doc operation failed
-	private boolean saveFailed = false;
+	// Indicates it save doc operation failed because of lock expired.
+	private boolean isLockExpired = false;
 
 	// Is the current doc a new doc?
 	private boolean isNewDoc;
+
+	// Did we just save the doc?
+	private boolean isSaved = false;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -89,6 +92,8 @@ public class LockedDocView extends Activity {
 						@Override
 						public void dispatchMessage(Message msg) {
 							super.dispatchMessage(msg);
+							
+							isLockExpired = true;
 							displayExpired();
 						}
 					};
@@ -190,13 +195,16 @@ public class LockedDocView extends Activity {
 		// which button did the user press?
 		switch (item.getItemId()) {
 		// create a new doc
-		case R.id.newDoc:
+		case R.id.newDoc:		
 			// if we had a new doc open before, dont release the lock on it
 			// since it hasnt been saved
 			if (currDoc.getKey() != null) {
 				// release lock since we are closing the current doc for which
 				// we likely hold the lock and are starting a new one
 				releaseLock();
+
+				// cancel the timer
+				lockedTimer.cancel();
 			}
 
 			LockedDocument newDoc = new LockedDocument(null, null, null,
@@ -232,15 +240,14 @@ public class LockedDocView extends Activity {
 	@Override
 	public void finish() {
 		Log.i(TAG, "quitting!");
-		// Cancel the lock expired toast
+
+		// Cancel the timer
 		lockedTimer.cancel();
 
 		// user is leaving this view, so release the lock
 		// of the current doc if it is not a new doc
-		if (!saveFailed && currDoc.getKey() != null) {
-			Log.i(TAG, "doc here should not be a new doc");
+		if (currDoc.getKey() != null && !isSaved) 
 			releaseLock();
-		}
 
 		super.finish();
 	}
@@ -273,61 +280,56 @@ public class LockedDocView extends Activity {
 					currDoc.setTitle(titleBox.getText().toString());
 					currDoc.setContents(contentBox.getText().toString());
 
+					// make the server call to save this doc
 					doc = service.saveDocument(currDoc);
 
 					// save if successful
 					if (doc != null)
 						saveComplete(doc);
 					else {
-						Log.i(TAG,
-								"Error - save could not complete (server returned null).");
+						Log.i(TAG, "Error - save could not complete " +
+								"(server returned null).");
 						throw new LockExpired();
-
 					}
-
 				}
 			} catch (LockExpired e) {
 				Log.i(TAG, "Caught LockExpired when trying to save doc.");
 
-				// alert the user that the save failed
-				Toast errorMsg = Toast.makeText(this,
-						"Save failed - lock was expired.", Toast.LENGTH_SHORT);
-				errorMsg.show();
+				isLockExpired = true;
 
 				// inform the user that the save failed
-				Toast msg = Toast.makeText(this, "Save failed. Lock expired",
+				Toast msg = Toast.makeText(this, "Save failed - lock expired.",
 						Toast.LENGTH_LONG);
 				msg.show();
 
 				// start a new unlockedDocView activity that will
 				// display the doc that
 				// we had before since the save operation failed
-
-				String docKey = currDoc.getKey();
-
-				// set currDoc to null as to not release the lock when
-				// this activity terminates
-				saveFailed = true;
 				startActivity(new Intent(this, UnlockedDocView.class).putExtra(
-						intentDataKey, docKey));
+						intentDataKey, currDoc.getKey()));
 
 			} catch (InvalidRequest e) {
+				Log.i(TAG, "Caught InvalidRequest when trying to save doc.");
+
 				// alert the user that the save failed
 				Toast errorMsg = Toast.makeText(this,
 						"Save failed - invalid request.", Toast.LENGTH_SHORT);
 				errorMsg.show();
 
-				Log.i(TAG, "Caught InvalidRequest when trying to save doc.");
 				displayLockedDoc();
 			}
 		}
 	}
 
+	/**
+	 * Called when the user leaves this activity 
+	 * (triggered by menu and back buttons).
+	 */
 	@Override
 	protected void onPause() {
-		if (!srcBack) {
+		if (!srcBack) 
 			finish();
-		}
+
 		super.onPause();
 	}
 
@@ -338,6 +340,8 @@ public class LockedDocView extends Activity {
 	 */
 	private void saveComplete(UnlockedDocument doc) {
 		Log.i(TAG, "saved the doc");
+
+		isSaved = true;
 
 		// inform the user that we saved the doc
 		Toast msg = Toast.makeText(this, "Document saved", Toast.LENGTH_SHORT);
@@ -361,10 +365,14 @@ public class LockedDocView extends Activity {
 				service.releaseLock(currDoc);
 				Log.i(TAG, "released the lock");
 
-				// inform the user of the release
-				Toast errorMsg = Toast.makeText(this, "Lock released.",
-						Toast.LENGTH_SHORT);
-				errorMsg.show();
+				// inform the user of the release 
+				// (don't do this if lock expired so user doesn't get confused)
+				if (!isLockExpired)
+				{
+					Toast msg = Toast.makeText(this, "Lock released.",
+							Toast.LENGTH_SHORT);
+					msg.show();
+				}
 			} catch (LockExpired e) {
 				// alert the user that the release failed
 				Toast errorMsg = Toast.makeText(this,
@@ -385,6 +393,9 @@ public class LockedDocView extends Activity {
 		}
 	}
 
+	/**
+	 * Called when the back button is pressed.
+	 */
 	@Override
 	public void onBackPressed() {
 		srcBack = true;
