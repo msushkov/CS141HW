@@ -50,12 +50,17 @@ public class LockedDocView extends Activity {
 	private EditText titleBox;
 	private EditText contentBox;
 
+	// timer for the lock
 	private Timer lockedTimer = new Timer();
 
 	// Boolean indicating if the button pressed was back
 	private boolean srcBack = false;
 
+	// Indicates it save doc operation failed
 	private boolean saveFailed = false;
+
+	// Is the current doc a new doc?
+	private boolean isNewDoc;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -76,23 +81,27 @@ public class LockedDocView extends Activity {
 		if (currDoc != null) {
 			displayLockedDoc();
 
-			lockedTimer.schedule(new TimerTask() {
-				private Handler updateUI = new Handler() {
-					@Override
-					public void dispatchMessage(Message msg) {
-						super.dispatchMessage(msg);
-						displayExpired();
-					}
-				};
+			// do not start a timer if we have a new doc
+			if (!isNewDoc)
+			{
+				lockedTimer.schedule(new TimerTask() {
+					private Handler updateUI = new Handler() {
+						@Override
+						public void dispatchMessage(Message msg) {
+							super.dispatchMessage(msg);
+							displayExpired();
+						}
+					};
 
-				public void run() {
-					try {
-						updateUI.sendEmptyMessage(0);
-					} catch (Exception e) {
-						e.printStackTrace();
+					public void run() {
+						try {
+							updateUI.sendEmptyMessage(0);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
-				}
-			}, LOCK_TIME);
+				}, LOCK_TIME);
+			}
 
 		} else {
 			Log.i(TAG, "Cannot display - doc is null.");
@@ -126,10 +135,14 @@ public class LockedDocView extends Activity {
 			doc = (LockedDocument) extras.get(intentDataKey);
 
 		this.currDoc = doc;
+		this.isNewDoc = false;
 
 		Log.i(TAG, "extracted locked doc");
 	}
 
+	/**
+	 * Inform the user that the lock had expired.
+	 */
 	private void displayExpired() {
 		// expired toast
 		Toast expiredMsg = Toast.makeText(LockedDocView.this, "Lock expired!",
@@ -188,6 +201,7 @@ public class LockedDocView extends Activity {
 
 			LockedDocument newDoc = new LockedDocument(null, null, null,
 					newDocTitle, newDocContents);
+			this.isNewDoc = true;
 			this.currDoc = newDoc;
 
 			// do this activity again with a new doc
@@ -254,7 +268,7 @@ public class LockedDocView extends Activity {
 							Toast.LENGTH_SHORT);
 					errorMsg.show();
 				} else {
-					// set the to-be-saved doc to have the msot
+					// set the to-be-saved doc to have the most
 					// recent title and contents
 					currDoc.setTitle(titleBox.getText().toString());
 					currDoc.setContents(contentBox.getText().toString());

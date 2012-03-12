@@ -49,12 +49,15 @@ public class DocListView extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.d(TAG, "created the doc list view activity");
+		service = new CollabServiceWrapper();
+		getDocList();
 
 		// if this is the very first time this activity gets run 
 		// (on startup), then there will be no extras. however, if this
 		// activity gets called by other activities then they will pass
 		// it an extra. 
 		Bundle extras = getIntent().getExtras();
+		
 		if (extras == null || extras.getBoolean(boolKey))
 		{
 			// display message to the user saying to press menu key 
@@ -63,9 +66,6 @@ public class DocListView extends ListActivity {
 					Toast.LENGTH_LONG);
 			msg.show();
 		}
-
-		service = new CollabServiceWrapper();
-		getDocList();
 	}
 
 	/**
