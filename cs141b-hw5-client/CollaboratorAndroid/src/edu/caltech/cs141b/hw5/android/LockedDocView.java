@@ -289,11 +289,6 @@ public class LockedDocView extends Activity {
 			} catch (LockExpired e) {
 				Log.i(TAG, "Caught LockExpired when trying to save doc.");
 
-				// alert the user that the save failed
-				Toast errorMsg = Toast.makeText(this,
-						"Save failed - lock was expired.", Toast.LENGTH_SHORT);
-				errorMsg.show();
-
 				// inform the user that the save failed
 				Toast msg = Toast.makeText(this, "Save failed. Lock expired",
 						Toast.LENGTH_LONG);
