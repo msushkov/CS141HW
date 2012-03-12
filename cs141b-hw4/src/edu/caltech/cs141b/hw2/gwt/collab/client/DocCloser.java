@@ -11,8 +11,8 @@ public class DocCloser implements AsyncCallback<Void> {
 	private Collaborator collaborator;
 
 	/**
-	 * Constructor for DocCloser. Note that there is no internal state and
-	 * thus no static constructor method is necessary.
+	 * Constructor for DocCloser. Note that there is no internal state and thus
+	 * no static constructor method is necessary.
 	 * 
 	 * @param collaborator
 	 */
@@ -20,7 +20,11 @@ public class DocCloser implements AsyncCallback<Void> {
 		this.collaborator = collaborator;
 	}
 
-	
+	/**
+	 * Actually makes the close document call
+	 * 
+	 * @param docKey The document to close
+	 */
 	public void removeFromServerQueue(String docKey) {
 		// remove this doc from our request queue
 		collaborator.collabService.leaveLockQueue(collaborator.clientID,
@@ -38,7 +42,7 @@ public class DocCloser implements AsyncCallback<Void> {
 	@Override
 	public void onSuccess(Void result) {
 		collaborator.statusUpdate("Removed from queue");
-		
+
 	}
 
 }

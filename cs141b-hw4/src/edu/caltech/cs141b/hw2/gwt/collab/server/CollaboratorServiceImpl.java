@@ -34,16 +34,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	// This is the time in seconds that clients can lock a document
 	private static final int LOCK_TIME = 30;
 
+	// This is the key for the locked document list
 	private static final Key lockListKey = KeyFactory.createKey(
 			LockedDocuments.class.getSimpleName(), "lockedDocuments");
-
-	// This object maps doc keys to queues of client IDs, which are the clients
-	// waiting for the document.
-	// private static Map<String, List<String>> queueMap;
-
-	// Contains the currently-locked documents.
-	// private static ArrayList<String> lockedDocuments = new
-	// ArrayList<String>();
 
 	// This is a bit of a hack that takes advantage of the fact all the fields
 	// are static. We need this static field to allow ClearLockServlet to access
@@ -63,10 +56,14 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 		Transaction t = pm.currentTransaction();
 		String lockedBy = null;
+
+		// boolean marking whether the doc is to be returned to the server
 		boolean returning = false;
 		try {
 			t.begin();
 			Key key = KeyFactory.stringToKey(docKey);
+
+			// Retrieve the document for the given key
 			Document doc = pm.getObjectById(Document.class, key);
 
 			// Unlock if lock expired
@@ -74,6 +71,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			if (lockedTil != null
 					&& lockedTil.before(new Date(System.currentTimeMillis()))) {
 				lockedBy = doc.getLockedBy();
+
+				// mark for the document to be returned to the server
 				returning = true;
 			}
 
@@ -82,6 +81,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				t.rollback();
 			}
 
+			// If the document lock was expired return the given document to the
+			// server
 			if (returning) {
 				receiveToken(lockedBy, docKey);
 			}
@@ -90,15 +91,17 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	// Keep transactions?
 	/**
-	 * Cleans locks for all currently locked documents
+	 * Cleans locks for all currently locked documents, called by the cronjob
 	 */
 	public static void cleanLocks() {
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+
 		LockedDocuments lockedDocsObj = pm.getObjectById(LockedDocuments.class,
 				lockListKey);
+
+		// Set of all locked document keys
 		Set<String> lockedDocKeys = lockedDocsObj.getLockedDocs();
 
 		for (String docKey : lockedDocKeys) {
@@ -116,6 +119,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 								new Date(System.currentTimeMillis()))) {
 
 					lockedBy = doc.getLockedBy();
+					// set the document to be returned to the server
 					returning = true;
 				}
 
@@ -123,6 +127,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				if (t.isActive()) {
 					t.rollback();
 				}
+				// if the lock has expired we are returning it to the server
 				if (returning) {
 					server.receiveToken(lockedBy, docKey);
 				}
@@ -188,7 +193,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			Document doc = pm.getObjectById(Document.class, key);
 
 			// Return the unlocked document, will get cleaned up as finally
-			// trumphs return
+			// trumps return
 			return doc.getUnlockedDoc();
 		} finally {
 			// Do cleanup
@@ -282,6 +287,13 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	/**
+	 * This fetches the locked document list and adds the specified document to
+	 * it
+	 * 
+	 * @param docKey
+	 *            The doc to add
+	 */
 	private void addLockedDoc(String docKey) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -290,11 +302,14 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			t.begin();
 			LockedDocuments lockedDocs;
 			try {
+				// Try to retrieve the locked document collection
 				lockedDocs = pm.getObjectById(LockedDocuments.class,
 						lockListKey);
 			} catch (JDOObjectNotFoundException ex) {
+				// If you can't find it, make a new one
 				lockedDocs = new LockedDocuments();
 			}
+			// Add the documen to the queue
 			lockedDocs.addDocument(docKey);
 			pm.makePersistent(lockedDocs);
 			t.commit();
@@ -307,6 +322,13 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	/**
+	 * This fetches the locked document list and removes the specified document
+	 * from it
+	 * 
+	 * @param docKey
+	 *            The doc to remove
+	 */
 	private void rmLockedDoc(String docKey) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -315,11 +337,14 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			t.begin();
 			LockedDocuments lockedDocs;
 			try {
+				// Get the locked document collection
 				lockedDocs = pm.getObjectById(LockedDocuments.class,
 						lockListKey);
 			} catch (JDOObjectNotFoundException ex) {
+				// If none exists, create a new one
 				lockedDocs = new LockedDocuments();
 			}
+			// Remove the document from this queue
 			lockedDocs.removeDocument(docKey);
 			pm.makePersistent(lockedDocs);
 			t.commit();
@@ -343,9 +368,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	private void receiveToken(String clientID, String docKey) {
 
-		// If there is no document waiting for the document remove from list of
-		// locked docs
-
+		// Get the persistence manager
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Document toSave;
 		String newClientID = null;
@@ -413,13 +436,12 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		Document toSave;
 		Date endTime;
 
-		// TODO: REMOVE
-		// Client client = pm.getObjectById(Client.class, clientID);
-
+		// Create the transaction
 		Transaction t = pm.currentTransaction();
 		try {
 			// Starting transaction...
 			t.begin();
+
 			// Create the key
 			Key key = KeyFactory.stringToKey(docKey);
 
@@ -431,18 +453,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			// Add key to locked documents (will only get added if it isn't
 			// already there)
 			pm.makePersistent(toSave);
-			// t.commit();
-			//
-			// t = pm.currentTransaction();
-			// add to locked documents and add to client ID
-			// t.begin();
 
-			// TODO: REMOVE
-
-			// client.addDoc(docKey);
-			// addLockedDoc(docKey);
-			// pm.makePersistent(client);
-
+			// End the transaction
 			t.commit();
 
 			// Finally, inform the client that the doc is locked and ready for
@@ -459,7 +471,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 	}
 
-	// TODO: FIX THIS TO HANDLE NOT IN THE QUEUE
 	/**
 	 * Release the lock of the given document.
 	 * 
@@ -549,11 +560,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				toSave.addToWaitingList(clientID);
 			}
 
-			// SHOULD BE THERE
 			client.addDoc(docKey);
 			addLockedDoc(docKey);
 
-			// SHOULD BE THERE
 			pm.makePersistent(client);
 			pm.makePersistent(toSave);
 
@@ -585,7 +594,9 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Create a datastore client with key = Client ID
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Client client = new Client(clientID);
+
 		pm.makePersistent(client);
+
 		pm.close();
 
 		return getChannelService().createChannel(clientID);
@@ -688,6 +699,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 			pm.close();
 
+			// If neccessary, return the token
 			if (toSave != null && toSave.getLockedBy().equals(clientID)) {
 				receiveToken(clientID, documentKey);
 			}
@@ -722,19 +734,19 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		Transaction t = pm.currentTransaction();
 		try {
 			t.begin();
-			Client client = pm.getObjectById(Client.class, clientID);
-			System.out.println("deleting");
-			pm.deletePersistent(client);
-			t.commit();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.out.println("client error");
-		} finally {
 
+			// Get the client
+			Client client = pm.getObjectById(Client.class, clientID);
+
+			// Delete the client
+			pm.deletePersistent(client);
+
+			t.commit();
+		} finally {
 			if (t.isActive()) {
-				System.out.println("client rollback");
 				t.rollback();
 			}
+
 			pm.close();
 		}
 	}
