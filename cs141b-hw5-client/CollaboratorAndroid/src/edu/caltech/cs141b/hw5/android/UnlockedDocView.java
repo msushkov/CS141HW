@@ -23,9 +23,13 @@ public class UnlockedDocView extends Activity {
 	// the key that identifies the doc that is passed between activities
 	private static String intentDataKey = "doc";
 
+	// the key that identifies the isStartup boolean that is passed
+	// to the list view activity
+	private static String boolKey = "isStartup";
+
 	// initial title + contents of new doc
-	private static String newDocTitle = "Enter the document title.";
-	private static String newDocContents = "Enter the document contents.";
+	private static String newDocTitle = "";
+	private static String newDocContents = "";
 
 	// makes server calls
 	private CollabServiceWrapper service;
@@ -41,7 +45,6 @@ public class UnlockedDocView extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		Log.d(TAG, "created the unlocked doc view activity");
 
 		service = new CollabServiceWrapper();
@@ -53,9 +56,23 @@ public class UnlockedDocView extends Activity {
 
 		// get the current doc's key (passed from another activity)
 		extractUnlockedDocKey();
-		
+
 		// get the unlocked doc with the current key from the server
-		getUnlockedDoc();
+		if (currDocKey != null)
+			getUnlockedDoc();
+		else {
+			Log.i(TAG, "doc key is null.");
+
+			// inform the user that something went wrong
+			Toast errorMsg = Toast.makeText(this,
+					"Error - document key is null.", Toast.LENGTH_SHORT);
+			errorMsg.show();
+
+			// go back to list view (pass it false to show that this is not
+			// startup)
+			startActivity((new Intent(this, DocListView.class)).
+					putExtra(boolKey, false));
+		}
 	}
 
 	/**
@@ -86,23 +103,39 @@ public class UnlockedDocView extends Activity {
 		// make a server request to get this doc
 		try {
 			doc = service.getDocument(currDocKey);
+			Log.i(TAG, "got the unlocked doc from the server");
 		} catch (InvalidRequest e) {
 			Log.i(TAG, "Invalid request when getting doc.");
 
 			// alert the user that the get doc operation failed
-			Toast errorMsg = Toast.makeText(this, 
-					"Getting the doc failed - invalid request.", Toast.LENGTH_SHORT);
+			Toast errorMsg = Toast.makeText(this,
+					"Getting the doc failed - invalid request.",
+					Toast.LENGTH_SHORT);
 			errorMsg.show();
-			
+
 			// show the doc list on failure of the request
-			startActivity(new Intent(this, DocListView.class));
+			// (pass it false to show that this is not startup)
+			startActivity((new Intent(this, DocListView.class)).
+					putExtra(boolKey, false));
 		}
 
 		// display the doc
 		if (doc != null)
 			displayUnlockedDoc(doc);
-		else
-			Log.i(TAG, "Server returned a null doc.");		
+		else {
+			Log.i(TAG, "Error - server returned a null doc.");
+
+			// inform the user that something went wrong
+			Toast errorMsg = Toast.makeText(this,
+					"Something went wrong - server returned a null doc.",
+					Toast.LENGTH_SHORT);
+			errorMsg.show();
+
+			// go back to list view
+			// (pass it false to show that this is not startup)
+			startActivity((new Intent(this, DocListView.class)).
+					putExtra(boolKey, false));
+		}
 	}
 
 	/**
@@ -113,13 +146,8 @@ public class UnlockedDocView extends Activity {
 	private void displayUnlockedDoc(UnlockedDocument doc) {
 		Log.i(TAG, "displaying the unlocked doc");
 
-		if (doc != null) {
-			Log.i(TAG, "doc != null");
-			titleBox.setText(doc.getTitle());
-			contentBox.setText(doc.getContents());
-		} 
-		else 
-			Log.i(TAG, "doc = null");
+		titleBox.setText(doc.getTitle());
+		contentBox.setText(doc.getContents());
 	}
 
 	/**
@@ -152,17 +180,24 @@ public class UnlockedDocView extends Activity {
 
 			// start new locked doc view activity with new doc key as arg
 			startActivity(new Intent(this, LockedDocView.class).putExtra(
-					intentDataKey, newDoc.getKey()));
+					intentDataKey, newDoc));
 			return true;
 
-		// refresh the doc list
+			// refresh the doc list
 		case R.id.docList:
-			startActivity(new Intent(this, DocListView.class));
+			// (pass it false to show that this is not startup)
+			startActivity((new Intent(this, DocListView.class)).
+					putExtra(boolKey, false));
 			return true;
 
-		// lock this doc
+			// lock this doc
 		case R.id.lockDoc:
 			lockDoc();
+			return true;
+
+			// refresh this doc
+		case R.id.refresh:
+			getUnlockedDoc();
 			return true;
 
 		default:
@@ -174,37 +209,62 @@ public class UnlockedDocView extends Activity {
 	 * Send the lock request to the server.
 	 */
 	public void lockDoc() {
+		Log.i(TAG, "starting to lock the doc");
+
 		LockedDocument doc = null;
 
-		try 
-		{
+		try {
 			doc = service.lockDocument(currDocKey);
-		} 
-		catch (LockUnavailable e) {
+			Log.i(TAG, "locked the doc");
+
+			lockComplete(doc);
+		} catch (LockUnavailable e) {
 			Log.i(TAG, "Caught LockUnavailable when trying to lock the doc.");
-			
+
 			// alert the user that the lock doc operation failed
-			Toast errorMsg = Toast.makeText(this, 
-					"Getting the lock failed - lock unavailable.", Toast.LENGTH_SHORT);
+			Toast errorMsg = Toast.makeText(this,
+					"Getting the lock failed - lock unavailable.",
+					Toast.LENGTH_SHORT);
 			errorMsg.show();
-			
+
 			// show the unlocked doc again
 			getUnlockedDoc();
-		} 
-		catch (InvalidRequest e) {
+		} catch (InvalidRequest e) {
 			Log.i(TAG, "Caught InvalidRequest when tyring to lock doc.");
-			
+
 			// alert the user that the lock doc operation failed
-			Toast errorMsg = Toast.makeText(this, 
-					"Getting the lock failed - invalid request.", Toast.LENGTH_SHORT);
+			Toast errorMsg = Toast.makeText(this,
+					"Getting the lock failed - invalid request.",
+					Toast.LENGTH_SHORT);
 			errorMsg.show();
-			
+
 			// show the unlocked doc again
 			getUnlockedDoc();
 		}
+	}
+
+	/**
+	 * Called when the lockDoc operation successfully finishes.
+	 * 
+	 * @param doc
+	 */
+	private void lockComplete(LockedDocument doc) {
+		// inform the user that we locked the doc
+		Toast msg = Toast.makeText(this, "Document locked", Toast.LENGTH_SHORT);
+		msg.show();
 
 		// now that we got the lock for this doc, switch to locked view
 		startActivity(new Intent(this, LockedDocView.class).putExtra(
 				intentDataKey, doc));
 	}
+
+	@Override
+	public void onBackPressed() {
+		// go back to list view
+		// (pass it false to say that this is not startup)
+		startActivity((new Intent(this, DocListView.class)).
+				putExtra(boolKey, false));
+		super.onBackPressed();
+	}
+
 }

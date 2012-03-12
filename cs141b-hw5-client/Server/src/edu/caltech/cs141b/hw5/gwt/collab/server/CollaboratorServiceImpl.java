@@ -9,8 +9,10 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.Transaction;
 
-import edu.caltech.cs141b.hw5.gwt.collab.server.Document;
-import edu.caltech.cs141b.hw5.gwt.collab.server.PMF;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
 import edu.caltech.cs141b.hw5.gwt.collab.client.CollaboratorService;
 import edu.caltech.cs141b.hw5.gwt.collab.shared.DocumentMetadata;
 import edu.caltech.cs141b.hw5.gwt.collab.shared.LockExpired;
@@ -18,18 +20,15 @@ import edu.caltech.cs141b.hw5.gwt.collab.shared.LockUnavailable;
 import edu.caltech.cs141b.hw5.gwt.collab.shared.LockedDocument;
 import edu.caltech.cs141b.hw5.gwt.collab.shared.UnlockedDocument;
 
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-
 /**
  * The server side implementation of the RPC service.
  */
 @SuppressWarnings("serial")
 public class CollaboratorServiceImpl extends RemoteServiceServlet implements
-CollaboratorService {
+		CollaboratorService {
 
-	private static final Logger log = Logger.getLogger(CollaboratorServiceImpl.class.toString());
+	private static final Logger log = Logger
+			.getLogger(CollaboratorServiceImpl.class.toString());
 
 	/**
 	 * Gets the doc list.
@@ -70,11 +69,13 @@ CollaboratorService {
 	@Override
 	public LockedDocument lockDocument(String documentKey)
 			throws LockUnavailable {
-		return lockDocument(documentKey, getThreadLocalRequest().getRemoteAddr());
+		return lockDocument(documentKey, getThreadLocalRequest()
+				.getRemoteAddr());
 	}
 
 	/**
 	 * Locks the doc with the given key for the given user.
+	 * 
 	 * @param documentKey
 	 * @param ip
 	 * @return The doc that was locked.
@@ -104,17 +105,21 @@ CollaboratorService {
 						new Date(System.currentTimeMillis()))) {
 					// Unlock it
 					toSave.unlock();
-				} 
-				else {
+				} else {
 					// Otherwise notify the client that it lock is unavailable
-					throw new LockUnavailable("\'" + toSave.getTitle() + "\' is locked for "
-							+ (toSave.getLockedUntil().getTime() - 
-									System.currentTimeMillis()) / 1000L	+ " more seconds.");
+					throw new LockUnavailable(
+							"\'"
+									+ toSave.getTitle()
+									+ "\' is locked for "
+									+ (toSave.getLockedUntil().getTime() - System
+											.currentTimeMillis()) / 1000L
+									+ " more seconds.");
 				}
 			}
 
-			// Lock the document for 30 seconds for the user whose IP was provided
-			toSave.lock(new Date(System.currentTimeMillis() + 30000L), ip);
+			// Lock the document for 120 seconds for the user whose IP was
+			// provided
+			toSave.lock(new Date(System.currentTimeMillis() + 120000L), ip);
 
 			// Write this to the Datastore
 			pm.makePersistent(toSave);
@@ -124,8 +129,7 @@ CollaboratorService {
 
 			// Return the locked document
 			return toSave.getLockedDoc();
-		} 
-		finally {
+		} finally {
 			// Do some cleanup
 			if (t.isActive())
 				t.rollback();
@@ -161,13 +165,13 @@ CollaboratorService {
 	 * Wrapper for saveDocument() - gets the user's IP.
 	 */
 	@Override
-	public UnlockedDocument saveDocument(LockedDocument doc)
-			throws LockExpired {
+	public UnlockedDocument saveDocument(LockedDocument doc) throws LockExpired {
 		return saveDocument(doc, getThreadLocalRequest().getRemoteAddr());
 	}
 
 	/**
 	 * Save the given doc.
+	 * 
 	 * @param doc
 	 * @param ip
 	 * @return
@@ -207,14 +211,13 @@ CollaboratorService {
 
 				// Check that the person trying to save has the lock and that
 				// the lock hasn't expired
-				if (lockedBy.equals(ip) && lockedUntil.after(new 
-						Date(System.currentTimeMillis()))) 
-				{
+				if (lockedBy.equals(ip)
+						&& lockedUntil.after(new Date(System
+								.currentTimeMillis()))) {
 					// If both are fulfilled, update and unlock the doc
 					toSave.update(doc);
 					toSave.unlock();
-				} 
-				else {
+				} else {
 					// Otherwise, throw an exception
 					throw new LockExpired();
 				}
@@ -228,10 +231,9 @@ CollaboratorService {
 
 			// Return the unlocked document
 			return toSave.getUnlockedDoc();
-		} 
-		finally {
+		} finally {
 			// Do some cleanup
-			if (t.isActive()) 
+			if (t.isActive())
 				t.rollback();
 
 			pm.close();
@@ -248,6 +250,7 @@ CollaboratorService {
 
 	/**
 	 * Releases the lock for doc.
+	 * 
 	 * @param doc
 	 * @param ip
 	 * @throws LockExpired
@@ -279,23 +282,19 @@ CollaboratorService {
 
 				// And store it in the Datastore
 				pm.makePersistent(toSave);
-			} 
-			else {
+			} else {
 				// Otherwise, throw an exception
 				throw new LockExpired("You no longer have the lock");
 			}
 
 			// ...Ending transaction
 			t.commit();
-		} 
-		finally
-		{
+		} finally {
 			// Do some cleanup
-			if (t.isActive()) 
+			if (t.isActive())
 				t.rollback();
-			
+
 			pm.close();
 		}
 	}
 }
-

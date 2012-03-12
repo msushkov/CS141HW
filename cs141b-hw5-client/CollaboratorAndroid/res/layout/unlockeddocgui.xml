@@ -12,7 +12,10 @@
         android:editable="false"
         android:freezesText="true"
         android:inputType="none"
-        android:textSize="30dp" />
+        android:singleLine="true"
+        android:textSize="30dp"
+        android:enabled="false" />
+
 
     <EditText
         android:id="@+id/content"
@@ -22,9 +25,9 @@
         android:editable="false"
         android:freezesText="true"
         android:gravity="top"
-        android:inputType="none" >
-
-        <requestFocus />
+        android:inputType="none"
+        android:singleLine="false"
+        android:enabled="false" >
     </EditText>
 
 </LinearLayout>
