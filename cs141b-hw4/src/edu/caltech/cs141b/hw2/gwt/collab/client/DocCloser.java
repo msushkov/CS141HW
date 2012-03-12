@@ -23,7 +23,8 @@ public class DocCloser implements AsyncCallback<Void> {
 	/**
 	 * Actually makes the close document call
 	 * 
-	 * @param docKey The document to close
+	 * @param docKey
+	 *            The document to close
 	 */
 	public void removeFromServerQueue(String docKey) {
 		// remove this doc from our request queue
