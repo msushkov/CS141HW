@@ -50,14 +50,15 @@ public class DocListView extends ListActivity {
 		super.onCreate(savedInstanceState);
 		Log.d(TAG, "created the doc list view activity");
 
-		// is this the very
-		boolean isStartup = true;
+		// if this is the very first time this activity gets run 
+		// (on startup), then there will be no extras. however, if this
+		// activity gets called by other activities then they will pass
+		// it an extra. 
 		Bundle extras = getIntent().getExtras();
-
 		if (extras == null || extras.getBoolean(boolKey))
 		{
 			// display message to the user saying to press menu key 
-			// inform the user that something went wrong
+			// (this is only done the very first time the app loads)
 			Toast msg = Toast.makeText(this, "Press MENU for more features!",
 					Toast.LENGTH_LONG);
 			msg.show();

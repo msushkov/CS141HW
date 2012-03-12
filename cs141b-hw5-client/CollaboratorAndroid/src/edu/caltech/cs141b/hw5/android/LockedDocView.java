@@ -196,14 +196,6 @@ public class LockedDocView extends Activity {
 
 			// refresh the doc list
 		case R.id.docList:
-			// if we had a new doc open before, dont release the lock on it
-			// since it hasnt been saved
-			if (currDoc.getKey() != null) {
-				// release lock since we are closing the current doc for which
-				// we likely hold the lock and are starting a new one
-				releaseLock();
-			}
-
 			// once we release the lock, go to the list view since this is what
 			// the user requested (pass it false to say that this is not startup
 			startActivity((new Intent(this, DocListView.class)).
