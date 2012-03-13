@@ -2,7 +2,7 @@
 <resources>
 
     <string name="hello">Hello World, CollaboratorAndroidActivity!</string>
-    <string name="app_name">CollaboratorAndroid</string>
+    <string name="app_name">Document Collaborator</string>
     <string name="Title">Title</string>
 
 </resources>
