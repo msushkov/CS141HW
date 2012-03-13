@@ -70,8 +70,8 @@ public class UnlockedDocView extends Activity {
 
 			// go back to list view (pass it false to show that this is not
 			// startup)
-			startActivity((new Intent(this, DocListView.class)).
-					putExtra(boolKey, false));
+			startActivity((new Intent(this, DocListView.class)).putExtra(
+					boolKey, false));
 		}
 	}
 
@@ -115,8 +115,8 @@ public class UnlockedDocView extends Activity {
 
 			// show the doc list on failure of the request
 			// (pass it false to show that this is not startup)
-			startActivity((new Intent(this, DocListView.class)).
-					putExtra(boolKey, false));
+			startActivity((new Intent(this, DocListView.class)).putExtra(
+					boolKey, false));
 		}
 
 		// display the doc
@@ -133,8 +133,8 @@ public class UnlockedDocView extends Activity {
 
 			// go back to list view
 			// (pass it false to show that this is not startup)
-			startActivity((new Intent(this, DocListView.class)).
-					putExtra(boolKey, false));
+			startActivity((new Intent(this, DocListView.class)).putExtra(
+					boolKey, false));
 		}
 	}
 
@@ -186,8 +186,8 @@ public class UnlockedDocView extends Activity {
 			// refresh the doc list
 		case R.id.docList:
 			// (pass it false to show that this is not startup)
-			startActivity((new Intent(this, DocListView.class)).
-					putExtra(boolKey, false));
+			startActivity((new Intent(this, DocListView.class)).putExtra(
+					boolKey, false));
 			return true;
 
 			// lock this doc
@@ -258,12 +258,16 @@ public class UnlockedDocView extends Activity {
 				intentDataKey, doc));
 	}
 
+	/**
+	 * Called when the user presses the back button, puts the user in a new doc
+	 * list view.
+	 */
 	@Override
 	public void onBackPressed() {
 		// go back to list view
 		// (pass it false to say that this is not startup)
-		startActivity((new Intent(this, DocListView.class)).
-				putExtra(boolKey, false));
+		startActivity((new Intent(this, DocListView.class)).putExtra(boolKey,
+				false));
 		super.onBackPressed();
 	}
 

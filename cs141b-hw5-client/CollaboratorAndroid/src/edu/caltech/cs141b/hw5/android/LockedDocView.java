@@ -85,17 +85,18 @@ public class LockedDocView extends Activity {
 			displayLockedDoc();
 
 			// do not start a timer if we have a new doc
-			if (!isNewDoc)
-			{
-				Toast.makeText(this, "Can edit the doc for the next " + LOCK_TIME / 1000 + 
-						" seconds.", Toast.LENGTH_SHORT).show();
-				
+			if (!isNewDoc) {
+				Toast.makeText(
+						this,
+						"Can edit the doc for the next " + LOCK_TIME / 1000
+								+ " seconds.", Toast.LENGTH_SHORT).show();
+
 				lockedTimer.schedule(new TimerTask() {
 					private Handler updateUI = new Handler() {
 						@Override
 						public void dispatchMessage(Message msg) {
 							super.dispatchMessage(msg);
-							
+
 							isLockExpired = true;
 							displayExpired();
 						}
@@ -122,8 +123,8 @@ public class LockedDocView extends Activity {
 
 			// go back to list view (pass it false to show that this is not
 			// startup)
-			startActivity((new Intent(this, DocListView.class)).
-					putExtra(boolKey, false));
+			startActivity((new Intent(this, DocListView.class)).putExtra(
+					boolKey, false));
 		}
 	}
 
@@ -198,7 +199,7 @@ public class LockedDocView extends Activity {
 		// which button did the user press?
 		switch (item.getItemId()) {
 		// create a new doc
-		case R.id.newDoc:		
+		case R.id.newDoc:
 			// if we had a new doc open before, dont release the lock on it
 			// since it hasnt been saved
 			if (currDoc.getKey() != null) {
@@ -223,8 +224,8 @@ public class LockedDocView extends Activity {
 		case R.id.docList:
 			// once we release the lock, go to the list view since this is what
 			// the user requested (pass it false to say that this is not startup
-			startActivity((new Intent(this, DocListView.class)).
-					putExtra(boolKey, false));
+			startActivity((new Intent(this, DocListView.class)).putExtra(
+					boolKey, false));
 			return true;
 
 			// save this doc
@@ -249,7 +250,7 @@ public class LockedDocView extends Activity {
 
 		// user is leaving this view, so release the lock
 		// of the current doc if it is not a new doc
-		if (currDoc.getKey() != null && !isSaved) 
+		if (currDoc.getKey() != null && !isSaved)
 			releaseLock();
 
 		super.finish();
@@ -290,8 +291,8 @@ public class LockedDocView extends Activity {
 					if (doc != null)
 						saveComplete(doc);
 					else {
-						Log.i(TAG, "Error - save could not complete " +
-								"(server returned null).");
+						Log.i(TAG, "Error - save could not complete "
+								+ "(server returned null).");
 						throw new LockExpired();
 					}
 				}
@@ -325,12 +326,12 @@ public class LockedDocView extends Activity {
 	}
 
 	/**
-	 * Called when the user leaves this activity 
-	 * (triggered by menu and back buttons).
+	 * Called when the user leaves this activity (triggered by menu and back
+	 * buttons).
 	 */
 	@Override
 	protected void onPause() {
-		if (!srcBack) 
+		if (!srcBack)
 			finish();
 
 		super.onPause();
@@ -368,10 +369,9 @@ public class LockedDocView extends Activity {
 				service.releaseLock(currDoc);
 				Log.i(TAG, "released the lock");
 
-				// inform the user of the release 
+				// inform the user of the release
 				// (don't do this if lock expired so user doesn't get confused)
-				if (!isLockExpired)
-				{
+				if (!isLockExpired) {
 					Toast msg = Toast.makeText(this, "Lock released.",
 							Toast.LENGTH_SHORT);
 					msg.show();
@@ -397,7 +397,8 @@ public class LockedDocView extends Activity {
 	}
 
 	/**
-	 * Called when the back button is pressed.
+	 * Called when the back button is pressed. Stores that the back button was
+	 * pressed before performing default behavior.
 	 */
 	@Override
 	public void onBackPressed() {
