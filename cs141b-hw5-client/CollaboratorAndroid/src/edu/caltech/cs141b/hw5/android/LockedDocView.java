@@ -86,7 +86,7 @@ public class LockedDocView extends Activity {
 		// display the current doc
 		display();
 	}
-	
+
 	/**
 	 * Gets the locked doc that was passed to this activity.
 	 * 
@@ -163,9 +163,9 @@ public class LockedDocView extends Activity {
 			// startup)
 			startActivity((new Intent(this, DocListView.class)).
 					putExtra(boolKey, false));
-		}		
+		}
 	}
-	
+
 	/**
 	 * Display the locked doc. Called after making the check that currDoc 
 	 * not null.
@@ -194,9 +194,6 @@ public class LockedDocView extends Activity {
 				Toast.LENGTH_SHORT).show();
 	}
 
-	//==========================================================================
-	// MENU
-	
 	/**
 	 * Create a menu when user presses the physical 'menu' button.
 	 */
@@ -220,7 +217,7 @@ public class LockedDocView extends Activity {
 		switch (item.getItemId()) {
 
 		// create a new doc
-		case R.id.newDoc:		
+		case R.id.newDoc:
 			// if we had a new doc open before, dont release the lock on it
 			// since it hasnt been saved
 			if (currDoc.getKey() != null) {
@@ -260,9 +257,6 @@ public class LockedDocView extends Activity {
 		}
 	}
 
-	// END MENU
-	//==========================================================================
-
 	/**
 	 * Saves the current doc.
 	 */
@@ -297,8 +291,8 @@ public class LockedDocView extends Activity {
 					if (doc != null)
 						saveComplete(doc);
 					else {
-						Log.i(TAG, "Error - save could not complete " +
-								"(server returned null).");
+						Log.i(TAG, "Error - save could not complete "
+								+ "(server returned null).");
 						throw new LockExpired();
 					}
 				}
@@ -329,7 +323,7 @@ public class LockedDocView extends Activity {
 			}
 		}
 	}
-	
+
 	/**
 	 * Called when the saveDoc operation completes successfully.
 	 * @param doc
@@ -359,11 +353,11 @@ public class LockedDocView extends Activity {
 				service.releaseLock(currDoc);
 				Log.i(TAG, "released the lock");
 
-				// inform the user of the release 
+				// inform the user of the release
 				// (don't do this if lock expired so user doesn't get confused)
 				if (!isLockExpired)
 					Toast.makeText(this, "Lock released.", Toast.LENGTH_SHORT).show();
-			} 
+			}
 			catch (LockExpired e) {
 				// alert the user that the release failed
 				Toast.makeText(this, "Lock release failed - lock expired.",
@@ -380,9 +374,6 @@ public class LockedDocView extends Activity {
 		}
 	}
 
-	//==========================================================================
-	// ACTIVITY METHODS
-	
 	/**
 	 * Called when the user exits this view.
 	 */
@@ -400,7 +391,7 @@ public class LockedDocView extends Activity {
 
 		super.finish();
 	}
-	
+
 	/**
 	 * Called when the user leaves this activity 
 	 * (triggered by menu and back buttons).
@@ -414,7 +405,8 @@ public class LockedDocView extends Activity {
 	}
 
 	/**
-	 * Called when the back button is pressed.
+	 * Called when the back button is pressed. Stores that the back button was
+	 * pressed before performing default behavior.
 	 */
 	@Override
 	public void onBackPressed() {
