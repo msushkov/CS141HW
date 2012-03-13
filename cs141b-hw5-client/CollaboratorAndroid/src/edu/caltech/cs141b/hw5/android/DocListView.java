@@ -49,7 +49,11 @@ public class DocListView extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.d(TAG, "created the doc list view activity");
+		
+		// need this to make server calls
 		service = new CollabServiceWrapper();
+		
+		// get the doc list from the server
 		getDocList();
 
 		// if this is the very first time this activity gets run 
@@ -154,7 +158,7 @@ public class DocListView extends ListActivity {
 					intentDataKey, newDoc));
 			return true;
 
-			// refresh is pressed
+		// refresh is pressed
 		case R.id.refreshList:
 			getDocList();
 			return true;
