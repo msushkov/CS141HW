@@ -191,16 +191,16 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		int retries = TRANSACTION_ATTEMPTS;
 
 		// Get the PM
-		PersistenceManager pm = PMF.get().getPersistenceManager();
+//		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		Document toSave;
 		// Get the document's key
 		String stringKey = doc.getKey();
 
-		pm.close();
+//		pm.close();
 
 		while (true) {
-			pm = PMF.get().getPersistenceManager();
+			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 			try {
 				// Starting transaction...
@@ -313,7 +313,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 				// if got here it means transaction succeeded, breaking the
 				// loop.
-				break;
+				return;
 			} catch (ConcurrentModificationException e) {
 				if (retries == 0) {
 					throw e;
@@ -360,7 +360,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				t.commit();
 				// if got here it means transaction succeeded, breaking the
 				// loop.
-				break;
+				return;
 			} catch (ConcurrentModificationException e) {
 				if (retries == 0) {
 					throw e;
@@ -423,7 +423,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				t.commit();
 				// if got here it means transaction succeeded, breaking the
 				// loop.
-				break;
+				return;
 			} catch (ConcurrentModificationException e) {
 				if (retries == 0) {
 					throw e;
@@ -604,19 +604,24 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
 
-		PersistenceManager pm = PMF.get().getPersistenceManager();
+		//PersistenceManager pm = PMF.get().getPersistenceManager();
 		Document toSave = null;
-		Client client = pm.getObjectById(Client.class, clientID);
 
-		pm.close();
+
+//		pm.close();
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 		while (true) {
-			pm = PMF.get().getPersistenceManager();
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			
 			Transaction t = pm.currentTransaction();
+			
 			try {
 				// Starting transaction...
 				t.begin();
+				
+				Client client = pm.getObjectById(Client.class, clientID);
+				
 				// Create the key
 				Key key = KeyFactory.stringToKey(docKey);
 
@@ -637,7 +642,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 				// if got here it means transaction succeeded, breaking the
 				// loop.
-				break;
+				return;
 
 			} catch (ConcurrentModificationException e) {
 				if (retries == 0) {
@@ -781,7 +786,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 				// if got here it means transaction succeeded, breaking the
 				// loop.
-				break;
+				return;
 
 			} catch (Exception e) {
 				if (retries == 0) {
@@ -805,7 +810,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 				}
 			}
 		}
-
 	}
 
 	/*
@@ -823,6 +827,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Read all document keys the client has not finished with (queue + use)
 		List<String> docKeys = pm.getObjectById(Client.class, clientID)
 				.getLockedDocs();
+
 		pm.close();
 
 		// Remove from all these entities
@@ -848,7 +853,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 				// if got here it means transaction succeeded, breaking the
 				// loop.
-				break;
+				return;
 			} catch (ConcurrentModificationException e) {
 				if (retries == 0) {
 					throw e;
