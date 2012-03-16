@@ -197,6 +197,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Get the document's key
 		String stringKey = doc.getKey();
 
+		pm.close();
+
 		while (true) {
 			pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
@@ -289,10 +291,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-
 		while (true) {
-			pm = PMF.get().getPersistenceManager();
+			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 
 			try {
@@ -340,10 +340,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-
 		while (true) {
-			pm = PMF.get().getPersistenceManager();
+			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 			try {
 				t.begin();
@@ -394,13 +392,11 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 
-		// Get the persistence manager
-		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Document toSave;
 		String newClientID = null;
 
 		while (true) {
-			pm = PMF.get().getPersistenceManager();
+			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 
 			try {
@@ -467,9 +463,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	private void sendToken(String clientID, String docKey) {
 
 		// Add to list of locked documents if not already in there
-		// Now, let's lock the document
-		// Get the PM
-		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		Document toSave;
 		Date endTime;
@@ -477,7 +470,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 		while (true) {
-			pm = PMF.get().getPersistenceManager();
+			PersistenceManager pm = PMF.get().getPersistenceManager();
 			// Create the transaction
 			Transaction t = pm.currentTransaction();
 			try {
@@ -537,11 +530,10 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
-		// Get the PM
-		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		while (true) {
-			pm = PMF.get().getPersistenceManager();
+			// Get the PM
+			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 			try {
 				// Starting transaction...
@@ -616,6 +608,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		Document toSave = null;
 		Client client = pm.getObjectById(Client.class, clientID);
 
+		pm.close();
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 		while (true) {
@@ -707,13 +700,12 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public LockedDocument getLockedDocument(String clientID, String documentKey)
 			throws LockUnavailable {
-		// Get the PM
-		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 		while (true) {
-			pm = PMF.get().getPersistenceManager();
+			// Get the PM
+			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 			try {
 				// Starting transaction...
@@ -765,13 +757,12 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	@Override
 	public void leaveLockQueue(String clientID, String documentKey) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Document toSave = null;
 
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 		while (true) {
-			pm = PMF.get().getPersistenceManager();
+			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 
 			try {
@@ -838,9 +829,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		for (String docKey : docKeys) {
 			leaveLockQueue(clientID, docKey);
 		}
-
-		// Finally delete the client
-		pm = PMF.get().getPersistenceManager();
 
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
