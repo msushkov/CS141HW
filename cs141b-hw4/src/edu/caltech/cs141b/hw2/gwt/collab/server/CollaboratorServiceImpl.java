@@ -1,7 +1,6 @@
 package edu.caltech.cs141b.hw2.gwt.collab.server;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -44,8 +43,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	// some of the non static functions of this class.
 	private static CollaboratorServiceImpl server = new CollaboratorServiceImpl();
 
-	private final int TRANSACTION_ATTEMPTS = 1000;
-
 	/**
 	 * Cleans lock for an individual document
 	 * 
@@ -57,28 +54,41 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Get the PM
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
+		Transaction t = pm.currentTransaction();
 		String lockedBy = null;
 
 		// boolean marking whether the doc is to be returned to the server
-		Key key = KeyFactory.stringToKey(docKey);
+		boolean returning = false;
+		try {
+			t.begin();
+			Key key = KeyFactory.stringToKey(docKey);
 
-		// Retrieve the document for the given key
-		Document doc = pm.getObjectById(Document.class, key);
+			// Retrieve the document for the given key
+			Document doc = pm.getObjectById(Document.class, key);
 
-		// Unlock if lock expired
-		Date lockedTil = doc.getLockedUntil();
-		if (lockedTil != null
-				&& lockedTil.before(new Date(System.currentTimeMillis()))) {
-			lockedBy = doc.getLockedBy();
+			// Unlock if lock expired
+			Date lockedTil = doc.getLockedUntil();
+			if (lockedTil != null
+					&& lockedTil.before(new Date(System.currentTimeMillis()))) {
+				lockedBy = doc.getLockedBy();
 
-			// If the document lock was expired return the given document to
-			// the server
-			receiveToken(lockedBy, docKey);
+				// mark for the document to be returned to the server
+				returning = true;
+			}
+
+		} finally {
+			if (t.isActive()) {
+				t.rollback();
+			}
+
+			// If the document lock was expired return the given document to the
+			// server
+			if (returning) {
+				receiveToken(lockedBy, docKey);
+			}
+			pm.close();
 
 		}
-
-		pm.close();
-
 	}
 
 	/**
@@ -95,21 +105,34 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		Set<String> lockedDocKeys = lockedDocsObj.getLockedDocs();
 
 		for (String docKey : lockedDocKeys) {
+			Transaction t = pm.currentTransaction();
 			String lockedBy = null;
-			Key key = KeyFactory.stringToKey(docKey);
-			Document doc = pm.getObjectById(Document.class, key);
+			boolean returning = false;
+			try {
+				t.begin();
+				Key key = KeyFactory.stringToKey(docKey);
+				Document doc = pm.getObjectById(Document.class, key);
 
-			// Unlock if lock expired
-			if (doc.getLockedBy() != null
-					&& doc.getLockedUntil().before(
-							new Date(System.currentTimeMillis()))) {
+				// Unlock if lock expired
+				if (doc.getLockedBy() != null
+						&& doc.getLockedUntil().before(
+								new Date(System.currentTimeMillis()))) {
 
-				lockedBy = doc.getLockedBy();
-				// set the document to be returned to the server
-				server.receiveToken(lockedBy, docKey);
+					lockedBy = doc.getLockedBy();
+					// set the document to be returned to the server
+					returning = true;
+				}
+
+			} finally {
+				if (t.isActive()) {
+					t.rollback();
+				}
+				// if the lock has expired we are returning it to the server
+				if (returning) {
+					server.receiveToken(lockedBy, docKey);
+				}
 
 			}
-
 		}
 		// Finally close the PM
 		pm.close();
@@ -187,95 +210,79 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public UnlockedDocument saveDocument(String clientID, LockedDocument doc)
 			throws LockExpired {
-		// Number of times to retry before throwing a concurrent exception error
-		int retries = TRANSACTION_ATTEMPTS;
-
 		// Get the PM
-//		PersistenceManager pm = PMF.get().getPersistenceManager();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		Document toSave;
 		// Get the document's key
 		String stringKey = doc.getKey();
 
-//		pm.close();
+		Transaction t = pm.currentTransaction();
+		try {
+			// Starting transaction...
+			t.begin();
 
-		while (true) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			Transaction t = pm.currentTransaction();
-			try {
-				// Starting transaction...
-				t.begin();
+			// If the doc has no key, it's a new document, so create a new
+			// document
+			if (stringKey == null) {
+				// First unlock it
+				toSave = new Document(doc.unlock());
+			} else {
 
-				// If the doc has no key, it's a new document, so create a new
-				// document
-				if (stringKey == null) {
-					// First unlock it
-					toSave = new Document(doc.unlock());
+				// Create the key
+				Key key = KeyFactory.stringToKey(stringKey);
+
+				// Get the document corresponding to the key
+				toSave = pm.getObjectById(Document.class, key);
+
+				// Get the lock information - saveDocument can only be called if
+				// there is a lock or if it's a new document
+				String lockedBy = toSave.getLockedBy();
+				Date lockedUntil = toSave.getLockedUntil();
+
+				// Get the client's ID
+				String identity = clientID;
+
+				// Check that the person trying to save has the lock and that
+				// the lock hasn't expired
+				if (lockedBy != null
+						&& lockedBy.equals(identity)
+						&& lockedUntil.after(new Date(System
+								.currentTimeMillis()))) {
+					// If both are fulfilled, update and unlock the doc
+					toSave.update(doc);
+					// toSave.unlock();
+
 				} else {
+					// Set to null to prevent the token from being returned
+					stringKey = null;
 
-					// Create the key
-					Key key = KeyFactory.stringToKey(stringKey);
-
-					// Get the document corresponding to the key
-					toSave = pm.getObjectById(Document.class, key);
-
-					// Get the lock information - saveDocument can only be
-					// called if
-					// there is a lock or if it's a new document
-					String lockedBy = toSave.getLockedBy();
-					Date lockedUntil = toSave.getLockedUntil();
-
-					// Get the client's ID
-					String identity = clientID;
-
-					// Check that the person trying to save has the lock and
-					// that
-					// the lock hasn't expired
-					if (lockedBy != null
-							&& lockedBy.equals(identity)
-							&& lockedUntil.after(new Date(System
-									.currentTimeMillis()))) {
-						// If both are fulfilled, update and unlock the doc
-						toSave.update(doc);
-						// toSave.unlock();
-
-					} else {
-						// Set to null to prevent the token from being returned
-						stringKey = null;
-
-						// Otherwise, throw an exception
-						throw new LockExpired();
-					}
+					// Otherwise, throw an exception
+					throw new LockExpired();
 				}
+			}
 
-				// Now write the results to Datastore
-				pm.makePersistent(toSave);
+			// Now write the results to Datastore
+			pm.makePersistent(toSave);
 
-				// ...Ending transaction
-				t.commit();
+			// ...Ending transaction
+			t.commit();
 
-				// Return the unlocked document (also breaks)
-				return toSave.getUnlockedDoc();
-			} catch (ConcurrentModificationException e) {
-				// Don't throw exception until failed for x number of times.
-				if (retries == 0) {
-					throw e;
-				}
-				retries--;
-			} finally {
-				// Do some cleanup
-				if (t.isActive()) {
-					t.rollback();
-				}
+			// Return the unlocked document
+			return toSave.getUnlockedDoc();
+		} finally {
+			// Do some cleanup
+			if (t.isActive()) {
+				t.rollback();
+			}
 
-				pm.close();
+			pm.close();
 
-				// Now, take the token back - even if there was a concurrent
-				// modification exception or some other exception besides
-				// LockExpired.
-				if (stringKey != null) {
-					receiveToken(clientID, stringKey);
-				}
+			// Now, take the token back - even if there was a concurrent
+			// modification exception or some other exception besides
+			// LockExpired.
+			if (stringKey != null) {
+				receiveToken(clientID, stringKey);
 			}
 		}
 	}
@@ -288,44 +295,30 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 *            The doc to add
 	 */
 	private void addLockedDoc(String docKey) {
-		// Number of times to retry before throwing a concurrent exception error
-		int retries = TRANSACTION_ATTEMPTS;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 
-		while (true) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			Transaction t = pm.currentTransaction();
-
+		Transaction t = pm.currentTransaction();
+		try {
+			t.begin();
+			LockedDocuments lockedDocs;
 			try {
-				t.begin();
-				LockedDocuments lockedDocs;
-				try {
-					// Try to retrieve the locked document collection
-					lockedDocs = pm.getObjectById(LockedDocuments.class,
-							lockListKey);
-				} catch (JDOObjectNotFoundException ex) {
-					// If you can't find it, make a new one
-					lockedDocs = new LockedDocuments();
-				}
-				// Add the documen to the queue
-				lockedDocs.addDocument(docKey);
-				pm.makePersistent(lockedDocs);
-				t.commit();
-
-				// if got here it means transaction succeeded, breaking the
-				// loop.
-				return;
-			} catch (ConcurrentModificationException e) {
-				if (retries == 0) {
-					throw e;
-				}
-				retries--;
-			} finally {
-				if (t.isActive()) {
-					t.rollback();
-				}
-
-				pm.close();
+				// Try to retrieve the locked document collection
+				lockedDocs = pm.getObjectById(LockedDocuments.class,
+						lockListKey);
+			} catch (JDOObjectNotFoundException ex) {
+				// If you can't find it, make a new one
+				lockedDocs = new LockedDocuments();
 			}
+			// Add the documen to the queue
+			lockedDocs.addDocument(docKey);
+			pm.makePersistent(lockedDocs);
+			t.commit();
+		} finally {
+			if (t.isActive()) {
+				t.rollback();
+			}
+
+			pm.close();
 		}
 	}
 
@@ -337,44 +330,30 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 *            The doc to remove
 	 */
 	private void rmLockedDoc(String docKey) {
-		// Number of times to retry before throwing a concurrent exception error
-		int retries = TRANSACTION_ATTEMPTS;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 
-		while (true) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			Transaction t = pm.currentTransaction();
+		Transaction t = pm.currentTransaction();
+		try {
+			t.begin();
+			LockedDocuments lockedDocs;
 			try {
-				t.begin();
-				LockedDocuments lockedDocs;
-				try {
-					// Get the locked document collection
-					lockedDocs = pm.getObjectById(LockedDocuments.class,
-							lockListKey);
-				} catch (JDOObjectNotFoundException ex) {
-					// If none exists, create a new one
-					lockedDocs = new LockedDocuments();
-				}
-				// Remove the document from this queue
-				lockedDocs.removeDocument(docKey);
-				pm.makePersistent(lockedDocs);
-				t.commit();
-				// if got here it means transaction succeeded, breaking the
-				// loop.
-				return;
-			} catch (ConcurrentModificationException e) {
-				if (retries == 0) {
-					throw e;
-				}
-				retries--;
+				// Get the locked document collection
+				lockedDocs = pm.getObjectById(LockedDocuments.class,
+						lockListKey);
+			} catch (JDOObjectNotFoundException ex) {
+				// If none exists, create a new one
+				lockedDocs = new LockedDocuments();
+			}
+			// Remove the document from this queue
+			lockedDocs.removeDocument(docKey);
+			pm.makePersistent(lockedDocs);
+			t.commit();
+		} finally {
+			if (t.isActive()) {
+				t.rollback();
 			}
 
-			finally {
-				if (t.isActive()) {
-					t.rollback();
-				}
-
-				pm.close();
-			}
+			pm.close();
 		}
 	}
 
@@ -389,67 +368,54 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	private void receiveToken(String clientID, String docKey) {
 
-		// Number of times to retry before throwing a concurrent exception error
-		int retries = TRANSACTION_ATTEMPTS;
-
+		// Get the persistence manager
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Document toSave;
 		String newClientID = null;
 
-		while (true) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			Transaction t = pm.currentTransaction();
+		Transaction t = pm.currentTransaction();
 
-			try {
-				// Starting transaction...
-				t.begin();
-				// Create the key
-				Key key = KeyFactory.stringToKey(docKey);
+		try {
+			// Starting transaction...
+			t.begin();
+			// Create the key
+			Key key = KeyFactory.stringToKey(docKey);
 
-				// Get the document corresponding to the key
-				toSave = pm.getObjectById(Document.class, key);
+			// Get the document corresponding to the key
+			toSave = pm.getObjectById(Document.class, key);
 
-				// Set next client if there's a queue
-				newClientID = toSave.pollNextClient();
+			// Set next client if there's a queue
+			newClientID = toSave.pollNextClient();
 
-				toSave.unlock();
+			toSave.unlock();
 
-				pm.makePersistent(toSave);
+			pm.makePersistent(toSave);
 
-				// Add the dockey to the client as well
-				Client client = pm.getObjectById(Client.class, clientID);
-				client.rmDoc(docKey);
-				pm.makePersistent(client);
+			// Add the dockey to the client as well
+			Client client = pm.getObjectById(Client.class, clientID);
+			client.rmDoc(docKey);
+			pm.makePersistent(client);
 
-				t.commit();
-				// if got here it means transaction succeeded, breaking the
-				// loop.
-				return;
-			} catch (ConcurrentModificationException e) {
-				if (retries == 0) {
-					throw e;
-				}
-				retries--;
+			t.commit();
+		} finally {
+			// Do some cleanup
+			if (t.isActive()) {
+				t.rollback();
 			}
 
-			finally {
-				// Do some cleanup
-				if (t.isActive()) {
-					t.rollback();
-				}
+			pm.close();
 
-				pm.close();
+			// Now, try to send a token if we can
+			if (newClientID != null) {
+				sendToken(newClientID, docKey);
+			}
 
-				// Now, try to send a token if we can
-				if (newClientID != null) {
-					sendToken(newClientID, docKey);
-				}
-
-				// Otherwise remove the document from locked documents.
-				else {
-					rmLockedDoc(docKey);
-				}
+			// Otherwise remove the document from locked documents.
+			else {
+				rmLockedDoc(docKey);
 			}
 		}
+
 	}
 
 	/**
@@ -463,59 +429,46 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	private void sendToken(String clientID, String docKey) {
 
 		// Add to list of locked documents if not already in there
+		// Now, let's lock the document
+		// Get the PM
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		Document toSave;
 		Date endTime;
 
-		// Number of times to retry before throwing a concurrent exception error
-		int retries = TRANSACTION_ATTEMPTS;
-		while (true) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			// Create the transaction
-			Transaction t = pm.currentTransaction();
-			try {
-				// Starting transaction...
-				t.begin();
+		// Create the transaction
+		Transaction t = pm.currentTransaction();
+		try {
+			// Starting transaction...
+			t.begin();
 
-				// Create the key
-				Key key = KeyFactory.stringToKey(docKey);
+			// Create the key
+			Key key = KeyFactory.stringToKey(docKey);
 
-				// Get the document corresponding to the key
-				toSave = pm.getObjectById(Document.class, key);
-				endTime = new Date(System.currentTimeMillis() + LOCK_TIME
-						* 1000);
-				toSave.lock(endTime, clientID);
+			// Get the document corresponding to the key
+			toSave = pm.getObjectById(Document.class, key);
+			endTime = new Date(System.currentTimeMillis() + LOCK_TIME * 1000);
+			toSave.lock(endTime, clientID);
 
-				// Add key to locked documents (will only get added if it isn't
-				// already there)
-				pm.makePersistent(toSave);
+			// Add key to locked documents (will only get added if it isn't
+			// already there)
+			pm.makePersistent(toSave);
 
-				// End the transaction
-				t.commit();
+			// End the transaction
+			t.commit();
 
-				// Finally, inform the client that the doc is locked and ready
-				// for
-				// them
-				getChannelService().sendMessage(
-						new ChannelMessage(clientID, docKey));
-
-				// if got here it means transaction succeeded, breaking the
-				// loop.
-				break;
-
-			} catch (ConcurrentModificationException e) {
-				if (retries == 0) {
-					throw e;
-				}
-				retries--;
-			} finally {
-				// Do some cleanup
-				if (t.isActive()) {
-					t.rollback();
-				}
-				pm.close();
+			// Finally, inform the client that the doc is locked and ready for
+			// them
+			getChannelService().sendMessage(
+					new ChannelMessage(clientID, docKey));
+		} finally {
+			// Do some cleanup
+			if (t.isActive()) {
+				t.rollback();
 			}
+			pm.close();
 		}
+
 	}
 
 	/**
@@ -527,69 +480,54 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public void releaseLock(String clientID, LockedDocument doc)
 			throws LockExpired {
+		// Get the PM
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 
-		// Number of times to retry before throwing a concurrent exception error
-		int retries = TRANSACTION_ATTEMPTS;
+		Transaction t = pm.currentTransaction();
+		try {
+			// Starting transaction...
+			t.begin();
 
-		while (true) {
-			// Get the PM
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			Transaction t = pm.currentTransaction();
-			try {
-				// Starting transaction...
-				t.begin();
+			// Get the doc's key
+			Key key = KeyFactory.stringToKey(doc.getKey());
 
-				// Get the doc's key
-				Key key = KeyFactory.stringToKey(doc.getKey());
+			// Use the key to retrieve the doc
+			Document toSave = pm.getObjectById(Document.class, key);
 
-				// Use the key to retrieve the doc
-				Document toSave = pm.getObjectById(Document.class, key);
+			// Get the lock information - saveDocument can only be called if
+			// there is a lock or if it's a new document
+			String lockedBy = toSave.getLockedBy();
 
-				// Get the lock information - saveDocument can only be called if
-				// there is a lock or if it's a new document
-				String lockedBy = toSave.getLockedBy();
+			// Get the client's identity
+			String identity = clientID;
 
-				// Get the client's identity
-				String identity = clientID;
+			// Make sure that the person unlocking is the person who locked the
+			// doc.
+			if (lockedBy != null && lockedBy.equals(identity)) {
+				// Unlock it
+				toSave.unlock();
 
-				// Make sure that the person unlocking is the person who locked
-				// the
-				// doc.
-				if (lockedBy != null && lockedBy.equals(identity)) {
-					// Unlock it
-					toSave.unlock();
+				// And store it in the Datastore
+				pm.makePersistent(toSave);
 
-					// And store it in the Datastore
-					pm.makePersistent(toSave);
+			} else {
+				// Otherwise, throw an exception
+				throw new LockExpired("You no longer have the lock");
 
-				} else {
-					// Otherwise, throw an exception
-					throw new LockExpired("You no longer have the lock");
-
-				}
-
-				// ...Ending transaction
-				t.commit();
-
-				// Indicate that the token has been returned
-				receiveToken(clientID, doc.getKey());
-
-				// if got here it means transaction succeeded, breaking the
-				// loop.
-				break;
-
-			} catch (ConcurrentModificationException e) {
-				if (retries == 0) {
-					throw e;
-				}
-				retries--;
-			} finally {
-				// Do some cleanup
-				if (t.isActive()) {
-					t.rollback();
-				}
-				pm.close();
 			}
+
+			// ...Ending transaction
+			t.commit();
+
+			// Indicate that the token has been returned
+			receiveToken(clientID, doc.getKey());
+
+		} finally {
+			// Do some cleanup
+			if (t.isActive()) {
+				t.rollback();
+			}
+			pm.close();
 		}
 	}
 
@@ -604,66 +542,43 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Handle the case where the token map doesn't have the docKey - no
 		// client has tried to access it yet
 
-		//PersistenceManager pm = PMF.get().getPersistenceManager();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Document toSave = null;
+		Client client = pm.getObjectById(Client.class, clientID);
+		Transaction t = pm.currentTransaction();
 
+		try {
+			// Starting transaction...
+			t.begin();
+			// Create the key
+			Key key = KeyFactory.stringToKey(docKey);
 
-//		pm.close();
-		// Number of times to retry before throwing a concurrent exception error
-		int retries = TRANSACTION_ATTEMPTS;
-		while (true) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			
-			Transaction t = pm.currentTransaction();
-			
-			try {
-				// Starting transaction...
-				t.begin();
-				
-				Client client = pm.getObjectById(Client.class, clientID);
-				
-				// Create the key
-				Key key = KeyFactory.stringToKey(docKey);
-
-				// Get the document corresponding to the key
-				toSave = pm.getObjectById(Document.class, key);
-				if (toSave.isLocked()) {
-					System.out.println("locked");
-					toSave.addToWaitingList(clientID);
-				}
-
-				client.addDoc(docKey);
-				addLockedDoc(docKey);
-
-				pm.makePersistent(client);
-				pm.makePersistent(toSave);
-
-				t.commit();
-
-				// if got here it means transaction succeeded, breaking the
-				// loop.
-				return;
-
-			} catch (ConcurrentModificationException e) {
-				if (retries == 0) {
-					throw e;
-				}
-				retries--;
+			// Get the document corresponding to the key
+			toSave = pm.getObjectById(Document.class, key);
+			if (toSave.isLocked()) {
+				System.out.println("locked");
+				toSave.addToWaitingList(clientID);
 			}
 
-			finally {
-				// Do some cleanup
-				if (t.isActive()) {
-					t.rollback();
-				}
+			client.addDoc(docKey);
+			addLockedDoc(docKey);
 
-				pm.close();
+			pm.makePersistent(client);
+			pm.makePersistent(toSave);
 
-				// UGH I have to put this here b/c sendToken can't go in a
-				// transaction >.> I'm sorry...
-				if (!toSave.isLocked()) {
-					sendToken(clientID, docKey);
-				}
+			t.commit();
+		} finally {
+			// Do some cleanup
+			if (t.isActive()) {
+				t.rollback();
+			}
+
+			pm.close();
+
+			// UGH I have to put this here b/c sendToken can't go in a
+			// transaction >.> I'm sorry...
+			if (!toSave.isLocked()) {
+				sendToken(clientID, docKey);
 			}
 		}
 	}
@@ -705,50 +620,41 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public LockedDocument getLockedDocument(String clientID, String documentKey)
 			throws LockUnavailable {
+		// Get the PM
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 
-		// Number of times to retry before throwing a concurrent exception error
-		int retries = TRANSACTION_ATTEMPTS;
-		while (true) {
-			// Get the PM
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			Transaction t = pm.currentTransaction();
-			try {
-				// Starting transaction...
-				t.begin();
+		Transaction t = pm.currentTransaction();
+		try {
+			// Starting transaction...
+			t.begin();
 
-				// Create the key
-				Key key = KeyFactory.stringToKey(documentKey);
+			// Create the key
+			Key key = KeyFactory.stringToKey(documentKey);
 
-				// Get the document from the Datastore
-				Document toSave = pm.getObjectById(Document.class, key);
+			// Get the document from the Datastore
+			Document toSave = pm.getObjectById(Document.class, key);
 
-				String identity = clientID;
+			String identity = clientID;
 
-				// If the doc is locked and you own it...
-				if (!toSave.isLocked()
-						|| !toSave.getLockedBy().equals(identity)
-						|| toSave.getLockedUntil().before(
-								new Date(System.currentTimeMillis()))) {
-					throw new LockUnavailable("This lock is not yours");
-				}
-
-				// ...Ending transaction
-				t.commit();
-
-				// Return the locked document and break the loop
-				return toSave.getLockedDoc();
-			} catch (ConcurrentModificationException e) {
-				if (retries == 0) {
-					throw e;
-				}
-				retries--;
-			} finally {
-				// Do some cleanup
-				if (t.isActive()) {
-					t.rollback();
-				}
-				pm.close();
+			// If the doc is locked and you own it...
+			if (!toSave.isLocked()
+					|| !toSave.getLockedBy().equals(identity)
+					|| toSave.getLockedUntil().before(
+							new Date(System.currentTimeMillis()))) {
+				throw new LockUnavailable("This lock is not yours");
 			}
+
+			// ...Ending transaction
+			t.commit();
+
+			// Return the locked document
+			return toSave.getLockedDoc();
+		} finally {
+			// Do some cleanup
+			if (t.isActive()) {
+				t.rollback();
+			}
+			pm.close();
 		}
 	}
 
@@ -762,54 +668,43 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	 */
 	@Override
 	public void leaveLockQueue(String clientID, String documentKey) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Document toSave = null;
 
-		// Number of times to retry before throwing a concurrent exception error
-		int retries = TRANSACTION_ATTEMPTS;
-		while (true) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			Transaction t = pm.currentTransaction();
+		Transaction t = pm.currentTransaction();
 
-			try {
-				// Starting transaction...
-				t.begin();
-				// Create the key
-				Key key = KeyFactory.stringToKey(documentKey);
+		try {
+			// Starting transaction...
+			t.begin();
+			// Create the key
+			Key key = KeyFactory.stringToKey(documentKey);
 
-				// Get the document corresponding to the key
-				toSave = pm.getObjectById(Document.class, key);
-				toSave.removeClient(clientID);
+			// Get the document corresponding to the key
+			toSave = pm.getObjectById(Document.class, key);
+			toSave.removeClient(clientID);
 
-				pm.makePersistent(toSave);
+			pm.makePersistent(toSave);
 
-				t.commit();
+			t.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("lock queue error");
+		} finally {
 
-				// if got here it means transaction succeeded, breaking the
-				// loop.
-				return;
+			// Do some cleanup
+			if (t.isActive()) {
+				System.out.println("lock queue rollback");
+				t.rollback();
+			}
 
-			} catch (Exception e) {
-				if (retries == 0) {
-					e.printStackTrace();
-					System.out.println("lock queue error");
-				}
-				retries--;
-			} finally {
+			pm.close();
 
-				// Do some cleanup
-				if (t.isActive()) {
-					System.out.println("lock queue rollback");
-					t.rollback();
-				}
-
-				pm.close();
-
-				// If neccessary, return the token
-				if (toSave != null && toSave.getLockedBy().equals(clientID)) {
-					receiveToken(clientID, documentKey);
-				}
+			// If neccessary, return the token
+			if (toSave != null && toSave.getLockedBy().equals(clientID)) {
+				receiveToken(clientID, documentKey);
 			}
 		}
+
 	}
 
 	/*
@@ -827,7 +722,6 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Read all document keys the client has not finished with (queue + use)
 		List<String> docKeys = pm.getObjectById(Client.class, clientID)
 				.getLockedDocs();
-
 		pm.close();
 
 		// Remove from all these entities
@@ -835,37 +729,25 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 			leaveLockQueue(clientID, docKey);
 		}
 
-		// Number of times to retry before throwing a concurrent exception error
-		int retries = TRANSACTION_ATTEMPTS;
-		while (true) {
-			pm = PMF.get().getPersistenceManager();
-			Transaction t = pm.currentTransaction();
-			try {
-				t.begin();
+		// Finally delete the client
+		pm = PMF.get().getPersistenceManager();
+		Transaction t = pm.currentTransaction();
+		try {
+			t.begin();
 
-				// Get the client
-				Client client = pm.getObjectById(Client.class, clientID);
+			// Get the client
+			Client client = pm.getObjectById(Client.class, clientID);
 
-				// Delete the client
-				pm.deletePersistent(client);
+			// Delete the client
+			pm.deletePersistent(client);
 
-				t.commit();
-
-				// if got here it means transaction succeeded, breaking the
-				// loop.
-				return;
-			} catch (ConcurrentModificationException e) {
-				if (retries == 0) {
-					throw e;
-				}
-				retries--;
-			} finally {
-				if (t.isActive()) {
-					t.rollback();
-				}
-
-				pm.close();
+			t.commit();
+		} finally {
+			if (t.isActive()) {
+				t.rollback();
 			}
+
+			pm.close();
 		}
 	}
 }
