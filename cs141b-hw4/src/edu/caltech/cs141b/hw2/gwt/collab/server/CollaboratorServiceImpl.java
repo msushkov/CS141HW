@@ -198,6 +198,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		String stringKey = doc.getKey();
 
 		while (true) {
+			pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 			try {
 				// Starting transaction...
@@ -291,6 +292,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		while (true) {
+			pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 
 			try {
@@ -341,7 +343,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		while (true) {
-
+			pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 			try {
 				t.begin();
@@ -398,6 +400,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		String newClientID = null;
 
 		while (true) {
+			pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 
 			try {
@@ -474,7 +477,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 		while (true) {
-
+			pm = PMF.get().getPersistenceManager();
 			// Create the transaction
 			Transaction t = pm.currentTransaction();
 			try {
@@ -531,12 +534,14 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public void releaseLock(String clientID, LockedDocument doc)
 			throws LockExpired {
-		// Get the PM
-		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
+		// Get the PM
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+
 		while (true) {
+			pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 			try {
 				// Starting transaction...
@@ -614,8 +619,8 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 		while (true) {
+			pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
-
 			try {
 				// Starting transaction...
 				t.begin();
@@ -708,6 +713,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 		while (true) {
+			pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 			try {
 				// Starting transaction...
@@ -765,6 +771,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 		while (true) {
+			pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 
 			try {
@@ -838,6 +845,7 @@ public class CollaboratorServiceImpl extends RemoteServiceServlet implements
 		// Number of times to retry before throwing a concurrent exception error
 		int retries = TRANSACTION_ATTEMPTS;
 		while (true) {
+			pm = PMF.get().getPersistenceManager();
 			Transaction t = pm.currentTransaction();
 			try {
 				t.begin();
